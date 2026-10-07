@@ -378,6 +378,10 @@ html[lang="ru"] .hero-name {
   min-height: 240px;
 }
 
+@media (max-width: 760px) {
+  .hero-stage { display: none; }
+}
+
 @media (min-width: 1024px) {
   .hero-stage { height: min(68vh, 620px); }
 }

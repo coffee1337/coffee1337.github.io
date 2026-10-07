@@ -2,15 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { useSite } from "../../context/site";
 import { useMagnetic } from "../../hooks/useMotion";
 import { NeuralOrb } from "../NeuralOrb/NeuralOrb";
-import { NeuralMark } from "../Brand/NeuralMark";
 
 export function Hero() {
-  const { dict, reduced, loaderDone, lowPower } = useSite();
+  const { dict, reduced, loaderDone } = useSite();
   const exploreRef = useMagnetic<HTMLAnchorElement>();
   const root = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [orbLive, setOrbLive] = useState(true);
-  const showOrb = !lowPower || !window.matchMedia("(max-width: 760px)").matches;
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 760px)").matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 760px)");
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const el = root.current;
@@ -49,7 +55,7 @@ export function Hero() {
 
   return (
     <section id="top" data-section="top" ref={root} className="section-anchor relative flex min-h-[100svh] items-end pb-16 pt-28 md:items-center md:pb-0">
-      {showOrb && orbLive && <NeuralOrb stageRef={stageRef} />}
+      {!isMobile && orbLive && <NeuralOrb stageRef={stageRef} />}
       <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(240px,0.9fr)]">
         <div className="min-w-0">
           <p data-fade className="kicker">{dict.hero.label}</p>
@@ -76,7 +82,6 @@ export function Hero() {
           </p>
         </div>
         <div ref={stageRef} className="hero-stage" aria-hidden>
-          {!showOrb && <NeuralMark className="h-48 w-48 text-[var(--text)]" />}
           <p className="mono absolute bottom-2 right-2 text-[10px] text-[var(--faint)]">CORE / ONLINE</p>
         </div>
       </div>
