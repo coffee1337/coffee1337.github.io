@@ -1,42 +1,63 @@
-# Personal Portfolio
+# Egor Trefilov — Portfolio
 
-Personal developer portfolio of **Egor Trefilov / Coffee1337**.
+Personal site of **Egor Trefilov / Coffee1337**, Python Backend & AI Automation Developer.
 
-The website presents my main projects and experience in Python backend development, AI integrations and automation.
-
-## Live
-
-https://coffee1337.github.io
+Live: https://coffee1337.github.io
 
 ## Stack
 
+- React 19
 - TypeScript
 - Vite
 - Tailwind CSS
-- GitHub Pages
+- GSAP (scroll reveals)
+- Lenis (smooth scroll, disabled for reduced motion)
+- Three.js (Neural Orb, dynamically imported)
 
-## Featured projects
+Static build only. GitHub Pages via `gh-pages`.
 
-- AI Python Mentor — FastAPI / PostgreSQL / Next.js / RAG
-- NGIE University App — Flutter / Riverpod / SQLite / WidgetKit
-- TransactionMonitor — C# / .NET 8 / WinUI 3 / SQL Server
-- K-Nearest Neighbors — C++17 / CMake / WinAPI
-
-## Development
+## Scripts
 
 ```bash
 npm install
 npm run dev
-```
-
-Production build:
-
-```bash
 npm run build
+npm run deploy
 ```
+
+`npm run deploy` publishes `dist` to the `gh-pages` branch. Vite `base` is `/` because this is a user site (`coffee1337.github.io`).
+
+## Structure
+
+```text
+src/
+  components/   Header, Loader, NeuralOrb, Hero, About, Experience,
+                Projects, Stack, Resume, Education, Contact, Footer
+  content/      en.ts, ru.ts, projects.ts
+  context/      theme, language, orb mode
+  hooks/        reveal, magnetic, Lenis
+  styles/       design tokens + global CSS
+  three/        Neural Orb scene
+public/
+  brand/mark.svg
+  favicon.svg, favicon-16.png, favicon-32.png, apple-touch-icon.png
+  og.png
+  projects/
+    ai-python-mentor/      optional future media only — case studies use drawn visuals
+    ngieu/
+    transaction-monitor/
+    neural-astar/
+    knn/
+```
+
+## Themes and language
+
+Dark and light tokens live in `src/styles/tokens.css`. The choice is stored in `localStorage` (`et-theme`, `et-lang`) and follows the system on the first visit.
+
+## Project visuals
+
+Case studies use drawn technical illustrations, not screenshots. The language lives in `src/components/Projects/ProjectVisual.tsx`.
 
 ## Author
 
-**Egor Trefilov / Coffee1337**
-
-GitHub: https://github.com/Coffee1337
+Egor Trefilov — https://github.com/coffee1337

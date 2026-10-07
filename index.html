@@ -2,38 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Egor Trefilov — Python Backend & AI Automation Developer</title>
     <meta
       name="description"
-      content="Egor Trefilov — Python Backend & AI Automation Developer. FastAPI, PostgreSQL, Docker, AI/LLM integrations."
-    />  
-    <meta
-      name="keywords"
-      content="Python, FastAPI, Backend, AI, LLM, PostgreSQL, Docker, Developer, Egor Trefilov"
-    />  
-    <meta name="author" content="Egor Trefilov" />  
-    <meta property="og:title" content="Egor Trefilov — Backend & AI Developer" />
+      content="Portfolio of Egor Trefilov — Python Backend & AI Automation Developer building backend systems, AI-powered applications and automation tools."
+    />
+    <meta name="author" content="Egor Trefilov" />
+    <meta name="theme-color" content="#0B0B0C" />
+    <link rel="canonical" href="https://coffee1337.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:site_name" content="Egor Trefilov" />
+    <meta property="og:title" content="Egor Trefilov — Python Backend & AI Automation Developer" />
     <meta
       property="og:description"
-      content="Backend systems, AI-powered applications and automation."
+      content="Portfolio of Egor Trefilov — Python Backend & AI Automation Developer building backend systems, AI-powered applications and automation tools."
     />
-    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://coffee1337.github.io/" />
+    <meta property="og:image" content="https://coffee1337.github.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Egor Trefilov — Python Backend & AI Automation Developer" />
     <meta
-      property="og:url"
-      content="https://coffee1337.github.io"
+      name="twitter:description"
+      content="Portfolio of Egor Trefilov — Python Backend & AI Automation Developer building backend systems, AI-powered applications and automation tools."
     />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
-    <title>Egor Trefilov — Backend & AI Developer</title>
+    <meta name="twitter:image" content="https://coffee1337.github.io/og.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Egor Trefilov",
+        "jobTitle": "Python Backend & AI Automation Developer",
+        "url": "https://coffee1337.github.io/",
+        "email": "mailto:trefilovegor84@gmail.com",
+        "sameAs": [
+          "https://github.com/coffee1337",
+          "https://www.linkedin.com/in/coffee1337"
+        ]
+      }
+    </script>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("et-theme");
+          var theme = t === "light" || t === "dark" ? t : (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+          document.documentElement.dataset.theme = theme;
+          var lang = localStorage.getItem("et-lang");
+          if (lang === "ru" || lang === "en") document.documentElement.lang = lang;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
