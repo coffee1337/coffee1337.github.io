@@ -5,6 +5,7 @@ import { NotFound } from "./components/NotFound";
 import { ProjectPage } from "./components/Projects/ProjectPage";
 import { SiteProvider } from "./context/SiteProvider";
 import type { Lang } from "./content";
+import { initAnalytics } from "./analytics";
 import "./styles/global.css";
 
 interface ClientRoute {
@@ -25,6 +26,7 @@ function parseRoute(): ClientRoute {
 }
 
 const route = parseRoute();
+initAnalytics();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

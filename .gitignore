@@ -24,4 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# local env / analytics beacon config
+.env
+.env.local
+.env.*.local
+
 dist-ssr

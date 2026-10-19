@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { dictionaries, type Lang } from "../content";
 import { SiteContext, type OrbMode, type RouteInfo, type Theme } from "./site";
+import { trackEvent } from "../analytics";
 
 const THEME_KEY = "et-theme";
 const hasWindow = typeof window !== "undefined";
@@ -64,6 +65,7 @@ export function SiteProvider({
       target = clean.replace(/^\/ru(?=\/|$)/, "") || "/";
     }
     if (target !== "/" && !target.endsWith("/")) target += "/";
+    if (to !== lang) trackEvent("lang_switch", { to });
     window.location.assign(target);
   };
 
