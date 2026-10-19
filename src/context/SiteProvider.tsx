@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { dictionaries, type Lang } from "../content";
-import { SiteContext, type OrbMode, type Theme } from "./site";
+import { SiteContext, type OrbMode, type RouteInfo, type Theme } from "./site";
 
 const THEME_KEY = "et-theme";
-const LANG_KEY = "et-lang";
+const hasWindow = typeof window !== "undefined";
 
 export const SECTION_ORDER = [
   "top",
@@ -17,22 +17,28 @@ export const SECTION_ORDER = [
 ];
 
 function initialTheme(): Theme {
+  if (!hasWindow) return "dark";
   const stored = localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
 
-function initialLang(): Lang {
-  const stored = localStorage.getItem(LANG_KEY);
-  if (stored === "ru" || stored === "en") return stored;
-  return navigator.language.toLowerCase().startsWith("ru") ? "ru" : "en";
-}
-
-export function SiteProvider({ children }: { children: ReactNode }) {
+export function SiteProvider({
+  children,
+  initialLang = "en",
+  route = { kind: "home" },
+}: {
+  children: ReactNode;
+  initialLang?: Lang;
+  route?: RouteInfo;
+}) {
   const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [lang, setLangState] = useState<Lang>(initialLang);
-  const [reduced, setReduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [lang] = useState<Lang>(initialLang);
+  const [reduced, setReduced] = useState(
+    () => hasWindow && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
   const [lowPower] = useState(() => {
+    if (!hasWindow) return false;
     const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
     const cores = navigator.hardwareConcurrency ?? 8;
     const narrow = window.matchMedia("(max-width: 760px)").matches;
@@ -40,9 +46,26 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     return Boolean(saveData) || (mem !== undefined && mem <= 4) || cores <= 4 || narrow;
   });
   const [orbMode, setOrbMode] = useState<OrbMode>("assemble");
-  const [loaderDone, setLoaderDone] = useState(false);
+  // Project pages have no boot loader, so reveals and smooth scroll can start right away.
+  const [loaderDone, setLoaderDone] = useState(route.kind !== "home");
   const assembleRef = useRef(0.05);
   const [section, setSection] = useState("top");
+
+  const pathBase = lang === "ru" ? "/ru" : "";
+
+  /** Language lives in the URL ("/" vs "/ru/"), so switching is a navigation. */
+  const switchLang = (to: Lang) => {
+    if (!hasWindow || to === lang) return;
+    const clean = window.location.pathname.replace(/index\.html$/, "").replace(/\/+$/, "");
+    let target: string;
+    if (to === "ru") {
+      target = clean === "" ? "/ru/" : `/ru${clean}/`;
+    } else {
+      target = clean.replace(/^\/ru(?=\/|$)/, "") || "/";
+    }
+    if (target !== "/" && !target.endsWith("/")) target += "/";
+    window.location.assign(target);
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -51,12 +74,12 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    localStorage.setItem(LANG_KEY, lang);
+    if (route.kind !== "home") return;
     const dict = dictionaries[lang];
     document.title = dict.meta.title;
     const desc = document.querySelector('meta[name="description"]');
     if (desc) desc.setAttribute("content", dict.meta.description);
-  }, [lang]);
+  }, [lang, route.kind]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -68,7 +91,9 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       lang,
-      setLang: (next: Lang) => setLangState(next),
+      switchLang,
+      route,
+      pathBase,
       theme,
       toggleTheme: (origin?: { x: number; y: number }) => {
         const root = document.documentElement;
@@ -108,7 +133,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       setSection,
       sectionIndex: Math.max(0, SECTION_ORDER.indexOf(section === "education" ? "resume" : section)),
     }),
-    [lang, theme, reduced, lowPower, orbMode, loaderDone, section],
+    [lang, theme, reduced, lowPower, orbMode, loaderDone, section, route, pathBase],
   );
 
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;

@@ -214,6 +214,11 @@ const ru: Dictionary = {
       },
     ]),
   },
+  projectPage: {
+    open: "Кейс",
+    back: "Все проекты",
+    next: "Следующий проект",
+  },
   stack: {
     index: "05",
     label: "Технологии",

@@ -12,7 +12,7 @@ export const links = {
   telegram: "https://t.me/cooffeek1337",
   telegramHandle: "@cooffeek1337",
   resumeRepo: "https://github.com/coffee1337/resume",
-  resumePdf: "https://raw.githubusercontent.com/coffee1337/resume/main/Egor_Trefilov_Resume.pdf",
+  resumePdf: "/resume/Egor_Trefilov_Resume.pdf",
   site: "https://coffee1337.github.io",
 };
 

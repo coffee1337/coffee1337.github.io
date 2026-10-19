@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { SiteProvider } from "./context/SiteProvider";
 import { useSite } from "./context/site";
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { Header } from "./components/Header/Header";
@@ -34,7 +33,7 @@ function Shell() {
               setBooting(false);
               if (hash && hash !== "top") document.getElementById(hash)?.scrollIntoView({ block: "start" });
               else window.scrollTo(0, 0);
-            }, 480);
+            }, 200);
           }}
         />
       )}
@@ -56,9 +55,5 @@ function Shell() {
 }
 
 export function App() {
-  return (
-    <SiteProvider>
-      <Shell />
-    </SiteProvider>
-  );
+  return <Shell />;
 }

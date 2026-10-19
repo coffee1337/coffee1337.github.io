@@ -214,6 +214,11 @@ const en: Dictionary = {
       },
     ]),
   },
+  projectPage: {
+    open: "Case study",
+    back: "All projects",
+    next: "Next project",
+  },
   stack: {
     index: "05",
     label: "Technology",

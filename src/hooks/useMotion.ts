@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useSite } from "../context/site";
 
-const COARSE = window.matchMedia("(pointer: coarse)");
+const COARSE = typeof window !== "undefined" ? window.matchMedia("(pointer: coarse)") : null;
 
 export function useReveal<T extends HTMLElement>(options?: { y?: number; delay?: number; stagger?: number }) {
   const ref = useRef<T>(null);
@@ -63,7 +63,7 @@ export function useMagnetic<T extends HTMLElement>() {
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduced || COARSE.matches) return;
+    if (!el || reduced || (COARSE && COARSE.matches)) return;
     const onMove = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
       const x = e.clientX - (r.left + r.width / 2);

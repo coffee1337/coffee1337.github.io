@@ -79,6 +79,11 @@ export interface Dictionary {
     active: string;
     items: ProjectContent[];
   };
+  projectPage: {
+    open: string;
+    back: string;
+    next: string;
+  };
   stack: {
     index: string;
     label: string;

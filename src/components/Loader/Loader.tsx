@@ -8,8 +8,8 @@ export function Loader({ onDone }: { onDone: () => void }) {
   const { dict, reduced, setOrbMode, assembleRef } = useSite();
   const [progress, setProgress] = useState(0);
   const [leaving, setLeaving] = useState(false);
-  const seen = sessionStorage.getItem(VISIT_KEY) === "1";
-  const duration = reduced ? 260 : seen ? 800 : 1500;
+  const seen = typeof sessionStorage !== "undefined" && sessionStorage.getItem(VISIT_KEY) === "1";
+  const duration = reduced ? 160 : seen ? 300 : 600;
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
 
@@ -34,7 +34,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
       else {
         setLeaving(true);
         sessionStorage.setItem(VISIT_KEY, "1");
-        timeout = window.setTimeout(() => doneRef.current(), reduced ? 120 : 420);
+        timeout = window.setTimeout(() => doneRef.current(), reduced ? 120 : 180);
       }
     };
     raf = requestAnimationFrame(step);

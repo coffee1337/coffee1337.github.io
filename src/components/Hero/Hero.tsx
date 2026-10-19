@@ -9,7 +9,9 @@ export function Hero() {
   const root = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [orbLive, setOrbLive] = useState(true);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 760px)").matches);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window === "undefined" || window.matchMedia("(max-width: 760px)").matches,
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 760px)");

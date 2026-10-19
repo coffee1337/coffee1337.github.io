@@ -26,7 +26,7 @@ export function Projects() {
 }
 
 function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boolean }) {
-  const { dict } = useSite();
+  const { dict, pathBase } = useSite();
   const ref = useReveal<HTMLElement>({ stagger: 0.05 });
   const copy = dict.projects;
 
@@ -42,7 +42,11 @@ function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boo
             </span>
           )}
         </div>
-        <h3 data-reveal className="display mt-3 text-[clamp(2rem,3.6vw,3.6rem)]">{project.name}</h3>
+        <h3 data-reveal className="display mt-3 text-[clamp(2rem,3.6vw,3.6rem)]">
+          <a className="transition-colors hover:text-[var(--accent)]" href={`${pathBase}/projects/${project.id}/`}>
+            {project.name}
+          </a>
+        </h3>
         <p data-reveal className="mt-4 max-w-xl text-lg">{project.statement}</p>
         <div className="mt-8 space-y-5 text-[var(--muted)]">
           <p data-reveal><span className="kicker mr-3 text-[var(--text)]">{copy.purpose}</span>{project.purpose}</p>
@@ -58,10 +62,16 @@ function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boo
             <span key={t} className="chip">{t}</span>
           ))}
         </div>
-        <a data-reveal className="link-arrow mt-8" href={project.github} target="_blank" rel="noopener noreferrer">
-          {copy.github}
-          <span className="arr" aria-hidden>↗</span>
-        </a>
+        <div data-reveal className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a className="link-arrow" href={project.github} target="_blank" rel="noopener noreferrer">
+            {copy.github}
+            <span className="arr" aria-hidden>↗</span>
+          </a>
+          <a className="link-arrow" href={`${pathBase}/projects/${project.id}/`}>
+            {dict.projectPage.open}
+            <span className="arr" aria-hidden>→</span>
+          </a>
+        </div>
       </div>
       <div data-reveal className={`case-visual ${flipped ? "lg:order-1" : ""}`}>
         <ProjectVisual project={project} />

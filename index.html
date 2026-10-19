@@ -43,7 +43,6 @@
         "name": "Egor Trefilov",
         "jobTitle": "Python Backend & AI Automation Developer",
         "url": "https://coffee1337.github.io/",
-        "email": "mailto:trefilovegor84@gmail.com",
         "sameAs": [
           "https://github.com/coffee1337",
           "https://www.linkedin.com/in/coffee1337"
@@ -56,8 +55,7 @@
           var t = localStorage.getItem("et-theme");
           var theme = t === "light" || t === "dark" ? t : (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
           document.documentElement.dataset.theme = theme;
-          var lang = localStorage.getItem("et-lang");
-          if (lang === "ru" || lang === "en") document.documentElement.lang = lang;
+          document.documentElement.lang = location.pathname === "/ru" || location.pathname.startsWith("/ru/") ? "ru" : "en";
         } catch (e) {}
       })();
     </script>

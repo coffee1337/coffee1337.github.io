@@ -14,15 +14,19 @@ const links = [
 ] as const;
 
 export function Header() {
-  const { dict, lang, setLang, theme, toggleTheme, section, setSection } = useSite();
+  const { dict, lang, switchLang, theme, toggleTheme, section, setSection, pathBase, route } = useSite();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const labels = dict.nav;
   const { lockUntilSettled } = useScrollSpy();
+  const onHome = route.kind === "home";
+  /** On the home page anchors stay in-document; elsewhere they point back at the landing page. */
+  const href = (hash: string) => (onHome ? hash : `${pathBase}/${hash}`);
 
   const go = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (!onHome) return;
     setSection(id);
     lockUntilSettled();
     setOpen(false);
@@ -61,11 +65,11 @@ export function Header() {
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
-      <a href="#about" className="skip-link">
+      <a href={href("#about")} className="skip-link">
         {dict.a11y.skip}
       </a>
       <div className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
-        <a href="#top" className="brand-mark" onClick={(e) => go(e, "top")} aria-label="ET">
+        <a href={onHome ? "#top" : `${pathBase}/`} className="brand-mark" onClick={(e) => go(e, "top")} aria-label="ET">
           <NeuralMark className="brand-orb h-6 w-6" />
           <span className="display text-lg leading-none">ET</span>
         </a>
@@ -74,7 +78,7 @@ export function Header() {
           {links.map((l) => (
             <a
               key={l.href}
-              href={l.href}
+              href={href(l.href)}
               className="nav-link"
               aria-current={current === l.href.slice(1) ? "true" : undefined}
               onClick={(e) => go(e, l.href.slice(1))}
@@ -90,7 +94,7 @@ export function Header() {
               <button
                 key={code}
                 type="button"
-                onClick={() => setLang(code)}
+                onClick={() => switchLang(code)}
                 aria-pressed={lang === code}
                 className="mono rounded-full px-2 py-1 text-[10px]"
                 style={{
@@ -129,7 +133,7 @@ export function Header() {
             {links.map((l) => (
               <a
                 key={l.href}
-                href={l.href}
+                href={href(l.href)}
                 className="border-b border-[var(--line)] px-3 py-3 text-lg last:border-b-0"
                 aria-current={current === l.href.slice(1) ? "true" : undefined}
                 onClick={(e) => go(e, l.href.slice(1))}

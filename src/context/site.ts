@@ -4,9 +4,19 @@ import type { Dictionary, Lang } from "../content";
 export type Theme = "dark" | "light";
 export type OrbMode = "assemble" | "hero" | "exit";
 
+export type RouteKind = "home" | "project" | "notfound";
+
+export interface RouteInfo {
+  kind: RouteKind;
+  projectId?: string;
+}
+
 export interface SiteContextValue {
   lang: Lang;
-  setLang: (lang: Lang) => void;
+  switchLang: (to: Lang) => void;
+  route: RouteInfo;
+  /** "" for the english tree, "/ru" for the russian tree. */
+  pathBase: string;
   theme: Theme;
   toggleTheme: (origin?: { x: number; y: number }) => void;
   dict: Dictionary;
