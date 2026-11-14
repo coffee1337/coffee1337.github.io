@@ -249,6 +249,22 @@ const en: Dictionary = {
           "Desktop visualization",
         ],
       },
+      {
+        name: "portfolio-analytics",
+        statement: "A self-hosted analytics collector for this site: sessions, clicks, scroll depth, UTM.",
+        purpose: "See how the portfolio is actually read without handing visitor data to a third-party service.",
+        built:
+          "A JavaScript beacon posts events to a FastAPI collector, SQLAlchemy stores them in SQLite, and a dashboard reads the aggregates.",
+        highlights: [
+          "Session ids + ?me=1 flag",
+          "Click targets and section ids",
+          "Scroll depth",
+          "30s pings and exit dwell",
+          "UTM capture",
+          "FastAPI collector",
+          "SQLite via SQLAlchemy",
+        ],
+      },
     ]),
   },
   projectPage: {

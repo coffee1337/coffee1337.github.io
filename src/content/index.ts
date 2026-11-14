@@ -1,8 +1,12 @@
-import type { Dictionary, Lang } from "./types";
+import type { FullDictionary, Lang } from "./types";
 import en from "./en";
 import ru from "./ru";
+import { sections } from "./sections";
 
-export const dictionaries: Record<Lang, Dictionary> = { en, ru };
+export const dictionaries: Record<Lang, FullDictionary> = {
+  en: { ...en, sections: sections.en },
+  ru: { ...ru, sections: sections.ru },
+};
 
 export const links = {
   email: "trefilovegor84@gmail.com",
@@ -16,4 +20,4 @@ export const links = {
   site: "https://coffee1337.github.io",
 };
 
-export type { Dictionary, Lang, ProjectContent } from "./types";
+export type { Dictionary, FullDictionary, Lang, ProjectContent } from "./types";

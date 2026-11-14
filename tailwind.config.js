@@ -21,6 +21,7 @@ export default {
         display: ["var(--font-display)"],
         body: ["var(--font-body)"],
         mono: ["var(--font-mono)"],
+        pixel: ["Pixelify Sans", "var(--font-mono)"],
       },
     },
   },

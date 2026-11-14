@@ -1,5 +1,5 @@
 import { createContext, useContext, type MutableRefObject } from "react";
-import type { Dictionary, Lang } from "../content";
+import type { FullDictionary, Lang } from "../content";
 
 export type Theme = "dark" | "light";
 export type OrbMode = "assemble" | "hero" | "exit";
@@ -19,7 +19,7 @@ export interface SiteContextValue {
   pathBase: string;
   theme: Theme;
   toggleTheme: (origin?: { x: number; y: number }) => void;
-  dict: Dictionary;
+  dict: FullDictionary;
   reduced: boolean;
   lowPower: boolean;
   orbMode: OrbMode;

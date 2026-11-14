@@ -1,0 +1,14 @@
+name = "coffee1337-chat"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://coffee1337.github.io"
+LLM_MODEL = "gemini-2.0-flash"
+
+# kv namespace для rate limit: wrangler kv namespace create RATE_KV → вставить id
+# [[kv_namespaces]]
+# binding = "RATE_KV"
+# id = "<id>"
+
+# секреты: wrangler secret put LLM_API_KEY

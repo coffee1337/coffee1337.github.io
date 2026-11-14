@@ -12,7 +12,10 @@ else
   sed -n '1,6p' brigade/logs/parity.log | sed 's/^/       /'
 fi
 
-n=$(grep -rn "[А-Яа-я]" src/components --include='*.tsx' 2>/dev/null | grep -v '^\s*//' | wc -l | tr -d ' ')
+# кириллица допустима в комментариях и в fuzzy-ключах cmdk (value="…"), запрещена в видимом тексте
+n=$(grep -rn "[А-Яа-я]" src/components --include='*.tsx' 2>/dev/null \
+  | grep -vE ':\s*(//|/\*|\*)' \
+  | grep -v 'value=' | wc -l | tr -d ' ')
 [ "$n" -eq 0 ] && ok "нет кириллицы в компонентах" || bad "кириллица в компонентах: $n строк"
 
 n=$(grep -rho '^\$ .*' src/content 2>/dev/null | wc -l | tr -d ' ')

@@ -4,16 +4,16 @@ import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { Header } from "./components/Header/Header";
 import { Loader } from "./components/Loader/Loader";
 import { Hero } from "./components/Hero/Hero";
+import { Entry } from "./components/Entry/Entry";
 import { About } from "./components/About/About";
-import { Capabilities } from "./components/Capabilities/Capabilities";
-import { Experience } from "./components/Experience/Experience";
-import { Projects } from "./components/Projects/Projects";
 import { Stack } from "./components/Stack/Stack";
-import { Resume } from "./components/Resume/Resume";
-import { Education } from "./components/Education/Education";
+import { Projects } from "./components/Projects/Projects";
+import { Reviews } from "./components/Reviews/Reviews";
 import { Contact } from "./components/Contact/Contact";
+import { Resume } from "./components/Resume/Resume";
 import { Footer } from "./components/Footer/Footer";
 import { ScrollProgress } from "./components/Progress/ScrollProgress";
+import { Assistant } from "./components/Assistant/Assistant";
 
 function Shell() {
   const { loaderDone, setLoaderDone, setOrbMode } = useSite();
@@ -44,16 +44,16 @@ function Shell() {
       <Header />
       <main id="content">
         <Hero />
+        <Entry />
         <About />
-        <Capabilities />
-        <Experience />
-        <Projects />
         <Stack />
+        <Projects />
+        <Reviews />
         <Resume />
-        <Education />
         <Contact />
       </main>
       <Footer />
+      <Assistant />
     </>
   );
 }

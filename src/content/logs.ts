@@ -75,4 +75,30 @@ $ curl -s localhost:8000/v1/models
 $ git status --short
 $ ruff check --fix app
 $ python -m compileall app
+$ python -m pytest tests/ -q --maxfail=1
+....................................... 39 passed in 12.4s
+$ docker build -t mentor-api:latest .
+=> exporting to image  layers: 14  size: 214MB
+$ psql -c "select count(*) from documents;"
+ count
+-------
+ 1284
+$ python -m app.eval --suite faithfulness
+faithfulness=0.87  answer_relevancy=0.82  context_precision=0.79
+$ python -m scripts.reindex --since 24h
+[worker] 46 documents changed → 312 chunks upserted in 8.9s
+>>> model.generate("Explain RAG in one sentence.", max_tokens=64)
+"Retrieve relevant chunks, then let the model answer with them as context."
+$ docker compose logs -f worker | tail -5
+[celery] task rag.reindex[8f2c] succeeded in 4.21s
+>>> embeddings = model.encode(chunks[:32], normalize=True)
+embeddings.shape → (32, 384)  dtype=float32
+$ make lint test
+ruff check . ok  mypy app ok  39 tests ok
+$ python -m scripts.embed --batch 64 --model bge-small
+[embed] 1284/1284 chunks  1284 x 384  float32  12.8s
+$ curl -s -X POST localhost:8000/v1/chat -d '{"q":"knn cosine"}'
+stream=true  ttft=214ms  tokens=96
+$ alembic revision --autogenerate -m "add chunk metadata"
+Generating app/alembic/versions/c9d1_add_chunk_metadata.py ... done
 `.trim().split("\n");

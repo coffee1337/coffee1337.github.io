@@ -696,3 +696,59 @@ body::before {
   .progress-line span, .case-visual, .loader-screen { transition: none; }
   .case:hover .case-visual { transform: none; }
 }
+
+/* ── Проектные схемы (SVG): поток данных по связям ───────────────────────── */
+[data-flow="true"] .sv-flow {
+  animation: sv-dash 1.1s linear infinite;
+}
+@keyframes sv-dash {
+  to { stroke-dashoffset: -16; }
+}
+[data-flow="true"] .sv-cell {
+  animation: sv-cell 900ms ease-out both;
+}
+@keyframes sv-cell {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 0.65; transform: scale(1); }
+}
+[data-flow="true"] .sv-row {
+  animation: sv-row 2.4s ease-in-out infinite;
+}
+@keyframes sv-row {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+[data-flow="true"] .sv-bar {
+  animation: sv-bar 2.8s ease-in-out infinite;
+  transform-origin: bottom;
+}
+@keyframes sv-bar {
+  0%, 100% { transform: scaleY(0.7); }
+  50% { transform: scaleY(1.12); }
+}
+[data-flow="true"] .sv-needle {
+  animation: sv-needle 3.2s ease-in-out infinite;
+}
+@keyframes sv-needle {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(24deg); }
+}
+[data-flow="true"] .sv-packet {
+  animation: sv-packet 1.6s linear infinite;
+}
+@keyframes sv-packet {
+  0% { opacity: 0; transform: translateX(-120px); }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(124px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-flow] .sv-flow,
+  [data-flow] .sv-cell,
+  [data-flow] .sv-row,
+  [data-flow] .sv-bar,
+  [data-flow] .sv-needle,
+  [data-flow] .sv-packet {
+    animation: none !important;
+  }
+}

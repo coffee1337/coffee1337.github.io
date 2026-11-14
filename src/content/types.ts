@@ -1,5 +1,7 @@
 export type Lang = "en" | "ru";
 
+export type FullDictionary = Dictionary & { sections: Sections };
+
 export interface ProjectContent {
   id: string;
   name: string;
@@ -10,8 +12,70 @@ export interface ProjectContent {
   highlights: string[];
   stack: string[];
   github: string;
-  visual: "mentor" | "campus" | "ledger" | "search" | "neighbors";
+  visual: "mentor" | "campus" | "ledger" | "search" | "neighbors" | "analytics";
   image?: string;
+}
+
+export interface Sections {
+  entry: {
+    index: string;
+    label: string;
+    title: string;
+    cards: { id: "hire" | "freelance" | "code"; title: string; body: string; action: string }[];
+  };
+  educationCard: {
+    badge: string;
+    school: string;
+    program: string;
+    profile: string;
+    period: string;
+    chipsTitle: string;
+    chips: string[];
+    note: string;
+  };
+  reviews: { index: string; label: string; title: string; prev: string; next: string; empty: string };
+  contactForm: {
+    title: string;
+    name: string;
+    email: string;
+    topic: string;
+    topics: { hire: string; project: string; other: string };
+    message: string;
+    send: string;
+    sending: string;
+    success: string;
+    error: string;
+    privacy: string;
+    unavailable: string;
+    mailtoCta: string;
+  };
+  assistant: {
+    title: string;
+    online: string;
+    note: string;
+    placeholder: string;
+    send: string;
+    sources: string;
+    fallback: string;
+    open: string;
+    close: string;
+    chips: string[];
+  };
+  projectsUi: {
+    explorer: string;
+    filterAll: string;
+    details: string;
+    problem: string;
+    solution: string;
+    result: string;
+    clone: string;
+    caseStudy: string;
+    repo: string;
+    copy: string;
+    copied: string;
+    empty: string;
+    tabs: string;
+  };
 }
 
 export interface Dictionary {

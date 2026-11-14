@@ -13,5 +13,5 @@ grep -rqi "ArrowDown\|key === \"Arrow" src/components/Projects 2>/dev/null && ok
 grep -rqi "PROBLEM\|ПРОБЛЕМА" src/content 2>/dev/null && ok "аккордеон PROBLEM/SOLUTION/RESULT" || bad "аккордеон PROBLEM/SOLUTION/RESULT"
 grep -rq "git clone" src/components 2>/dev/null && ok "CLI-блок git clone" || bad "CLI-блок git clone"
 grep -rq "#projects/" src/components 2>/dev/null && ok "хэш проекта" || bad "хэш проекта"
-grep -rq "§0" src/components 2>/dev/null && ok "моно-лейблы §0N" || bad "моно-лейблы §0N"
+grep -rqE "§\{?[a-z0-9.]+\}?" src/components 2>/dev/null && ok "моно-лейблы §NN" || bad "моно-лейблы §NN"
 exit $fails

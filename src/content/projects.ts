@@ -41,6 +41,14 @@ export const projectMeta = [
     stack: ["C++17", "CMake", "WinAPI"],
     status: false,
   },
+  {
+    id: "portfolio-analytics",
+    visual: "analytics" as const,
+    image: undefined as string | undefined,
+    github: "https://github.com/coffee1337/portfolio-analytics",
+    stack: ["Python", "FastAPI", "SQLAlchemy", "SQLite", "JavaScript"],
+    status: false,
+  },
 ];
 
 export type ProjectCopy = Pick<ProjectContent, "name" | "statement" | "purpose" | "built" | "highlights" | "status">;
