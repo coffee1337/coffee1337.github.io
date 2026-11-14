@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "build": "node scripts/fetch-github.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "sync:resume": "curl -fsSL -o public/resume/Egor_Trefilov_Resume.pdf https://raw.githubusercontent.com/coffee1337/resume/main/Egor_Trefilov_Resume.pdf"

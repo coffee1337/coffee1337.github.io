@@ -42,17 +42,28 @@ export interface Dictionary {
     menu: string;
     close: string;
   };
-  loader: { forming: string };
+  loader: { forming: string; skip: string; lines: string[]; tokens: string[] };
   hero: {
     label: string;
     first: string;
     last: string;
     role: string;
+    headline: string;
     summary: string;
     explore: string;
     contact: string;
     available: string;
     locationNote: string;
+    status: string;
+    metricCommits: string;
+    metricRepos: string;
+    metricYear: string;
+    metricLangs: string;
+    linkEmail: string;
+    linkTelegram: string;
+    linkGithub: string;
+    linkLinkedin: string;
+    linkResume: string;
   };
   about: {
     index: string;

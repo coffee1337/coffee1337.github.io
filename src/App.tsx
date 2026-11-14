@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSite } from "./context/site";
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { Header } from "./components/Header/Header";
@@ -17,8 +17,12 @@ import { ScrollProgress } from "./components/Progress/ScrollProgress";
 
 function Shell() {
   const { loaderDone, setLoaderDone, setOrbMode } = useSite();
-  const [booting, setBooting] = useState(true);
+  const [booting, setBooting] = useState(false);
   useSmoothScroll(loaderDone);
+
+  useEffect(() => {
+    setBooting(true);
+  }, []);
 
   return (
     <>

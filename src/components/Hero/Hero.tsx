@@ -1,91 +1,164 @@
 import { useEffect, useRef, useState } from "react";
+import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useMagnetic } from "../../hooks/useMotion";
-import { NeuralOrb } from "../NeuralOrb/NeuralOrb";
+import { CopyButton } from "../CopyButton";
+import { ScrambleHeading } from "../Scramble/ScrambleHeading";
+import github from "../../generated/github.json";
+import { EmbeddingSpace } from "./EmbeddingSpace";
+import { HeroLogs } from "./HeroLogs";
+
+function moscowClock() {
+  return new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Europe/Moscow",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date());
+}
+
+function CountUp({ value }: { value: number }) {
+  const { reduced, loaderDone } = useSite();
+  const [shown, setShown] = useState(reduced ? value : 0);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (reduced || !loaderDone) {
+      setShown(value);
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      const start = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - start) / 900);
+        setShown(Math.round(value * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [loaderDone, reduced, value]);
+
+  return <span ref={ref}>{shown}</span>;
+}
 
 export function Hero() {
   const { dict, reduced, loaderDone } = useSite();
   const exploreRef = useMagnetic<HTMLAnchorElement>();
   const root = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [orbLive, setOrbLive] = useState(true);
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window === "undefined" || window.matchMedia("(max-width: 760px)").matches,
-  );
+  const [clock, setClock] = useState("--:--:--");
+  const [caretOn, setCaretOn] = useState(true);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 760px)");
-    const onChange = () => setIsMobile(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    setClock(moscowClock());
+    const id = window.setInterval(() => setClock(moscowClock()), 1000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setOrbLive(entry.isIntersecting),
-      { threshold: 0 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const el = root.current;
-    if (!el || !loaderDone || reduced) return;
-    let ctx: { revert: () => void } | undefined;
-    let dead = false;
-    void import("gsap").then(({ default: gsap }) => {
-      if (dead) return;
-      const lines = el.querySelectorAll<HTMLElement>("[data-line]");
-      const fades = el.querySelectorAll<HTMLElement>("[data-fade]");
-      gsap.set(lines, { yPercent: 110 });
-      gsap.set(fades, { opacity: 0, y: 14 });
-      ctx = gsap.context(() => {
-        gsap.to(lines, { yPercent: 0, duration: 1, ease: "power3.out", stagger: 0.06 });
-        gsap.to(fades, { opacity: 1, y: 0, duration: 0.7, delay: 0.28, stagger: 0.07 });
-      }, el);
-    });
-    return () => {
-      dead = true;
-      ctx?.revert();
-    };
+    if (!loaderDone || reduced) {
+      setCaretOn(true);
+      return;
+    }
+    let flashes = 0;
+    const id = window.setInterval(() => {
+      flashes += 1;
+      setCaretOn((on) => !on);
+      if (flashes >= 6) {
+        window.clearInterval(id);
+        setCaretOn(true);
+      }
+    }, 220);
+    return () => window.clearInterval(id);
   }, [loaderDone, reduced]);
 
-  const roleLines = dict.hero.role.split("\n");
+  const metrics = [
+    { value: github.commitsLastYear, label: dict.hero.metricCommits, href: links.github },
+    { value: github.publicRepos, label: dict.hero.metricRepos, href: links.github },
+    { value: 3, label: dict.hero.metricYear, href: "#about" },
+    { value: 6, label: dict.hero.metricLangs, href: "#projects" },
+  ];
+
+  const status = dict.hero.status.replace("{time}", clock);
 
   return (
-    <section id="top" data-section="top" ref={root} className="section-anchor relative flex min-h-[100svh] items-end pb-16 pt-28 md:items-center md:pb-0">
-      {!isMobile && orbLive && <NeuralOrb stageRef={stageRef} />}
-      <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(240px,0.9fr)]">
+    <section
+      id="top"
+      data-section="top"
+      ref={root}
+      className="section-anchor relative flex min-h-[100svh] items-end overflow-hidden pb-16 pt-28 md:items-center md:pb-0"
+    >
+      <HeroLogs />
+      <div className="dot-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden />
+      <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(240px,0.85fr)]">
         <div className="min-w-0">
-          <p data-fade className="kicker">{dict.hero.label}</p>
-          <h1 className="hero-name display mt-5">
-            <span className="reveal-line"><span data-line>{dict.hero.first}</span></span>
-            <span className="reveal-line">
-              <span data-line className="text-[color-mix(in_srgb,var(--text)_76%,var(--accent))]">{dict.hero.last}</span>
-            </span>
-          </h1>
-          <p className="mt-6 max-w-xl text-xl leading-snug text-[var(--muted)] md:text-2xl">
-            {roleLines.map((line) => (
-              <span key={line} className="reveal-line"><span data-line>{line}</span></span>
-            ))}
+          <p className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-dim)]">
+            <span className="status-dot bg-[var(--ok)]" aria-hidden />
+            {status}
           </p>
-          <p data-fade className="mt-6 max-w-lg text-[var(--muted)]">{dict.hero.summary}</p>
-          <div data-fade className="mt-8 flex flex-wrap gap-3">
-            <a ref={exploreRef} href="#projects" className="btn btn-primary">{dict.hero.explore}</a>
-            <a href="#contact" className="btn btn-ghost">{dict.hero.contact}</a>
+          <div className="relative mt-5">
+            <ScrambleHeading
+              as="h1"
+              text={dict.hero.headline}
+              className="hero-name hero-gradient display"
+            />
+            <span
+              data-caret
+              className="hero-caret"
+              style={{ opacity: caretOn ? 1 : 0 }}
+              aria-hidden
+            />
           </div>
-          <p data-fade className="mt-8 flex items-center gap-3 text-sm text-[var(--muted)]">
-            <span className="status-dot" aria-hidden />
-            {dict.hero.available}
-            <span className="hidden sm:inline">· {dict.hero.locationNote}</span>
+          <p className="mt-6 max-w-[38rem] text-[18px] leading-relaxed text-[var(--ink-dim)] md:text-[20px]">
+            {dict.hero.summary}
           </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a ref={exploreRef} href="#projects" className="btn btn-primary">
+              {dict.hero.explore}
+            </a>
+            <a href="#contact" className="btn btn-ghost">
+              {dict.hero.contact} ↗
+            </a>
+          </div>
+          <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-dim)]">
+            <CopyButton value={links.email} label={dict.hero.linkEmail} copiedLabel={dict.contact.copied} className="hero-copy" />
+            <span aria-hidden>·</span>
+            <a href={links.telegram}>{dict.hero.linkTelegram}</a>
+            <span aria-hidden>·</span>
+            <a href={links.github}>{dict.hero.linkGithub}</a>
+            <span aria-hidden>·</span>
+            <a href={links.linkedin}>{dict.hero.linkLinkedin}</a>
+            <span aria-hidden>·</span>
+            <a href={links.resumePdf}>{dict.hero.linkResume}</a>
+          </p>
+          <div className="mt-10 grid grid-cols-2 gap-px bg-[var(--line)] sm:grid-cols-4">
+            {metrics.map((metric) => (
+              <a
+                key={metric.label}
+                href={metric.href}
+                className="bg-[var(--bg)] px-4 py-5 transition-colors hover:bg-[var(--bg-2)]"
+              >
+                <p className="display text-[clamp(1.8rem,4vw,2.6rem)] leading-none">
+                  <CountUp value={metric.value} />
+                </p>
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-faint)]">
+                  {metric.label}
+                </p>
+              </a>
+            ))}
+          </div>
         </div>
-        <div ref={stageRef} className="hero-stage" aria-hidden>
-          <p className="mono absolute bottom-2 right-2 text-[10px] text-[var(--faint)]">CORE / ONLINE</p>
-        </div>
+        <EmbeddingSpace />
       </div>
     </section>
   );
