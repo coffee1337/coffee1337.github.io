@@ -17,7 +17,12 @@ export function Projects() {
         </div>
         <div className="flex flex-col gap-24 md:gap-32">
           {dict.projects.items.map((project, i) => (
-            <CaseStudy key={project.id} project={project} flipped={i % 2 === 1} />
+            <CaseStudy
+              key={project.id}
+              project={project}
+              position={String(i + 1).padStart(2, "0")}
+              flipped={i % 2 === 1}
+            />
           ))}
         </div>
       </div>
@@ -25,7 +30,7 @@ export function Projects() {
   );
 }
 
-function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boolean }) {
+function CaseStudy({ project, position, flipped }: { project: ProjectContent; position: string; flipped: boolean }) {
   const { dict, pathBase } = useSite();
   const ref = useReveal<HTMLElement>({ stagger: 0.05 });
   const copy = dict.projects;
@@ -34,7 +39,7 @@ function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boo
     <article ref={ref} className="case grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
       <div className={flipped ? "lg:order-2" : ""}>
         <div data-reveal className="flex items-center gap-3">
-          <span className="display text-3xl text-[var(--faint)]">{project.index}</span>
+          <span className="display text-3xl text-[var(--faint)]">{position}</span>
           {project.status && (
             <span className="inline-flex items-center gap-2">
               <span className="status-dot" aria-hidden />
@@ -74,7 +79,7 @@ function CaseStudy({ project, flipped }: { project: ProjectContent; flipped: boo
         </div>
       </div>
       <div data-reveal className={`case-visual ${flipped ? "lg:order-1" : ""}`}>
-        <ProjectVisual project={project} />
+        <ProjectVisual project={project} position={position} />
       </div>
     </article>
   );

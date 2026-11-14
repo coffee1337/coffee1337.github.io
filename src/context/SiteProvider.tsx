@@ -111,7 +111,7 @@ export function SiteProvider({
         }
         const wipe = document.createElement("div");
         wipe.className = "theme-wipe";
-        wipe.style.background = next === "light" ? "#f4f0e8" : "#0b0b0c";
+        wipe.style.background = next === "light" ? "#f8f4ee" : "#0c0a09";
         document.body.appendChild(wipe);
         wipe.animate(
           [

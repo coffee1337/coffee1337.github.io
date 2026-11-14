@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useSite } from "../context/site";
+import { getScrollTrigger } from "../lib/scrollRefresh";
 
 const COARSE = typeof window !== "undefined" ? window.matchMedia("(pointer: coarse)") : null;
 
@@ -21,31 +22,35 @@ export function useReveal<T extends HTMLElement>(options?: { y?: number; delay?:
       return;
     }
 
-    nodes.forEach((n) => {
-      n.style.opacity = "0";
-      n.style.transform = `translateY(${options?.y ?? 24}px)`;
-    });
-
     let ctx: { revert: () => void } | null = null;
     let dead = false;
 
-    void import("gsap").then(({ default: gsap }) => {
-      if (dead) return;
-      void import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-        if (dead) return;
-        gsap.registerPlugin(ScrollTrigger);
-        ctx = gsap.context(() => {
-          gsap.to(nodes, {
-            opacity: 1,
-            y: 0,
-            duration: 0.85,
-            ease: "power3.out",
-            stagger: options?.stagger ?? 0.07,
-            delay: options?.delay ?? 0,
-            scrollTrigger: { trigger: el, start: "top 88%", once: true },
-          });
-        }, el);
+    // Нестандартный сдвиг по Y: переопределяем базовые 24px из CSS до старта твина.
+    if (options?.y != null) {
+      nodes.forEach((n) => {
+        n.style.transform = `translateY(${options.y}px)`;
       });
+    }
+
+    void getScrollTrigger().then(({ gsap, ScrollTrigger }) => {
+      if (dead) return;
+      ctx = gsap.context(() => {
+        const tween = gsap.to(nodes, {
+          opacity: 1,
+          y: 0,
+          duration: 0.85,
+          ease: "power3.out",
+          stagger: options?.stagger ?? 0.07,
+          delay: options?.delay ?? 0,
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+        });
+        // §10.1: элементы, уже в вьюпорте на момент инициализации
+        // (прямой заход на /projects/:id/), анимируем сразу, не дожидаясь скролла.
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+          if (el.getBoundingClientRect().top < window.innerHeight) tween.play(0);
+        });
+      }, el);
     });
 
     return () => {

@@ -3,7 +3,6 @@ import type { ProjectContent } from "./types";
 export const projectMeta = [
   {
     id: "ai-python-mentor",
-    index: "01",
     visual: "mentor" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/ai-python-mentor",
@@ -12,7 +11,6 @@ export const projectMeta = [
   },
   {
     id: "ngie",
-    index: "02",
     visual: "campus" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/ngieuapp",
@@ -21,7 +19,6 @@ export const projectMeta = [
   },
   {
     id: "transaction-monitor",
-    index: "03",
     visual: "ledger" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/TransactionMonitor",
@@ -30,7 +27,6 @@ export const projectMeta = [
   },
   {
     id: "neural-astar",
-    index: "04",
     visual: "search" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/neural-astar-heuristic",
@@ -39,7 +35,6 @@ export const projectMeta = [
   },
   {
     id: "knn",
-    index: "05",
     visual: "neighbors" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/k-nearest-neighbors",

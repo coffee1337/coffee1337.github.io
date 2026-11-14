@@ -1,10 +1,10 @@
 import type { ProjectContent } from "../../content";
 
-export function ProjectVisual({ project }: { project: ProjectContent }) {
+export function ProjectVisual({ project, position }: { project: ProjectContent; position?: string }) {
   return (
     <div className={`project-art art-${project.visual}`} aria-hidden>
       <div className="flex items-start justify-between">
-        <span className="mono text-[10px] text-[var(--faint)]">{project.index} / SYS</span>
+        <span className="mono text-[10px] text-[var(--faint)]">{position ?? "--"} / SYS</span>
         <span className="mono text-[10px] text-[var(--muted)]">{project.stack[0]}</span>
       </div>
       <Diagram kind={project.visual} />
@@ -66,7 +66,7 @@ function Diagram({ kind }: { kind: ProjectContent["visual"] }) {
         <circle key={i} cx={x} cy={y} r={i === 4 ? 7 : 4} fill={i === 4 ? "var(--lime)" : "var(--accent)"} />
       ))}
       <circle cx="168" cy="70" r="30" fill="none" stroke="var(--text)" strokeOpacity="0.35" />
-      <text x="188" y="28" fill="var(--muted)" fontSize="11" fontFamily="IBM Plex Mono, monospace">k = 3</text>
+      <text x="188" y="28" fill="var(--muted)" fontSize="11" fontFamily="var(--font-mono)">k = 3</text>
     </svg>
   );
 }

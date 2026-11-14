@@ -2,7 +2,6 @@ export type Lang = "en" | "ru";
 
 export interface ProjectContent {
   id: string;
-  index: string;
   name: string;
   status?: string;
   statement: string;

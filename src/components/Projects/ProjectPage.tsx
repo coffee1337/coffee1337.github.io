@@ -10,6 +10,7 @@ import { ProjectVisual } from "./ProjectVisual";
 export function ProjectPage({ id }: { id?: string }) {
   const { dict, lang, pathBase, loaderDone } = useSite();
   const ref = useReveal<HTMLElement>();
+  const nextRef = useReveal<HTMLElement>();
   useSmoothScroll(loaderDone);
 
   const items = dict.projects.items;
@@ -44,6 +45,9 @@ export function ProjectPage({ id }: { id?: string }) {
   if (!project) return <NotFound />;
 
   const next = items[(index + 1) % items.length];
+  // §10.2: позиция и всего считаются из массива, без захардкоженных номеров.
+  const position = String(index + 1).padStart(2, "0");
+  const total = String(items.length).padStart(2, "0");
 
   return (
     <>
@@ -53,7 +57,7 @@ export function ProjectPage({ id }: { id?: string }) {
           <div className="site-wrap">
             <div data-reveal className="flex flex-wrap items-center gap-3">
               <p className="kicker">
-                {project.index} / {copy.index} — {copy.label}
+                {position} / {total} — {copy.label}
               </p>
               {project.status && (
                 <span className="inline-flex items-center gap-2">
@@ -93,7 +97,7 @@ export function ProjectPage({ id }: { id?: string }) {
                 </div>
               </div>
               <div data-reveal className="case-visual">
-                <ProjectVisual project={project} />
+                <ProjectVisual project={project} position={position} />
               </div>
             </div>
 
@@ -106,7 +110,7 @@ export function ProjectPage({ id }: { id?: string }) {
           </div>
         </section>
 
-        <section className="relative z-[2] border-t border-[var(--line)] py-12">
+        <section ref={nextRef} className="relative z-[2] border-t border-[var(--line)] py-12">
           <div className="site-wrap">
             <a data-reveal className="link-arrow" href={`${pathBase}/projects/${next.id}/`}>
               {t.next} — {next.name}

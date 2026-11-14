@@ -6,7 +6,12 @@ import { ProjectPage } from "./components/Projects/ProjectPage";
 import { SiteProvider } from "./context/SiteProvider";
 import type { Lang } from "./content";
 import { initAnalytics } from "./analytics";
+import { installScrollTriggerRefresh } from "./lib/scrollRefresh";
 import "./styles/global.css";
+
+// §10.1: CSS скрывает [data-reveal] только под html.js — без JS и в пререндере всё видно.
+document.documentElement.classList.add("js");
+installScrollTriggerRefresh();
 
 interface ClientRoute {
   kind: "home" | "project" | "notfound";
