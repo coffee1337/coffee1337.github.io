@@ -1,0 +1,155 @@
+# Egor Trefilov (coffee1337)
+
+> Python backend & AI automation developer. FastAPI, PostgreSQL, LLM/RAG integrations. Third-year student at NGIEU (AI Systems). Open to internships, full-time and freelance.
+
+Note: all facts below come from the site content and the listed public repositories. No invented metrics.
+
+## Profile
+- [About](https://coffee1337.github.io/#about)
+- [Technology stack](https://coffee1337.github.io/#stack)
+- [Projects](https://coffee1337.github.io/#projects)
+- [Reviews](https://coffee1337.github.io/#reviews)
+- [Contact](https://coffee1337.github.io/#contact)
+- [Resume PDF](https://coffee1337.github.io/resume/Egor_Trefilov_Resume.pdf)
+
+## Projects
+- [ai-python-mentor](https://github.com/coffee1337/ai-python-mentor): Next.js + FastAPI learning platform with AI Gateway, LLM, RAG on pgvector, Redis queue and a Telegram bot.
+- [ngieuapp](https://github.com/coffee1337/ngieuapp): Flutter university app with offline SQLite cache, schedule and notifications.
+- [TransactionMonitor](https://github.com/coffee1337/TransactionMonitor): C# / .NET 8 / WinUI 3 desktop app for transaction monitoring and risk.
+- [neural-astar-heuristic](https://github.com/coffee1337/neural-astar-heuristic): learned value function guiding A* search.
+- [k-nearest-neighbors](https://github.com/coffee1337/k-nearest-neighbors): k-NN from scratch in C++17 with visualisation.
+- [portfolio-analytics](https://github.com/coffee1337/portfolio-analytics): first-party analytics collector (JS beacon → FastAPI → SQLAlchemy/SQLite).
+
+## Contact
+- Email: trefilovegor84@gmail.com
+- Telegram: https://t.me/cooffeek1337
+- GitHub: https://github.com/coffee1337
+- LinkedIn: https://www.linkedin.com/in/coffee1337
+
+## Optional
+- [Full content (EN + RU)](https://coffee1337.github.io/llms-full.txt)
+
+
+---
+
+# Knowledge base
+
+# About Egor Trefilov
+
+## RU
+Егор Трефилов (coffee1337) — Python backend и AI automation разработчик. Учится на 3 курсе НГИЭУ по направлению 09.03.01 «Информатика и вычислительная техника», профиль «Системы искусственного интеллекта», бакалавриат, выпуск в 2028 году.
+Работает с Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, Docker, LLM API, RAG и PyTorch. Дополнительно — Next.js/React/TypeScript, Flutter/Dart, C#/.NET 8/WinUI 3, C++17.
+Цель сайта: найм (стажировка или работа), фриланс-заказы и портфолио. Открыт к найму и фрилансу.
+
+## EN
+Egor Trefilov (coffee1337) is a Python backend and AI automation developer. He is a third-year student at NGIEU, programme 09.03.01 Informatics and Computer Engineering, profile Artificial Intelligence Systems, bachelor, graduating in 2028.
+He works with Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, Docker, LLM APIs, RAG and PyTorch, plus Next.js/React/TypeScript, Flutter/Dart, C#/.NET 8/WinUI 3 and C++17.
+The site exists for hiring, freelance work and portfolio. He is open to both.
+
+---
+
+# Contacts
+
+## RU
+Email: trefilovegor84@gmail.com — самый надёжный канал.
+Telegram: @cooffeek1337. GitHub: github.com/coffee1337. LinkedIn: linkedin.com/in/coffee1337.
+Резюме PDF доступно на сайте в разделе Resume.
+
+## EN
+Email: trefilovegor84@gmail.com — the most reliable channel.
+Telegram: @cooffeek1337. GitHub: github.com/coffee1337. LinkedIn: linkedin.com/in/coffee1337.
+The PDF resume is available on the site in the Resume section.
+
+---
+
+# Education
+
+## RU
+НГИЭУ — Нижегородский государственный инженерно-экономический университет.
+Направление 09.03.01 «Информатика и вычислительная техника», профиль «Системы искусственного интеллекта», бакалавриат, 3 курс, выпуск 2028.
+Дисциплины: машинное обучение, нейронные сети, анализ данных, алгоритмы и структуры данных, базы данных, математическая статистика.
+
+## EN
+NGIEU — Nizhny Novgorod State Engineering and Economic University.
+Programme 09.03.01 Informatics and Computer Engineering, profile Artificial Intelligence Systems, bachelor, 3rd year, graduation 2028.
+Coursework: machine learning, neural networks, data analysis, algorithms and data structures, databases, mathematical statistics.
+
+---
+
+# FAQ
+
+## RU
+Открыт ли к стажировке? Да, к стажировке, работе и фрилансу.
+Есть ли коммерческий опыт? Основной опыт — собственные проекты и учебные задачи, описанные на сайте; конкретные детали — в переписке.
+Работает ли удалённо? Да, MSK (UTC+3).
+Сколько стоит проект? Зависит от объёма, обсуждается после описания задачи.
+Можно ли посмотреть код? Да, все проекты есть на github.com/coffee1337.
+
+## EN
+Open to internships? Yes — internships, full-time and freelance.
+Commercial experience? The main experience is the projects on this site plus coursework; details on request.
+Remote? Yes, MSK (UTC+3).
+Project pricing? Depends on scope, discussed after the brief.
+Can I read the code? Yes, every project is on github.com/coffee1337.
+
+---
+
+# Freelance
+
+## RU
+Типовые задачи: Telegram-бот, API-сервис, автоматизация рутины, интеграция LLM в существующий процесс, RAG по внутренним документам, парсеры и пайплайны данных.
+Как начать: написать в Telegram @cooffeek1337 или на trefilovegor84@gmail.com, описать задачу и сроки.
+
+## EN
+Typical jobs: a Telegram bot, an API service, automating routine work, wiring an LLM into an existing process, RAG over internal documents, parsers and data pipelines.
+How to start: message @cooffeek1337 on Telegram or email trefilovegor84@gmail.com with the task and deadline.
+
+---
+
+# Hiring
+
+## RU
+Формат: стажировка, full-time, фриланс. Языки: русский и английский.
+Что умеет: проектировать и писать бэкенд на Python и FastAPI, работать с PostgreSQL и SQLAlchemy, поднимать Docker, встраивать LLM и RAG в продукт, писать тесты и доводить до продакшена.
+География: Нижегородская область, MSK (UTC+3), удалённо.
+
+## EN
+Formats: internship, full-time, freelance. Languages: Russian and English.
+What he does: designs and writes Python/FastAPI backends, works with PostgreSQL and SQLAlchemy, containers with Docker, integrates LLMs and RAG into products, writes tests and ships to production.
+Location: Nizhny Novgorod region, MSK (UTC+3), remote-friendly.
+
+---
+
+# Projects
+
+## RU
+ai-python-mentor — full-stack платформа для обучения Python и бэкенду: Next.js, FastAPI, AI Gateway, LLM, RAG на pgvector, PostgreSQL, Redis, Telegram-бот.
+ngieuapp — кроссплатформенное приложение университета: расписание, офлайн-кэш на SQLite, уведомления и виджеты. Flutter, Dart, Riverpod, Drift.
+TransactionMonitor — десктопное приложение для мониторинга транзакций и оценки риска. C#, .NET 8, WinUI 3, SQL Server.
+neural-astar-heuristic — нейросетевая эвристика для A*: сначала решённые состояния, затем обучение функции ценности, затем поиск. Python, PyTorch, NumPy.
+k-nearest-neighbors — классификатор k-NN с нуля на C++17 с десктопной визуализацией: евклидово, манхэттенское и косинусное расстояние, взвешенное голосование, нормализация.
+portfolio-analytics — собственный сборщик аналитики сайта: JavaScript-beacon, коллектор на FastAPI, SQLAlchemy и SQLite, дашборд.
+
+## EN
+ai-python-mentor — a full-stack platform for learning Python and backend development: Next.js, FastAPI, AI Gateway, LLM, RAG on pgvector, PostgreSQL, Redis, Telegram bot.
+ngieuapp — a cross-platform university app: schedule, offline SQLite cache, notifications and widgets. Flutter, Dart, Riverpod, Drift.
+TransactionMonitor — a desktop app for transaction monitoring and risk analysis. C#, .NET 8, WinUI 3, SQL Server.
+neural-astar-heuristic — a neural heuristic for A*: solve states first, learn a value function, then search. Python, PyTorch, NumPy.
+k-nearest-neighbors — a k-NN classifier written from scratch in C++17 with desktop visualisation: Euclidean, Manhattan and cosine distance, weighted voting, normalisation.
+portfolio-analytics — a self-hosted analytics collector for this site: JavaScript beacon, FastAPI collector, SQLAlchemy and SQLite, dashboard.
+
+---
+
+# Stack
+
+## RU
+Backend: Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, Docker, REST API, фоновые задачи.
+AI и данные: LLM API, RAG, pgvector, PyTorch, Pandas, NumPy.
+Фронтенд и мобильные: TypeScript, React, Next.js, Flutter, Dart.
+Системы и инструменты: C#/.NET 8/WinUI 3, C++17, Git, Linux.
+
+## EN
+Backend: Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, Docker, REST APIs, background jobs.
+AI and data: LLM APIs, RAG, pgvector, PyTorch, Pandas, NumPy.
+Frontend and mobile: TypeScript, React, Next.js, Flutter, Dart.
+Systems and tools: C#/.NET 8/WinUI 3, C++17, Git, Linux.
