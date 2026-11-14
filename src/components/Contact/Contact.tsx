@@ -2,6 +2,7 @@ import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useMagnetic, useReveal } from "../../hooks/useMotion";
 import { CopyButton } from "../CopyButton";
+import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { NeuralMark } from "../Brand/NeuralMark";
 
 export function Contact() {
@@ -17,7 +18,7 @@ export function Contact() {
           <p className="kicker">{c.index} — {c.label}</p>
           <NeuralMark className="h-8 w-8 text-[var(--text)]" />
         </div>
-        <h2 data-reveal className="display mt-6 max-w-5xl text-[clamp(2.8rem,7vw,6.4rem)]">{c.title}</h2>
+        <ScrambleHeading data-reveal text={c.title} className="display mt-6 max-w-5xl text-[clamp(2.8rem,7vw,6.4rem)]" />
         <p data-reveal className="mt-6 flex items-center gap-3 text-[var(--muted)]">
           <span className="status-dot" aria-hidden />
           {c.status}

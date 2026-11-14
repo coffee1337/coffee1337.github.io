@@ -16,6 +16,21 @@ export interface ProjectContent {
 
 export interface Dictionary {
   meta: { title: string; description: string };
+  palette: {
+    search: string;
+    empty: string;
+    nav: string;
+    projects: string;
+    actions: string;
+    settings: string;
+    copyEmail: string;
+    downloadResume: string;
+    askAi: string;
+    writeMe: string;
+    toggleTheme: string;
+    switchLang: string;
+    hints: string;
+  };
   nav: {
     about: string;
     capabilities: string;
@@ -130,6 +145,10 @@ export interface Dictionary {
   footer: {
     role: string;
     rights: string;
+    status: string;
+    location: string;
+    sayHello: string;
+    builtWith: string;
   };
   a11y: {
     themeToLight: string;

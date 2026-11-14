@@ -1,4 +1,5 @@
 import { useSite } from "../../context/site";
+import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { useReveal } from "../../hooks/useMotion";
 
 export function Stack() {
@@ -12,9 +13,7 @@ export function Stack() {
         <p className="kicker">
           {dict.stack.index} — {dict.stack.label}
         </p>
-        <h2 data-reveal className="display mt-4 max-w-4xl text-[clamp(2.6rem,5vw,5rem)]">
-          {dict.stack.title}
-        </h2>
+        <ScrambleHeading data-reveal text={dict.stack.title} className="display mt-4 max-w-4xl text-[clamp(2.6rem,5vw,5rem)]" />
       </div>
 
       <div className="mt-10 overflow-hidden border-y border-[var(--line)] py-3">

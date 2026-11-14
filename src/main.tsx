@@ -7,6 +7,7 @@ import { SiteProvider } from "./context/SiteProvider";
 import type { Lang } from "./content";
 import { initAnalytics } from "./analytics";
 import { installScrollTriggerRefresh } from "./lib/scrollRefresh";
+import { ToastProvider } from "./components/Toast/ToastProvider";
 import "./styles/global.css";
 
 // §10.1: CSS скрывает [data-reveal] только под html.js — без JS и в пререндере всё видно.
@@ -36,13 +37,15 @@ initAnalytics();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SiteProvider initialLang={route.lang} route={route}>
-      {route.kind === "home" ? (
-        <App />
-      ) : route.kind === "project" ? (
-        <ProjectPage id={route.projectId} />
-      ) : (
-        <NotFound />
-      )}
+      <ToastProvider>
+        {route.kind === "home" ? (
+          <App />
+        ) : route.kind === "project" ? (
+          <ProjectPage id={route.projectId} />
+        ) : (
+          <NotFound />
+        )}
+      </ToastProvider>
     </SiteProvider>
   </StrictMode>,
 );

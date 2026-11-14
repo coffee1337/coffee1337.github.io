@@ -1,5 +1,6 @@
 import type { ProjectContent } from "../../content";
 import { useSite } from "../../context/site";
+import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { useReveal } from "../../hooks/useMotion";
 import { ProjectVisual } from "./ProjectVisual";
 
@@ -11,7 +12,7 @@ export function Projects() {
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6 md:mb-20">
           <div>
             <p className="kicker">{dict.projects.index} — {dict.projects.label}</p>
-            <h2 className="display mt-4 text-[clamp(2.8rem,6.5vw,6rem)]">{dict.projects.title}</h2>
+            <ScrambleHeading text={dict.projects.title} className="display mt-4 text-[clamp(2.8rem,6.5vw,6rem)]" />
           </div>
           <p className="mono text-[10px] text-[var(--faint)]">05</p>
         </div>

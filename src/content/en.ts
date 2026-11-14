@@ -7,6 +7,21 @@ const en: Dictionary = {
     description:
       "Portfolio of Egor Trefilov — Python Backend & AI Automation Developer building backend systems, AI-powered applications and automation tools.",
   },
+  palette: {
+    search: "Search sections, projects, actions…",
+    empty: "Nothing found.",
+    nav: "Navigation",
+    projects: "Projects",
+    actions: "Actions",
+    settings: "Settings",
+    copyEmail: "Copy email",
+    downloadResume: "Download resume",
+    askAi: "Ask the AI assistant",
+    writeMe: "Write me",
+    toggleTheme: "Toggle theme",
+    switchLang: "Switch language",
+    hints: "↑↓ navigate · ↵ open · esc close",
+  },
   nav: {
     about: "About",
     capabilities: "Capabilities",
@@ -281,8 +296,12 @@ const en: Dictionary = {
     resume: "Resume",
   },
   footer: {
+    location: "Nizhny Novgorod region · MSK (UTC+3)", // TODO: подтвердить у владельца (§13)
+    sayHello: "Say hello",
+    builtWith: "Built with React 19 · Vite · Three.js",
     role: "Python Backend / AI / Automation",
     rights: "Egor Trefilov",
+    status: "● OPEN TO WORK",
   },
   a11y: {
     themeToLight: "Switch to light theme",

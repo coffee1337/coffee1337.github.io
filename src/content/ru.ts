@@ -7,6 +7,21 @@ const ru: Dictionary = {
     description:
       "Портфолио Егора Трефилова — Python Backend & AI Automation Developer. Backend-системы, AI-приложения и инструменты автоматизации.",
   },
+  palette: {
+    search: "Поиск по секциям, проектам, действиям…",
+    empty: "Ничего не найдено.",
+    nav: "Навигация",
+    projects: "Проекты",
+    actions: "Действия",
+    settings: "Настройки",
+    copyEmail: "Скопировать email",
+    downloadResume: "Скачать резюме",
+    askAi: "Спросить AI-ассистента",
+    writeMe: "Написать мне",
+    toggleTheme: "Переключить тему",
+    switchLang: "Переключить язык",
+    hints: "↑↓ навигация · ↵ открыть · esc закрыть",
+  },
   nav: {
     about: "Обо мне",
     capabilities: "Что я делаю",
@@ -281,8 +296,12 @@ const ru: Dictionary = {
     resume: "Резюме",
   },
   footer: {
+    location: "Нижегородская обл. · MSK (UTC+3)", // TODO: подтвердить у владельца (§13)
+    sayHello: "Написать",
+    builtWith: "Сделано на React 19 · Vite · Three.js",
     role: "Python Backend / AI / Automation",
     rights: "Егор Трефилов",
+    status: "● ОТКРЫТ К НАЙМУ",
   },
   a11y: {
     themeToLight: "Включить светлую тему",

@@ -1,4 +1,5 @@
 import { useSite } from "../../context/site";
+import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { useReveal } from "../../hooks/useMotion";
 
 export function About() {
@@ -12,7 +13,7 @@ export function About() {
           <p className="mono text-[10px] text-[var(--faint)]">Independent developer</p>
         </div>
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
-          <h2 data-reveal className="display text-[clamp(2.4rem,5vw,4.8rem)]">{dict.about.statement}</h2>
+          <ScrambleHeading data-reveal text={dict.about.statement} className="display text-[clamp(2.4rem,5vw,4.8rem)]" />
           <div className="space-y-5 text-lg leading-relaxed text-[var(--muted)]">
             {dict.about.paragraphs.map((p) => (
               <p key={p} data-reveal>{p}</p>

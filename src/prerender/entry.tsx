@@ -7,6 +7,7 @@ import { ProjectPage } from "../components/Projects/ProjectPage";
 import { SiteProvider } from "../context/SiteProvider";
 import { dictionaries, type Lang } from "../content";
 import { projectMeta } from "../content/projects";
+import { ToastProvider } from "../components/Toast/ToastProvider";
 
 export interface PrerenderRoute {
   /** URL path with trailing slash, e.g. "/", "/ru/", "/projects/ai-python-mentor/". */
@@ -50,7 +51,7 @@ export function renderRoute(route: PrerenderRoute): string {
     );
   return renderToString(
     <SiteProvider initialLang={route.lang} route={route}>
-      {inner}
+      <ToastProvider>{inner}</ToastProvider>
     </SiteProvider>,
   );
 }

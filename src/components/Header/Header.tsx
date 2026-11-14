@@ -1,166 +1,207 @@
-import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSite } from "../../context/site";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
-import { NeuralMark } from "../Brand/NeuralMark";
+import { CommandPalette } from "../Command/CommandPalette";
 
-const links = [
-  { href: "#about", key: "about" },
-  { href: "#capabilities", key: "capabilities" },
-  { href: "#experience", key: "experience" },
-  { href: "#projects", key: "projects" },
-  { href: "#stack", key: "stack" },
-  { href: "#resume", key: "resume" },
-  { href: "#contact", key: "contact" },
-] as const;
+const NAV_IDS = ["about", "projects", "stack", "resume", "contact"] as const;
+const MOBILE_IDS = [...NAV_IDS, "capabilities", "experience"] as const;
+
+type NavKey = keyof ReturnType<typeof useSite>["dict"]["nav"];
 
 export function Header() {
-  const { dict, lang, switchLang, theme, toggleTheme, section, setSection, pathBase, route } = useSite();
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const menuId = useId();
-  const labels = dict.nav;
+  const site = useSite();
+  const { dict, lang, switchLang, theme, toggleTheme, section, setSection, pathBase, route } = site;
   const { lockUntilSettled } = useScrollSpy();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const lastY = useRef(0);
   const onHome = route.kind === "home";
-  /** On the home page anchors stay in-document; elsewhere they point back at the landing page. */
-  const href = (hash: string) => (onHome ? hash : `${pathBase}/${hash}`);
+
+  const href = (id: string) => (onHome ? `#${id}` : `${pathBase}/#${id}`);
 
   const go = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
     if (!onHome) return;
+    event.preventDefault();
     setSection(id);
     lockUntilSettled();
-    setOpen(false);
-    event.preventDefault();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    setMenuOpen(false);
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
+    const onScroll = () => {
+      const delta = window.scrollY - lastY.current;
+      setCompact(window.scrollY > 24);
+      if (Math.abs(delta) > 8) setHidden(delta > 0 && window.scrollY > 100);
+      lastY.current = window.scrollY;
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const locked = menuOpen || paletteOpen;
+    document.body.style.overflow = locked ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [menuOpen, paletteOpen]);
 
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setPaletteOpen(true);
+      }
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setPaletteOpen(false);
+      }
     };
     window.addEventListener("keydown", onKey);
-    const root = panelRef.current;
-    const focusable = root?.querySelectorAll<HTMLElement>("a, button");
-    focusable?.[0]?.focus();
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, []);
+
+  useEffect(() => {
+    if (menuOpen) menuButton.current?.focus();
+  }, [menuOpen]);
 
   const current = section === "education" ? "resume" : section;
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
-      <a href={href("#about")} className="skip-link">
-        {dict.a11y.skip}
-      </a>
-      <div className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
-        <a href={onHome ? "#top" : `${pathBase}/`} className="brand-mark" onClick={(e) => go(e, "top")} aria-label="ET">
-          <NeuralMark className="brand-orb h-6 w-6" />
-          <span className="display text-lg leading-none">ET</span>
+    <>
+      <header
+        className={`fixed left-1/2 top-4 z-50 flex -translate-x-1/2 items-center rounded-full border border-[var(--line)] bg-[color-mix(in_srgb,var(--bg-2)_70%,transparent)] px-3 backdrop-blur-md transition-all duration-300 ${
+          compact ? "py-1.5 shadow-lg" : "py-2.5"
+        } ${hidden ? "-translate-y-24 opacity-0" : "opacity-100"}`}
+      >
+        <a
+          href={href("top")}
+          onClick={(event) => go(event, "top")}
+          className="whitespace-nowrap font-mono text-sm font-semibold"
+        >
+          <span className="text-[var(--accent)]">●</span> coffee1337
         </a>
 
-        <nav className="hidden items-center gap-4 xl:flex" aria-label="Primary">
-          {links.map((l) => (
+        <nav className="mx-5 hidden items-center gap-1 lg:flex" aria-label="Primary">
+          {NAV_IDS.map((id) => (
             <a
-              key={l.href}
-              href={href(l.href)}
-              className="nav-link"
-              aria-current={current === l.href.slice(1) ? "true" : undefined}
-              onClick={(e) => go(e, l.href.slice(1))}
+              key={id}
+              href={href(id)}
+              onClick={(event) => go(event, id)}
+              className="relative rounded-full px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-dim)] hover:text-[var(--ink)]"
             >
-              {labels[l.key]}
+              {current === id && (
+                <motion.span
+                  layoutId="active-nav"
+                  className="absolute inset-0 -z-10 rounded-full bg-[var(--line)]"
+                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                />
+              )}
+              {dict.nav[id as NavKey]}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-full border border-[var(--line)] p-0.5" role="group" aria-label={dict.a11y.lang}>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="hidden rounded-full border border-[var(--line)] px-2 py-1 font-mono text-[10px] lg:block"
+            onClick={() => setPaletteOpen(true)}
+            aria-label={dict.palette.nav}
+          >
+            ⌘K
+          </button>
+
+          <div
+            className="hidden rounded-full border border-[var(--line)] p-0.5 sm:flex"
+            role="group"
+            aria-label={dict.a11y.lang}
+          >
             {(["en", "ru"] as const).map((code) => (
               <button
                 key={code}
                 type="button"
                 onClick={() => switchLang(code)}
                 aria-pressed={lang === code}
-                className="mono rounded-full px-2 py-1 text-[10px]"
-                style={{
-                  background: lang === code ? "var(--text)" : "transparent",
-                  color: lang === code ? "var(--bg)" : "var(--muted)",
-                }}
+                className="relative rounded-full px-2 py-1 font-mono text-[10px]"
               >
-                {code}
+                {lang === code && (
+                  <motion.span
+                    layoutId="lang-badge"
+                    className="absolute inset-0 -z-10 rounded-full bg-[var(--accent)]"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
+                <span className={lang === code ? "text-[var(--bg)]" : ""}>{code.toUpperCase()}</span>
               </button>
             ))}
           </div>
+
           <button
             type="button"
             className="theme-btn"
+            onClick={(event) => toggleTheme({ x: event.clientX, y: event.clientY })}
             aria-label={theme === "dark" ? dict.a11y.themeToLight : dict.a11y.themeToDark}
-            data-tip={theme === "dark" ? dict.a11y.themeLight : dict.a11y.themeDark}
-            onClick={(e) => toggleTheme({ x: e.clientX, y: e.clientY })}
           >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            {theme === "dark" ? "☼" : "☾"}
           </button>
+
           <button
+            ref={menuButton}
             type="button"
-            className="mono px-2 text-[10px] xl:hidden"
-            aria-expanded={open}
-            aria-controls={menuId}
-            onClick={() => setOpen((v) => !v)}
+            className="font-mono text-[10px] uppercase lg:hidden"
+            onClick={() => setMenuOpen(true)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
-            {open ? labels.close : labels.menu}
+            ⌘ {dict.nav.menu}
           </button>
         </div>
-      </div>
+      </header>
 
-      {open && (
-        <div id={menuId} ref={panelRef} className="site-wrap mt-2 xl:hidden">
-          <nav className="flex flex-col border border-[var(--line)] bg-[var(--bg)] p-2" aria-label="Mobile">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={href(l.href)}
-                className="border-b border-[var(--line)] px-3 py-3 text-lg last:border-b-0"
-                aria-current={current === l.href.slice(1) ? "true" : undefined}
-                onClick={(e) => go(e, l.href.slice(1))}
-              >
-                {labels[l.key]}
-              </a>
-            ))}
-          </nav>
-        </div>
-      )}
-    </header>
-  );
-}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            id="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-[var(--bg)] p-6 pt-28 lg:hidden"
+            role="dialog"
+            aria-modal="true"
+          >
+            <nav className="flex flex-col" aria-label="Mobile">
+              {MOBILE_IDS.map((id, index) => (
+                <a
+                  key={id}
+                  href={href(id)}
+                  onClick={(event) => go(event, id)}
+                  className="border-b border-[var(--line)] py-4 font-mono text-2xl"
+                >
+                  <span className="mr-4 text-sm text-[var(--accent)]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {dict.nav[id as NavKey]}
+                </a>
+              ))}
+            </nav>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              className="mt-8 font-mono text-xs uppercase"
+            >
+              {dict.nav.close} ×
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-function SunIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-      <circle cx="8" cy="8" r="2.4" fill="currentColor" />
-      <path d="M8 1.2v1.8M8 13v1.8M1.2 8h1.8M13 8h1.8M3.2 3.2l1.3 1.3M11.5 11.5l1.3 1.3M3.2 12.8l1.3-1.3M11.5 4.5l1.3-1.3" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-      <path d="M9.2 1.6a5.6 5.6 0 1 0 5.2 7.6A4.6 4.6 0 0 1 9.2 1.6z" fill="currentColor" />
-    </svg>
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+    </>
   );
 }

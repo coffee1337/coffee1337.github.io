@@ -9,8 +9,8 @@ grep -q '"framer-motion"' package.json && ok "framer-motion" || bad "framer-moti
 grep -q '"cmdk"' package.json && ok "cmdk" || bad "cmdk"
 
 grep -rqi "ScrambleHeading" src && ok "ScrambleHeading существует" || bad "ScrambleHeading существует"
-n=$(grep -rli "ScrambleHeading" src/components 2>/dev/null | wc -l | tr -d ' ')
-[ "$n" -ge 1 ] && ok "ScrambleHeading используется" || bad "ScrambleHeading используется"
+n=$(grep -rl "ScrambleHeading" src/components 2>/dev/null | grep -v "Scramble/" | wc -l | tr -d ' ')
+[ "$n" -ge 3 ] && ok "ScrambleHeading используется в $n файлах" || bad "ScrambleHeading используется в $n файлах (нужно >=3 секции)"
 
 grep -rq "layoutId" src && ok "layoutId (бегущий индикатор)" || bad "layoutId (бегущий индикатор)"
 grep -rqi "backdrop-blur\|backdropFilter" src && ok "шапка с blur" || bad "шапка с blur"
