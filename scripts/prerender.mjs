@@ -85,6 +85,7 @@ function renderPage(route) {
 
 const routes = buildRoutes();
 for (const route of routes) {
+  if (route.kind === "notfound") continue;
   const html = renderPage(route);
   const file = route.path === "/" ? join(distDir, "index.html") : join(distDir, route.path, "index.html");
   await mkdir(dirname(file), { recursive: true });
@@ -92,12 +93,21 @@ for (const route of routes) {
   console.log(`prerender: ${route.path}`);
 }
 
-// GitHub Pages serves 404.html for unknown paths; the client router shows NotFound on top of it.
-await copyFile(join(distDir, "index.html"), join(distDir, "404.html"));
-console.log("prerender: /404.html");
+// GitHub Pages serves 404.html for unknown paths. It renders NotFound, not the home page,
+// so crawlers see a real 404 document instead of a duplicate homepage.
+const notFoundRoute = routes.find((route) => route.kind === "notfound");
+if (notFoundRoute) {
+  const html = renderPage({ ...notFoundRoute, path: "/404/" }).replace(
+    "</head>",
+    '<meta name="robots" content="noindex" />\n  </head>',
+  );
+  await writeFile(join(distDir, "404.html"), html);
+  console.log("prerender: /404.html (notfound)");
+}
 
 const lastmod = new Date().toISOString().slice(0, 10);
 const urls = routes
+  .filter((route) => route.kind !== "notfound")
   .map((route) => {
     const en = mirror(route.path, "en");
     const ru = mirror(route.path, "ru");
@@ -117,4 +127,8 @@ ${urls}
 </urlset>
 `;
 await writeFile(join(distDir, "sitemap.xml"), sitemap);
-console.log(`prerender: sitemap.xml (${routes.length} urls)`);
+console.log(`prerender: sitemap.xml (${urls.split("<loc>").length - 1} urls)`);
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}

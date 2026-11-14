@@ -16,7 +16,7 @@ import { ScrollProgress } from "./components/Progress/ScrollProgress";
 import { Assistant } from "./components/Assistant/Assistant";
 
 function Shell() {
-  const { loaderDone, setLoaderDone, setOrbMode } = useSite();
+  const { loaderDone, setLoaderDone, setOrbMode, dict } = useSite();
   const [booting, setBooting] = useState(false);
   useSmoothScroll(loaderDone);
 
@@ -41,6 +41,7 @@ function Shell() {
           }}
         />
       )}
+      <a className="skip-link" href="#content">{dict.a11y.skip}</a>
       <Header />
       <main id="content">
         <Hero />

@@ -349,7 +349,7 @@ const en: Dictionary = {
     lang: "Language",
     skip: "Skip to content",
     orb: "Decorative neural core",
-    notFound: { title: "This page is not here.", body: "The address does not match anything on the site.", back: "Back home" },
+    notFound: { title: "404 — out of coffee", body: "This page is gone, the cup is empty and the steam stopped. Head back to the main page.", back: "Back to home" },
   },
 };
 

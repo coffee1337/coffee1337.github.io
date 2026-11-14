@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
 import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 type Props = {
   open: boolean;
@@ -16,6 +17,8 @@ const SECTION_IDS = ["about", "projects", "stack", "resume", "contact"] as const
 export function CommandPalette({ open, onClose }: Props) {
   const { dict, lang, switchLang, toggleTheme, setSection, pathBase } = useSite();
   const { lockUntilSettled } = useScrollSpy();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, open);
   const { toast } = useToast();
   const p = dict.palette;
 
@@ -49,6 +52,7 @@ export function CommandPalette({ open, onClose }: Props) {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={dialogRef}
           className="fixed inset-0 z-[90] grid place-items-center bg-black/40 p-4 backdrop-blur-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

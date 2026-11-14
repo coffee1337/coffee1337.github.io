@@ -22,6 +22,7 @@ export function buildRoutes(): PrerenderRoute[] {
     { path: "/", lang: "en", kind: "home" },
     { path: "/ru/", lang: "ru", kind: "home" },
   ];
+  routes.push({ path: "/404.html", lang: "en", kind: "notfound" });
   for (const meta of projectMeta) {
     routes.push({ path: `/projects/${meta.id}/`, lang: "en", kind: "project", projectId: meta.id });
     routes.push({ path: `/ru/projects/${meta.id}/`, lang: "ru", kind: "project", projectId: meta.id });
@@ -36,6 +37,9 @@ export function routeMeta(route: PrerenderRoute): { title: string; description: 
     if (project) {
       return { title: `${project.name} — ${dict.resume.name}`, description: project.statement };
     }
+  }
+  if (route.kind === "notfound") {
+    return { title: dict.a11y.notFound.title, description: dict.a11y.notFound.body };
   }
   return { title: dict.meta.title, description: dict.meta.description };
 }

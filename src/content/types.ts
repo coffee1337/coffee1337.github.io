@@ -24,6 +24,7 @@ export interface Sections {
     cards: { id: "hire" | "freelance" | "code"; title: string; body: string; action: string }[];
   };
   educationCard: {
+    labels: { code: string; profile: string; term: string };
     badge: string;
     school: string;
     program: string;

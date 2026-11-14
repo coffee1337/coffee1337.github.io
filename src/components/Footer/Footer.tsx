@@ -10,6 +10,20 @@ export function Footer() {
   const [time, setTime] = useState("--:--:--");
   useEffect(() => { const update = () => setTime(new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(new Date())); update(); const id = window.setInterval(update, 1000); return () => window.clearInterval(id); }, []);
   return <footer className="relative z-[2] overflow-hidden border-t border-[var(--line)] bg-[var(--bg)] pb-8 pt-12">
+    <div className="relative">
+    <svg className="voxel-cup absolute -top-1 right-[8%] h-16 w-16 md:h-20 md:w-20" viewBox="0 0 40 40" aria-hidden>
+        <g fill="var(--accent-2)" opacity="0.9">
+          <rect x="8" y="8" width="4" height="4" /><rect x="12" y="8" width="4" height="4" /><rect x="16" y="8" width="4" height="4" />
+          <rect x="20" y="8" width="4" height="4" /><rect x="8" y="12" width="4" height="4" /><rect x="20" y="12" width="4" height="4" />
+          <rect x="8" y="16" width="4" height="4" /><rect x="20" y="16" width="4" height="4" />
+          <rect x="8" y="20" width="4" height="4" /><rect x="12" y="20" width="4" height="4" /><rect x="16" y="20" width="4" height="4" /><rect x="20" y="20" width="4" height="4" />
+          <rect x="24" y="14" width="4" height="4" fill="var(--accent)" />
+          <rect x="12" y="24" width="12" height="3" fill="var(--accent)" opacity="0.6" />
+        </g>
+        <g fill="var(--ink-faint)" opacity="0.5">
+          <rect x="12" y="2" width="2" height="2" /><rect x="16" y="0" width="2" height="2" /><rect x="20" y="3" width="2" height="2" />
+        </g>
+      </svg>
     <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px 0px -80px" }} className="site-wrap">
       <svg className="mb-10 h-auto w-full text-[var(--ink)]" viewBox="0 0 1200 150" role="img" aria-label="COFFEE1337"><text x="0" y="125" textLength="1200" lengthAdjust="spacingAndGlyphs" fill="none" stroke="currentColor" strokeOpacity=".12" strokeWidth="1" style={{ fontFamily: "var(--font-display)" }} fontSize="150" fontWeight="800">COFFEE1337</text></svg>
       <div className="grid gap-10 border-b border-[var(--line)] pb-12 md:grid-cols-3">
@@ -19,5 +33,6 @@ export function Footer() {
       </div>
       <div className="flex flex-col gap-2 pt-5 font-mono text-[11px] text-[var(--ink-faint)] md:flex-row md:items-center md:justify-between"><span>© 2026 {dict.footer.rights} (coffee1337)</span><span>{dict.footer.builtWith}</span><span>⌘K</span></div>
     </motion.div>
+    </div>
   </footer>;
 }

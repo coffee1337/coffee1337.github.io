@@ -370,9 +370,12 @@ body::before {
   left: 1rem;
   top: -4rem;
   z-index: 80;
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: var(--accent);
+  color: var(--bg);
   padding: 0.5rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .skip-link:focus { top: 0.6rem; }

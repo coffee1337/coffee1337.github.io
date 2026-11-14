@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSite } from "../../context/site";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
 import { CommandPalette } from "../Command/CommandPalette";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const NAV_IDS = ["about", "projects", "stack", "resume", "contact"] as const;
 const MOBILE_IDS = [...NAV_IDS, "capabilities", "experience"] as const;
@@ -18,6 +19,8 @@ export function Header() {
   const [hidden, setHidden] = useState(false);
   const [compact, setCompact] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(menuRef, menuOpen);
   const lastY = useRef(0);
   const onHome = route.kind === "home";
 
@@ -168,6 +171,7 @@ export function Header() {
         {menuOpen && (
           <motion.div
             id="mobile-menu"
+            ref={menuRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

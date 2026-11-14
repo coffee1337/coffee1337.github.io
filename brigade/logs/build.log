@@ -3,8 +3,55 @@
 > node scripts/fetch-github.mjs && node scripts/build-kb.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/gen-llms.mjs && node scripts/check-links.mjs
 
 build-kb: 16 чанков из 8 файлов → public/kb-index.json
-src/components/Education/EducationCard.tsx(21,68): error TS2339: Property 'labels' does not exist on type '{ badge: string; school: string; program: string; profile: string; period: string; chipsTitle: string; chips: string[]; note: string; }'.
-src/components/Education/EducationCard.tsx(25,68): error TS2339: Property 'labels' does not exist on type '{ badge: string; school: string; program: string; profile: string; period: string; chipsTitle: string; chips: string[]; note: string; }'.
-src/components/Education/EducationCard.tsx(29,68): error TS2339: Property 'labels' does not exist on type '{ badge: string; school: string; program: string; profile: string; period: string; chipsTitle: string; chips: string[]; note: string; }'.
-src/content/sections.ts(34,5): error TS2353: Object literal may only specify known properties, and 'labels' does not exist in type '{ badge: string; school: string; program: string; profile: string; period: string; chipsTitle: string; chips: string[]; note: string; }'.
-src/content/sections.ts(135,5): error TS2353: Object literal may only specify known properties, and 'labels' does not exist in type '{ badge: string; school: string; program: string; profile: string; period: string; chipsTitle: string; chips: string[]; note: string; }'.
+[36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
+transforming...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[32m✓[39m 579 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                          [39m[1m[2m  3.71 kB[22m[1m[22m[2m │ gzip:   1.21 kB[22m
+[2mdist/[22m[35massets/index-CVg_MCCy.css           [39m[1m[2m 39.67 kB[22m[1m[22m[2m │ gzip:   9.00 kB[22m
+[2mdist/[22m[36massets/EmbeddingCanvas-D_LI5Ega.js  [39m[1m[2m  2.38 kB[22m[1m[22m[2m │ gzip:   1.10 kB[22m
+[2mdist/[22m[36massets/keyboard-Cx3rlXgF.js         [39m[1m[2m  5.79 kB[22m[1m[22m[2m │ gzip:   2.75 kB[22m
+[2mdist/[22m[36massets/embedding-DrgScmxI.js        [39m[1m[2m  7.48 kB[22m[1m[22m[2m │ gzip:   3.42 kB[22m
+[2mdist/[22m[36massets/index-BMqwubCq.js            [39m[1m[2m 17.98 kB[22m[1m[22m[2m │ gzip:   5.91 kB[22m
+[2mdist/[22m[36massets/lenis-BBml_0t9.js            [39m[1m[2m 18.71 kB[22m[1m[22m[2m │ gzip:   5.45 kB[22m
+[2mdist/[22m[36massets/ScrollTrigger-BrDuEirF.js    [39m[1m[2m 43.55 kB[22m[1m[22m[2m │ gzip:  18.11 kB[22m
+[2mdist/[22m[36massets/index-D4-8ALNT.js            [39m[1m[2m 70.43 kB[22m[1m[22m[2m │ gzip:  27.68 kB[22m
+[2mdist/[22m[36massets/three.module-D4kkC7wv.js     [39m[1m[2m477.96 kB[22m[1m[22m[2m │ gzip: 119.11 kB[22m
+[2mdist/[22m[36massets/index-CdnGcPU-.js            [39m[1m[33m544.41 kB[39m[22m[2m │ gzip: 175.66 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 4.30s[39m
+[36mvite v7.3.7 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+[32m✓[39m 56 modules transformed.
+rendering chunks...
+[2mdist-ssr/[22m[36massets/EmbeddingCanvas-zYx5CqZF.js  [39m[1m[2m  3.63 kB[22m[1m[22m
+[2mdist-ssr/[22m[36massets/keyboard-DroGoHIj.js         [39m[1m[2m  8.35 kB[22m[1m[22m
+[2mdist-ssr/[22m[36massets/embedding-CeZabpCb.js        [39m[1m[2m 13.40 kB[22m[1m[22m
+[2mdist-ssr/[22m[36mentry.js                            [39m[1m[2m182.15 kB[22m[1m[22m
+[32m✓ built in 944ms[39m
+prerender: /
+prerender: /ru/
+prerender: /projects/ai-python-mentor/
+prerender: /ru/projects/ai-python-mentor/
+prerender: /projects/ngie/
+prerender: /ru/projects/ngie/
+prerender: /projects/transaction-monitor/
+prerender: /ru/projects/transaction-monitor/
+prerender: /projects/neural-astar/
+prerender: /ru/projects/neural-astar/
+prerender: /projects/knn/
+prerender: /ru/projects/knn/
+prerender: /projects/portfolio-analytics/
+prerender: /ru/projects/portfolio-analytics/
+prerender: /404.html (notfound)
+prerender: sitemap.xml (14 urls)
+llms: llms.txt: 1789 B, llms-full.txt: 10120 B
+ссылки ok: 15 html-файлов, битых нет
