@@ -75,7 +75,9 @@ for f in brigade/checks.d/*.sh; do
   [ "${num:-99}" -le "$PHASE" ] || continue
   head_ "checks: $(basename "$f")"
   # shellcheck disable=SC1090
-  if ! bash "$f"; then bad "$(basename "$f")"; fi
+  bash "$f"
+  rc=$?
+  if [ "$rc" -ne 0 ]; then FAILS=$((FAILS + rc)); fi
 done
 
 # ── Итог ─────────────────────────────────────────────────────────────────────
