@@ -1,0 +1,47 @@
+
+> coffee1337.github.io@1.0.0 build
+> tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs
+
+[36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
+transforming...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[32m✓[39m 69 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                        [39m[1m[2m  3.34 kB[22m[1m[22m[2m │ gzip:   1.02 kB[22m
+[2mdist/[22m[35massets/index-DzBKKVoa.css         [39m[1m[2m 27.68 kB[22m[1m[22m[2m │ gzip:   7.05 kB[22m
+[2mdist/[22m[36massets/orb-DMyvSfYn.js            [39m[1m[2m 12.32 kB[22m[1m[22m[2m │ gzip:   4.61 kB[22m
+[2mdist/[22m[36massets/lenis-BBml_0t9.js          [39m[1m[2m 18.71 kB[22m[1m[22m[2m │ gzip:   5.45 kB[22m
+[2mdist/[22m[36massets/ScrollTrigger-BrDuEirF.js  [39m[1m[2m 43.55 kB[22m[1m[22m[2m │ gzip:  18.11 kB[22m
+[2mdist/[22m[36massets/index-D4-8ALNT.js          [39m[1m[2m 70.43 kB[22m[1m[22m[2m │ gzip:  27.68 kB[22m
+[2mdist/[22m[36massets/index-BiI5Mxmt.js          [39m[1m[2m289.27 kB[22m[1m[22m[2m │ gzip:  89.27 kB[22m
+[2mdist/[22m[36massets/three.module-Dcbj-bkz.js   [39m[1m[33m704.69 kB[39m[22m[2m │ gzip: 181.05 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 3.42s[39m
+[36mvite v7.3.7 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+[32m✓[39m 33 modules transformed.
+rendering chunks...
+[2mdist-ssr/[22m[36massets/orb-_aUJ-pBk.js  [39m[1m[2m20.65 kB[22m[1m[22m
+[2mdist-ssr/[22m[36mentry.js                [39m[1m[2m91.29 kB[22m[1m[22m
+[32m✓ built in 937ms[39m
+prerender: /
+prerender: /ru/
+prerender: /projects/ai-python-mentor/
+prerender: /ru/projects/ai-python-mentor/
+prerender: /projects/ngie/
+prerender: /ru/projects/ngie/
+prerender: /projects/transaction-monitor/
+prerender: /ru/projects/transaction-monitor/
+prerender: /projects/neural-astar/
+prerender: /ru/projects/neural-astar/
+prerender: /projects/knn/
+prerender: /ru/projects/knn/
+prerender: /404.html
+prerender: sitemap.xml (12 urls)
