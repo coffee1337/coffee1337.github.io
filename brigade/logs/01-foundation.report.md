@@ -1,6 +1,6 @@
 ## Итог: сделано
 
-Коммиты: <см. git log после коммита фазы> `phase 1: токены Espresso/Parchment, variable-шрифты с Onest cyrillic, фиксы §10.1/§10.2`
+Коммиты: 94d1771 `phase 1: токены Espresso/Parchment, variable-шрифты (Onest cyrillic fallback), зерно/сетка, фиксы reveal §10.1 и нумерации §10.2`
 
 Зелено:
 - `./brigade/gate.sh` — exit 0, `GATE GREEN (phase 1)`: сборка (tsc + vite + ssr + prerender), все 12 URL в sitemap, 404 на месте, пререндер EN/RU содержит контент, inline `opacity: 0` в dist нет, все 26 проверок `01-foundation.sh` зелёные.
