@@ -1,0 +1,21 @@
+Фаза 3 закрыта. `./brigade/gate.sh` — GATE GREEN (phase 3). Коммит `e36ac23`.
+
+Что село
+- Сплэш «загрузка модели» на canvas: сессия (`sessionStorage`), 3s / 700ms / 600ms reduced, skip кликом/клавишей/`skip ↵`. Оверлей только на клиенте.
+- Hero: статус с живыми часами (в пререндере `--:--:--`), scramble-заголовок, одна каретка, кнопки, моно-ссылки, 4 метрики с count-up.
+- Embedding Space: `THREE.Points` + шейдер-атлас, drag/инерция, query top-k, HUD. Three только в ленивом чанке после сплэша. Fallback: `public/embedding-fallback.svg`.
+- Фоновые логи: 30 `$`-строк (гейт ≥15), маска, reduced без анимации.
+- `scripts/fetch-github.mjs` в `build`; кэш `307` / `10`.
+
+Чанки
+- основной `index-CRA3ePoQ.js` 504 kB (gzip 163)
+- three `embedding-CLfDlZQI.js` 479 kB (gzip 121) — не в стартовом JS
+- canvas 2.2 kB
+
+Отчёт: `brigade/logs/03-hero3d.report.md`. Живой клик в браузере в этой сессии не гонял. `NeuralOrb`/`orb.ts` больше не подключены, файлы не трогал.
+
+⚠️ File-mutation verifier: 1 file edit(s) FAILED this turn despite any wording above that may suggest otherwise. Run `git status` or `read_file` to confirm what actually landed.
+  • `C:\Users\trefi\source\repos\coffee1337.github.io\src\vite-env.d.ts` — [patch] No edit was applied because old_string and new_string are identical. Provide the existing text to replace in old_string and the changed replacement text in new_string.
+
+session_id: 20261114_052225_07f3e9
+  [tool] ヽ(>∀<☆)☆ reasoning...

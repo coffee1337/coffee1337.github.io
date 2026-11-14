@@ -23,7 +23,7 @@ computing gzip size...
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
-[32m✓ built in 4.26s[39m
+[32m✓ built in 4.09s[39m
 [36mvite v7.3.7 [32mbuilding ssr environment for production...[36m[39m
 transforming...
 [32m✓[39m 40 modules transformed.
@@ -31,7 +31,7 @@ rendering chunks...
 [2mdist-ssr/[22m[36massets/EmbeddingCanvas-zYx5CqZF.js  [39m[1m[2m  3.63 kB[22m[1m[22m
 [2mdist-ssr/[22m[36massets/embedding-CeZabpCb.js        [39m[1m[2m 13.40 kB[22m[1m[22m
 [2mdist-ssr/[22m[36mentry.js                            [39m[1m[2m118.26 kB[22m[1m[22m
-[32m✓ built in 900ms[39m
+[32m✓ built in 840ms[39m
 prerender: /
 prerender: /ru/
 prerender: /projects/ai-python-mentor/
