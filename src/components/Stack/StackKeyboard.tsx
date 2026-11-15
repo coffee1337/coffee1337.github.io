@@ -189,7 +189,7 @@ export function StackKeyboard() {
           )}
         </div>
 
-        {/* Панель «где используется»: desktop — справа, mobile — под клавиатурой */}
+        {/* "Where it's used" panel: desktop — right of the board, mobile — below it */}
         <aside
           aria-live="polite"
           aria-label={dict.stack.panelLabel}
@@ -249,7 +249,7 @@ export function StackKeyboard() {
         </aside>
       </div>
 
-      {/* Доступный список: те же клавиши для клавиатуры и скринридеров */}
+      {/* Accessible list: the same keys for keyboard and screen readers */}
       <ul className="sr-only" aria-label={dict.stack.keysLabel}>
         {rows.flatMap((row) =>
           row.keys.map((key) => (
