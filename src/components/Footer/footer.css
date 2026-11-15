@@ -1,0 +1,134 @@
+/* Футер: водяной знак-ник (fit-text), пиксельный маскот, список ссылок.
+   Палитра/шрифты/линии — только из токенов, ничего нового не вводим. */
+
+.footer-mark {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.footer-word {
+  display: block;
+  width: max-content;
+  padding: 0.05em 0 0.1em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 15vw, 15rem); /* fallback до замера и в пререндере */
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  user-select: none;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ink) 74%, transparent) 0%,
+    color-mix(in srgb, var(--ink) 74%, transparent) 18%,
+    color-mix(in srgb, var(--ink) 46%, transparent) 58%,
+    color-mix(in srgb, var(--ink) 10%, transparent) 90%,
+    transparent 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Если background-clip:text не поддержан — слово просто приглушённое, но видимое. */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .footer-word {
+    color: var(--ink-faint);
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+.footer-mascot {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.25s var(--ease);
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: var(--accent);
+}
+
+button.footer-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--ink-dim);
+  cursor: pointer;
+  text-align: left;
+}
+
+button.footer-link:hover,
+button.footer-link:focus-visible {
+  color: var(--accent);
+}
+
+.footer-link__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  opacity: 0.78;
+  transition: opacity 0.25s var(--ease);
+}
+
+.footer-link:hover .footer-link__icon {
+  opacity: 1;
+}
+
+.footer-link__arrow {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  opacity: 0.4;
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.footer-link:hover .footer-link__arrow {
+  opacity: 0.85;
+}
+
+a.footer-link:hover .footer-link__arrow {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 767px) {
+  .footer-mascot {
+    top: -2.1rem;
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-link,
+  .footer-link__icon,
+  .footer-link__arrow {
+    transition: none;
+  }
+}

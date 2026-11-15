@@ -1,0 +1,75 @@
+/* Пиксельная чашка-маскот: сетка 16×16, ровные пиксели, ступенчатый пар. */
+
+.pixel-cup {
+  shape-rendering: crispEdges;
+  overflow: visible;
+}
+
+.pixel-cup__body {
+  fill: var(--accent-2);
+}
+
+.pixel-cup__handle {
+  fill: var(--accent);
+}
+
+.pixel-cup__saucer {
+  fill: var(--ink-faint);
+  opacity: 0.38;
+}
+
+/* Пар: подъём — ступенями по пикселю, затухание — плавное. */
+.pixel-cup__puff {
+  fill: var(--ink-faint);
+  opacity: 0;
+  animation:
+    pixel-steam-rise 1.8s steps(3, end) infinite,
+    pixel-steam-fade 1.8s ease-in-out infinite;
+}
+
+.pixel-cup__puff:nth-child(2) {
+  animation-delay: 0.6s, 0.6s;
+}
+
+.pixel-cup__puff:nth-child(3) {
+  animation-delay: 1.2s, 1.2s;
+}
+
+@keyframes pixel-steam-rise {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pixel-steam-fade {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.5;
+  }
+  72% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-cup__puff {
+    animation: none;
+    opacity: 0.42;
+  }
+  .pixel-cup__puff:nth-child(2) {
+    transform: translateY(-1px);
+    opacity: 0.3;
+  }
+  .pixel-cup__puff:nth-child(3) {
+    transform: translateY(-2px);
+    opacity: 0.18;
+  }
+}

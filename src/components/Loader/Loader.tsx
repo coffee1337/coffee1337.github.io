@@ -1,209 +1,273 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSite } from "../../context/site";
+import { useScrollLock } from "../../hooks/useScrollLock";
+import { BRAND, createLoaderScene } from "../../loader/scene";
 
 const VISIT_KEY = "et-seen";
-const CHAOS = "#/8}~%*01<>_[]=+·◉●";
 
-type LogLine = { text: string; at: number };
+/** Первый визит: символы → coffee1337 → сайт. */
+const FULL_MS = 4000;
+/** Повторный визит в сессии: короткий reveal. */
+const SHORT_MS = 1000;
+/** prefers-reduced-motion: статичный ник и fade. */
+const REDUCED_MS = 400;
 
-function paintFrame(
-  ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
-  t: number,
-  reduced: boolean,
-) {
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#0c0a09";
-  ctx.fillRect(0, 0, w, h);
-  const ink = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim() || "#f3efe8";
-  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c4562a";
-  const faint = getComputedStyle(document.documentElement).getPropertyValue("--ink-faint").trim() || "#7f7972";
-  const layers = 5;
-  const cols = [6, 8, 10, 8, 6];
-  const cx = w * 0.52;
-  const cy = h * 0.42;
-  const gather = reduced ? 1 : Math.min(1, t / 900);
-  const pulse = t < 900 ? 0 : Math.min(1, (t - 900) / 1100);
-  const scatter = t < 2700 ? 0 : Math.min(1, (t - 2700) / 300);
-  ctx.font = "13px ui-monospace, monospace";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  for (let l = 0; l < layers; l++) {
-    const n = cols[l];
-    const x = cx + (l - 2) * Math.min(120, w * 0.12);
-    for (let i = 0; i < n; i++) {
-      const y = cy + (i - (n - 1) / 2) * 28;
-      const jx = (1 - gather) * Math.sin(i * 12.7 + l) * 80;
-      const jy = (1 - gather) * Math.cos(i * 7.3 + l) * 60;
-      const sx = (Math.random() - 0.5) * scatter * 220;
-      const sy = (Math.random() - 0.5) * scatter * 180;
-      const lit = pulse > 0 && Math.abs((pulse * 4.2) - l) < 0.55;
-      ctx.fillStyle = lit ? accent : ink;
-      ctx.globalAlpha = (0.35 + gather * 0.55) * (1 - scatter);
-      const glyph = gather < 0.85 ? CHAOS[(i * 5 + l + Math.floor(t / 40)) % CHAOS.length] : i % 2 ? "◉" : "●";
-      ctx.fillText(glyph, x + jx + sx, y + jy + sy);
-      if (l < layers - 1 && gather > 0.4) {
-        ctx.globalAlpha = 0.22 * gather * (1 - scatter);
-        ctx.fillStyle = faint;
-        const n2 = cols[l + 1];
-        const x2 = cx + (l + 1 - 2) * Math.min(120, w * 0.12);
-        const y2 = cy + ((i % n2) - (n2 - 1) / 2) * 28;
-        for (let d = 0; d < 8; d++) {
-          const p = d / 8;
-          ctx.fillText("·", x + (x2 - x) * p, y + (y2 - y) * p);
-        }
-      }
-    }
+/** Доля сюжета, на которой поднимается шторка (совпадает с фазой OUT сцены). */
+const WIPE_AT = 0.8;
+/** Доля сюжета, на которой вызывается onDone. */
+const DONE_AT = 0.9;
+
+function seenThisSession(): boolean {
+  try {
+    return sessionStorage.getItem(VISIT_KEY) === "1";
+  } catch {
+    return false;
   }
-  ctx.globalAlpha = 1;
+}
+
+/** Прогресс-бар привязан к фазам сюжета, а не к «сколько нарисовалось». */
+function progressAt(u: number): number {
+  if (u <= 0) return 0;
+  if (u < 0.2) return 8 * (u / 0.2);
+  if (u < 0.55) return 8 + 64 * ((u - 0.2) / 0.35);
+  if (u < 0.8) return 72 + 18 * ((u - 0.55) / 0.25);
+  return Math.min(100, 90 + 10 * ((u - 0.8) / 0.2));
 }
 
 export function Loader({ onDone }: { onDone: () => void }) {
-  const { dict, reduced } = useSite();
+  const { dict, reduced, lowPower } = useSite();
+  useScrollLock(true);
+
+  /**
+   * Длительность фиксируется на монтировании: finish() пишет et-seen, и без
+   * кэша следующий же ре-рендер пересчитал бы сюжет на короткую версию.
+   */
+  const [duration] = useState(() =>
+    reduced ? REDUCED_MS : seenThisSession() ? SHORT_MS : FULL_MS,
+  );
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const pctRef = useRef<HTMLSpanElement>(null);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
   const [leaving, setLeaving] = useState(false);
-  const [log, setLog] = useState<LogLine[]>([]);
-  const [tokens, setTokens] = useState<string[]>([]);
-  const [bar, setBar] = useState(0);
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-  const skipRef = useRef(false);
+  const [logCount, setLogCount] = useState(() => (reduced ? dict.loader.lines.length : 0));
+  const [tokensOn, setTokensOn] = useState(reduced);
 
-  const seen = typeof sessionStorage !== "undefined" && sessionStorage.getItem(VISIT_KEY) === "1";
-  const duration = reduced ? 600 : seen ? 700 : 3000;
-
-  const finish = () => {
-    if (skipRef.current) return;
-    skipRef.current = true;
+  /** Идемпотентный финал: снимает оверлей ровно один раз при любом сценарии. */
+  const finishedRef = useRef(false);
+  const finish = useCallback((instant: boolean) => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
     setLeaving(true);
     try {
       sessionStorage.setItem(VISIT_KEY, "1");
     } catch {
       /* private mode */
     }
-    window.setTimeout(() => doneRef.current(), reduced ? 120 : 220);
-  };
+    window.setTimeout(() => onDoneRef.current(), instant ? 120 : 0);
+  }, []);
 
+  const lines = dict.loader.lines;
+  const tokens = dict.loader.tokens;
+
+  // #boot живёт до первого отрисованного кадра лоадера: два rAF гарантируют,
+  // что пререндер уже закрыт, а пользователь не видит мигания страницы.
   useEffect(() => {
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    let first = 0;
+    let second = 0;
+    first = window.requestAnimationFrame(() => {
+      second = window.requestAnimationFrame(() => {
+        document.documentElement.classList.add("boot-done");
+        document.getElementById("boot")?.remove();
+      });
+    });
     return () => {
-      document.body.style.overflow = previous;
+      window.cancelAnimationFrame(first);
+      window.cancelAnimationFrame(second);
     };
   }, []);
 
-  // Критический оверлей из index.html снимаем, как только лоадер отрисовался.
-  useEffect(() => {
-    document.documentElement.classList.add("boot-done");
-    document.getElementById("boot")?.remove();
-  }, []);
-
-  useEffect(() => {
-    const onSkip = () => finish();
-    window.addEventListener("keydown", onSkip);
-    window.addEventListener("pointerdown", onSkip);
-    return () => {
-      window.removeEventListener("keydown", onSkip);
-      window.removeEventListener("pointerdown", onSkip);
-    };
-  }, []);
-
+  // Сцена: монтирование/снятие, пауза в скрытой вкладке, смена темы.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      window.setTimeout(finish, duration);
-      return;
-    }
-    const start = performance.now();
+
+    const scene = createLoaderScene(canvas, {
+      name: BRAND,
+      reduced,
+      lowPower,
+      duration,
+    });
+
+    // Первый кадр — сразу, чтобы canvas был непустым ещё до rAF: под #boot
+    // не должно быть пустого прямоугольника даже один кадр.
+    scene.frame(0);
+
+    const subscribeTheme = () => {
+      scene.setTheme();
+      // Static (reduced) frame: repaint once the palette fade has landed.
+      if (reduced) window.setTimeout(() => scene.frame(0), 420);
+    };
+    window.addEventListener("themechange", subscribeTheme);
+
+    const onResize = () => scene.resize();
+    window.addEventListener("resize", onResize);
+
     let raf = 0;
-    const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
+    let stopped = false;
+    let paused = false;
+    let pausedAt = 0;
+    let offset = 0;
+    let wipeStarted = false;
+    let shownLog = -1;
+    let latestPct = -1;
+    let tokensShown = false;
+    const startedAt = performance.now();
 
-    const logs = dict.loader.lines;
-    const nameTokens = dict.loader.tokens;
-    const shown = new Set<number>();
-
-    const step = (now: number) => {
-      const t = Math.min(duration, now - start);
-      const p = t / duration;
-      paintFrame(ctx, window.innerWidth, window.innerHeight, reduced ? duration : t, reduced);
-      if (!reduced && duration >= 2000) {
-        logs.forEach((line, i) => {
-          if (t >= i * 160 && !shown.has(i)) {
-            shown.add(i);
-            setLog((prev) => [...prev, { text: line, at: i }]);
-          }
-        });
-        const pct = Math.min(100, Math.floor(Math.max(0, t - 900) / 11));
-        setBar(pct);
-        const tokenCount = Math.min(nameTokens.length, Math.max(0, Math.floor((t - 2000) / 140)));
-        setTokens(nameTokens.slice(0, tokenCount));
-      } else if (reduced) {
-        setLog(logs.map((text, i) => ({ text, at: i })));
-        setBar(100);
-        setTokens(nameTokens);
+    const paintChrome = (u: number) => {
+      const pct = progressAt(u);
+      if (barRef.current) barRef.current.style.transform = `scaleX(${(pct / 100).toFixed(4)})`;
+      const rounded = Math.round(pct);
+      if (rounded !== latestPct) {
+        latestPct = rounded;
+        if (pctRef.current) pctRef.current.textContent = `${rounded}%`;
       }
-      if (p < 1 && !skipRef.current) raf = requestAnimationFrame(step);
-      else finish();
+      const want = Math.min(lines.length, Math.max(0, Math.floor((u - 0.21) / 0.055) + 1));
+      if (want !== shownLog) {
+        shownLog = want;
+        setLogCount(want);
+      }
+      if (!tokensShown && u > 0.47) {
+        tokensShown = true;
+        setTokensOn(true);
+      }
     };
-    raf = requestAnimationFrame(step);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-    };
-  }, [dict.loader.lines, dict.loader.tokens, duration, reduced]);
 
-  const filled = Math.round(bar / 5);
-  const barText = `${"▓".repeat(filled)}${"░".repeat(Math.max(0, 20 - filled))} ${bar}%`;
+    const tick = (now: number) => {
+      raf = 0;
+      if (stopped || finishedRef.current) return;
+      const elapsed = now - startedAt - offset;
+      const u = Math.min(1, Math.max(0, elapsed / duration));
+      scene.frame(elapsed);
+      paintChrome(u);
+      if (!wipeStarted && u >= WIPE_AT) {
+        wipeStarted = true;
+        setLeaving(true);
+      }
+      if (u >= DONE_AT) {
+        stopped = true;
+        finish(false);
+        return;
+      }
+      raf = window.requestAnimationFrame(tick);
+    };
+
+    if (reduced) {
+      // Статичный кадр без частиц уже нарисован выше; дальше только таймер.
+      const timer = window.setTimeout(() => finish(false), REDUCED_MS);
+      return () => {
+        window.clearTimeout(timer);
+        window.removeEventListener("themechange", subscribeTheme);
+        window.removeEventListener("resize", onResize);
+        scene.dispose();
+      };
+    }
+
+    const onVisibility = () => {
+      if (stopped || finishedRef.current) return;
+      if (document.hidden) {
+        if (paused) return;
+        paused = true;
+        pausedAt = performance.now();
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+        return;
+      }
+      if (!paused) return;
+      paused = false;
+      offset += performance.now() - pausedAt;
+      raf = window.requestAnimationFrame(tick);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    raf = window.requestAnimationFrame(tick);
+
+    return () => {
+      stopped = true;
+      window.cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("themechange", subscribeTheme);
+      window.removeEventListener("resize", onResize);
+      scene.dispose();
+    };
+  }, [duration, finish, lines, lowPower, reduced]);
+
+  // Пропуск: кнопка и только Esc/Enter/клик мышью — не «любая клавиша».
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+      if (event.key !== "Escape" && event.key !== "Enter") return;
+      event.preventDefault();
+      finish(true);
+    };
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("[data-loader-skip]")) return;
+      finish(true);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
+  }, [finish]);
 
   return (
     <div
-      className="loader-screen"
-      style={{ opacity: leaving ? 0 : 1 }}
+      className={`loader-screen loader-shell${leaving ? " is-leaving" : ""}`}
       role="status"
       aria-live="polite"
       aria-label={dict.loader.forming}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
-      <div className="relative z-[1] flex h-full w-full flex-col justify-between p-6 md:p-10">
-        <pre className="font-mono text-[12px] leading-6 text-[var(--ink-dim)]">
-          {log.map((line) => (
-            <div key={line.at}>{line.text}</div>
+      <canvas ref={canvasRef} className="loader-canvas" aria-hidden="true" />
+      <div className="loader-hud">
+        <div className="loader-log">
+          {lines.slice(0, logCount).map((line, index) => (
+            <div className="loader-log-line" key={index}>
+              {line}
+            </div>
           ))}
-        </pre>
-        <div className="mb-[12vh]">
-          {!reduced && tokens.length > 0 && (
-            <p className="font-mono text-sm text-[var(--ink)]">
-              {tokens.map((tok) => (
-                <span key={tok} className="mr-3">
-                  {tok}
-                  <span className="ml-1 text-[10px] text-[var(--ink-faint)]">p=0.97</span>
-                </span>
-              ))}
-            </p>
-          )}
-          <p className="mt-4 font-mono text-[12px] tracking-[0.08em] text-[var(--accent)]">{barText}</p>
-          <p className="kicker mt-3">{dict.loader.forming}</p>
+        </div>
+        <div className="loader-meta">
+          <div className="loader-tokens" data-on={tokensOn ? "true" : "false"} aria-hidden="true">
+            {tokens.map((token, index) => (
+              <span key={index}>{token}</span>
+            ))}
+          </div>
+          <div className="loader-bar-row">
+            <span className="loader-label">{dict.loader.forming}</span>
+            <div className="loader-bar" aria-hidden="true">
+              <div
+                ref={barRef}
+                className="loader-bar-fill"
+                style={{ transform: reduced ? "scaleX(1)" : "scaleX(0)" }}
+              />
+            </div>
+            <span ref={pctRef} className="loader-pct">
+              {reduced ? "100%" : "0%"}
+            </span>
+          </div>
         </div>
       </div>
       <button
         type="button"
-        className="absolute bottom-6 right-6 z-[2] font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-faint)]"
-        onClick={(event) => {
-          event.stopPropagation();
-          finish();
-        }}
+        data-loader-skip="true"
+        className="loader-skip"
+        onClick={() => finish(true)}
       >
         {dict.loader.skip}
       </button>

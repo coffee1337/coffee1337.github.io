@@ -1,0 +1,10 @@
+export type { IconProps } from "./types";
+export { ArrowUpRight } from "./ArrowUpRight";
+export { Copy } from "./Copy";
+export { GitHub } from "./GitHub";
+export { LinkedIn } from "./LinkedIn";
+export { Llms } from "./Llms";
+export { Mail } from "./Mail";
+export { PixelCup } from "./PixelCup";
+export { Resume } from "./Resume";
+export { Telegram } from "./Telegram";

@@ -9,9 +9,9 @@ export function Education() {
         <p className="kicker">{edu.index} — {edu.label}</p>
         <div>
           <p className="display text-3xl md:text-5xl">{edu.school}</p>
-          <p className="mt-2 text-lg text-[var(--muted)]">{edu.program}</p>
+          <p className="mt-2 text-lg text-[var(--ink-dim)]">{edu.program}</p>
         </div>
-        <p className="mono text-[12px] text-[var(--lime)]">{edu.period}</p>
+        <p className="mono text-[12px] text-[var(--accent)]">{edu.period}</p>
       </div>
     </section>
   );

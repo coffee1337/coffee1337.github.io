@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useMagnetic, useReveal } from "../../hooks/useMotion";
 import { CopyButton } from "../CopyButton";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { NeuralMark } from "../Brand/NeuralMark";
+import { GitHub, LinkedIn, Mail, Resume, Telegram } from "../Icons";
 import { ContactForm } from "./ContactForm";
 
 export function Contact() {
@@ -17,10 +19,10 @@ export function Contact() {
       <div className="site-wrap">
         <div className="flex items-center justify-between">
           <p className="kicker">{c.index} — {c.label}</p>
-          <NeuralMark className="h-8 w-8 text-[var(--text)]" />
+          <NeuralMark className="h-8 w-8 text-[var(--ink)]" />
         </div>
         <ScrambleHeading data-reveal text={c.title} className="display mt-6 max-w-5xl text-[clamp(2.8rem,7vw,6.4rem)]" />
-        <p data-reveal className="mt-6 flex items-center gap-3 text-[var(--muted)]">
+        <p data-reveal className="mt-6 flex items-center gap-3 text-[var(--ink-dim)]">
           <span className="status-dot" aria-hidden />
           {c.status}
         </p>
@@ -31,11 +33,11 @@ export function Contact() {
         <div className="mt-12 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div data-reveal><ContactForm /></div>
           <ul className="border-t border-[var(--line)]">
-          <Row label={c.email} value={links.email} href={links.mailto} copyValue={links.email} copyLabel={c.copyEmail} copiedLabel={c.copied} />
-          <Row label="GitHub" value="coffee1337" href={links.github} external />
-          <Row label={c.linkedin} value="in/coffee1337" href={links.linkedin} external />
-          <Row label={c.telegram} value={links.telegramHandle} href={links.telegram} external copyValue={links.telegramHandle} copyLabel={c.copyTelegram} copiedLabel={c.copied} />
-            <Row label={c.resume} value="resume" href={links.resumeRepo} external />
+          <Row icon={<Mail className="h-4 w-4" />} label={c.email} value={links.email} href={links.mailto} copyValue={links.email} copyLabel={c.copyEmail} copiedLabel={c.copied} />
+          <Row icon={<GitHub className="h-4 w-4" />} label="GitHub" value="coffee1337" href={links.github} external />
+          <Row icon={<LinkedIn className="h-4 w-4" />} label={c.linkedin} value="in/coffee1337" href={links.linkedin} external />
+          <Row icon={<Telegram className="h-4 w-4" />} label={c.telegram} value={links.telegramHandle} href={links.telegram} external copyValue={links.telegramHandle} copyLabel={c.copyTelegram} copiedLabel={c.copied} />
+            <Row icon={<Resume className="h-4 w-4" />} label={c.resume} value="resume" href={links.resumeRepo} external />
           </ul>
         </div>
       </div>
@@ -44,6 +46,7 @@ export function Contact() {
 }
 
 function Row({
+  icon,
   label,
   value,
   href,
@@ -52,6 +55,7 @@ function Row({
   copyLabel,
   copiedLabel,
 }: {
+  icon: ReactNode;
   label: string;
   value: string;
   href: string;
@@ -62,8 +66,11 @@ function Row({
 }) {
   return (
     <li data-reveal className="contact-line">
-      <a href={href} className="contact-row" {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-        <span className="kicker">{label}</span>
+      <a href={href} className="contact-row group" {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+        <span className="inline-flex items-center gap-2.5">
+          <span className="inline-flex shrink-0 text-[var(--ink-faint)] transition-colors duration-300 group-hover:text-[var(--accent)]">{icon}</span>
+          <span className="kicker">{label}</span>
+        </span>
         <span className="contact-value">{value}</span>
       </a>
       {copyValue && copyLabel && copiedLabel && (

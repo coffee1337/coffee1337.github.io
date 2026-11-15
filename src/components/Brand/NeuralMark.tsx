@@ -3,7 +3,7 @@ export function NeuralMark({ className = "" }: { className?: string }) {
     <svg className={className} viewBox="0 0 64 64" fill="none" aria-hidden>
       <circle cx="32" cy="32" r="18" stroke="currentColor" strokeWidth="1.25" opacity="0.85" />
       <circle cx="32" cy="32" r="8" stroke="var(--accent)" strokeWidth="1" opacity="0.7" />
-      <circle cx="32" cy="32" r="3.2" fill="var(--lime)" />
+      <circle cx="32" cy="32" r="3.2" fill="var(--accent)" />
       <circle cx="32" cy="14" r="1.7" fill="currentColor" />
       <circle cx="48" cy="40" r="1.7" fill="currentColor" />
       <circle cx="17" cy="42" r="1.7" fill="currentColor" />

@@ -16,12 +16,12 @@ export function Resume() {
       <div className="site-wrap">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <p className="kicker">{r.index} — {r.label}</p>
-          <p className="mono text-[10px] text-[var(--faint)]">CV / {year}</p>
+          <p className="mono text-[10px] text-[var(--ink-faint)]">CV / {year}</p>
         </div>
         <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
           <div>
             <h2 className="display text-[clamp(2.6rem,5vw,4.6rem)]">{r.name}</h2>
-            <p className="mt-2 text-[var(--muted)]">{r.role}</p>
+            <p className="mt-2 text-[var(--ink-dim)]">{r.role}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <a className="btn btn-primary" href={links.resumePdf} download>{r.download}</a>
@@ -33,12 +33,12 @@ export function Resume() {
           <div className="grid md:grid-cols-2">
             <Cell title={r.profileTitle}><p>{r.profile}</p></Cell>
             <Cell title={r.experienceTitle}>
-              <p className="text-[var(--text)]">{exp.role}</p>
+              <p className="text-[var(--ink)]">{exp.role}</p>
               <p className="mt-1">{exp.employment}</p>
-              <p className="mono mt-3 text-[11px] text-[var(--lime)]">{exp.period}</p>
+              <p className="mono mt-3 text-[11px] text-[var(--accent)]">{exp.period}</p>
             </Cell>
             <Cell title={r.educationTitle}>
-              <p className="text-[var(--text)]">{edu.school}</p>
+              <p className="text-[var(--ink)]">{edu.school}</p>
               <p className="mt-1">{edu.program}</p>
               <p className="mono mt-3 text-[11px]">{edu.period}</p>
             </Cell>
@@ -54,7 +54,7 @@ export function Resume() {
               {dict.projects.items.map((p, i) => (
                 <li key={p.id}>
                   <a href={p.github} target="_blank" rel="noopener noreferrer" className="group block">
-                    <span className="mono text-[10px] text-[var(--faint)]">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="mono text-[10px] text-[var(--ink-faint)]">{String(i + 1).padStart(2, "0")}</span>
                     <span className="mt-1 block text-sm group-hover:text-[var(--accent)]">{p.name}</span>
                   </a>
                 </li>
@@ -69,7 +69,7 @@ export function Resume() {
 
 function Cell({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div data-reveal className="border-b border-[var(--line)] px-5 py-6 text-[var(--muted)] md:border-r md:px-8">
+    <div data-reveal className="border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:border-r md:px-8">
       <h3 className="kicker mb-3">{title}</h3>
       {children}
     </div>
