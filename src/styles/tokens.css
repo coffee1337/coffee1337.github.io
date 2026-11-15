@@ -12,11 +12,14 @@
   --ink-faint: #7f7972;        /* поднят с #6e6862 из ТЗ: AA для мелких лейблов (4.59:1 на --bg) */
   --line: rgb(243 239 232 / .10);
   --line-2: rgb(243 239 232 / .06);
+  --line-strong: rgb(243 239 232 / .28);
   --dot: rgb(243 239 232 / .07);
   --accent: #c4562a;           /* терракота */
   --accent-2: #d9a066;         /* карамель / крема */
   --accent-glow: rgb(196 86 42 / .18);
+  --accent-ink: #0c0a09;       /* текст на терракотовой плашке */
   --ok: #7cc47f;               /* точка статуса «онлайн» */
+  --header: rgb(12 10 9 / .72);
 
   --font-display: "Bricolage Grotesque Variable", "Onest Variable", system-ui, sans-serif;
   --font-body: "Epilogue Variable", "Onest Variable", system-ui, sans-serif;
@@ -34,29 +37,12 @@
   --ink-faint: #846b5f;        /* поднят с #8b7367 из ТЗ: AA для мелких лейблов (4.51:1 на --bg) */
   --line: rgb(28 20 16 / .12);
   --line-2: rgb(28 20 16 / .07);
+  --line-strong: rgb(28 20 16 / .42);
   --dot: rgb(28 20 16 / .08);
   --accent: #b34a22;           /* темнее для контраста на светлом */
   --accent-2: #9a6a3a;
   --accent-glow: rgb(179 74 34 / .14);
+  --accent-ink: #f8f4ee;
   --ok: #2f8f3a;
-}
-
-/* ── Совместимость со старыми компонентами. Удалять по мере миграции фаз 2–4. ── */
-:root {
-  --text: var(--ink);
-  --muted: var(--ink-dim);
-  --faint: var(--ink-faint);
-  --surface: var(--bg-2);
-  --surface-2: var(--bg-3);
-  --accent-ink: #0c0a09;
-  --line-strong: rgb(243 239 232 / .28);
-  --focus: var(--accent);
-  --lime: var(--accent);       /* был лаймовый акцент; теперь алиас терракоты */
-  --lime-ink: var(--accent-ink);
-  --header: rgb(12 10 9 / .72);
-}
-
-:root[data-theme="light"] {
-  --line-strong: rgb(28 20 16 / .42);
   --header: rgb(248 244 238 / .78);
 }

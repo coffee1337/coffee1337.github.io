@@ -62,24 +62,24 @@ export function ProjectPage({ id }: { id?: string }) {
               {project.status && (
                 <span className="inline-flex items-center gap-2">
                   <span className="status-dot" aria-hidden />
-                  <span className="mono text-[10px] text-[var(--lime)]">{project.status}</span>
+                  <span className="mono text-[10px] text-[var(--accent)]">{project.status}</span>
                 </span>
               )}
             </div>
             <h1 data-reveal className="display mt-6 text-[clamp(2.6rem,6vw,5.2rem)]">{project.name}</h1>
-            <p data-reveal className="mt-5 max-w-2xl text-xl leading-snug text-[var(--muted)] md:text-2xl">
+            <p data-reveal className="mt-5 max-w-2xl text-xl leading-snug text-[var(--ink-dim)] md:text-2xl">
               {project.statement}
             </p>
 
             <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
-                <div className="space-y-5 text-[var(--muted)]">
+                <div className="space-y-5 text-[var(--ink-dim)]">
                   <p data-reveal>
-                    <span className="kicker mr-3 text-[var(--text)]">{copy.purpose}</span>
+                    <span className="kicker mr-3 text-[var(--ink)]">{copy.purpose}</span>
                     {project.purpose}
                   </p>
                   <p data-reveal>
-                    <span className="kicker mr-3 text-[var(--text)]">{copy.built}</span>
+                    <span className="kicker mr-3 text-[var(--ink)]">{copy.built}</span>
                     {project.built}
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export function ProjectPage({ id }: { id?: string }) {
                   ))}
                 </div>
               </div>
-              <div data-reveal className="case-visual">
+              <div data-reveal>
                 <ProjectVisual project={project} position={position} />
               </div>
             </div>

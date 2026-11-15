@@ -1,24 +1,278 @@
 /* ── SVG-схемы кейсов: геометрия анимаций и поток данных по связям.
-   Все трансформации — в системе координат самого элемента (fill-box),
-   иначе клетки/столбики «вылетают» из угла SVG. ── */
+   Все трансформации живут в системе координат самого элемента (fill-box),
+   иначе клетки/столбики/стрелка «вылетают» из угла SVG.
+   Здесь же — все тайминги, чтобы разметка схем оставалась декларативной. ── */
 
+.sv-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Геометрия трансформаций. */
 .sv-node,
 .sv-cell,
+.sv-exp,
+.sv-pathc,
 .sv-bar,
+.sv-col,
+.sv-pkt,
+.sv-halo,
+.sv-edge,
+.sv-chip,
+.sv-stream,
 .sv-needle,
 .sv-packet,
 .sv-flow {
   transform-box: fill-box;
 }
 
-.sv-cell {
+.sv-cell,
+.sv-exp,
+.sv-pathc,
+.sv-halo,
+.sv-chip {
   transform-origin: center;
 }
 
-.sv-bar {
+/* Столбики растут строго от своей базовой линии — общей оси графика. */
+.sv-bar,
+.sv-col {
   transform-origin: center bottom;
 }
 
-.sv-needle {
-  transform-origin: 50% 100%;
+/* Стрим ответа тянется слева направо. */
+.sv-stream {
+  transform-origin: left center;
+}
+
+/* ── текст ──────────────────────────────────────────────────────────────── */
+
+.sv-node-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  fill: var(--ink);
+}
+
+.sv-node-sub {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  fill: var(--ink-faint);
+}
+
+.sv-label {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--ink-faint);
+}
+
+.sv-label-accent {
+  fill: var(--accent);
+}
+
+.sv-label-ink {
+  fill: var(--ink-dim);
+}
+
+.sv-chip-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.sv-gauge-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--ink-faint);
+}
+
+/* ── сетки и оси ────────────────────────────────────────────────────────── */
+
+.sv-grid {
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.sv-axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+/* ── A*: клетки раскрываются в порядке работы алгоритма ─────────────────── */
+
+[data-flow="true"] .sv-exp {
+  animation: sv-exp 0.5s var(--ease) both;
+}
+
+@keyframes sv-exp {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  72% {
+    opacity: 0.58;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+}
+
+[data-flow="true"] .sv-pathc {
+  animation: sv-pathc 0.42s ease-out both;
+}
+
+@keyframes sv-pathc {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+/* ── KNN: цикл query → радиус → соседи → победитель (6s) ────────────────── */
+
+[data-flow="true"] .sv-edge {
+  animation: sv-edge 6s ease-out infinite;
+}
+
+@keyframes sv-edge {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 1;
+  }
+  12% {
+    opacity: 0.8;
+    stroke-dashoffset: 0;
+  }
+  78% {
+    opacity: 0.8;
+    stroke-dashoffset: 0;
+  }
+  92%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+[data-flow="true"] .sv-halo {
+  animation: sv-halo 6s ease-out infinite;
+}
+
+@keyframes sv-halo {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  6% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  20% {
+    opacity: 0.3;
+    transform: scale(1.12);
+  }
+  32%,
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+[data-flow="true"] .sv-chip {
+  animation: sv-chip 6s ease-out infinite;
+}
+
+@keyframes sv-chip {
+  0%,
+  54% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  64% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+/* ── mentor: ответ стримится ────────────────────────────────────────────── */
+
+[data-flow="true"] .sv-stream {
+  animation: sv-stream 2.6s var(--ease) infinite;
+}
+
+@keyframes sv-stream {
+  0% {
+    transform: scaleX(0.02);
+    opacity: 0.2;
+  }
+  22% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+  84% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* ── monitor: алерт выше порога ─────────────────────────────────────────── */
+
+[data-flow="true"] .sv-alert {
+  animation: sv-alert 2.8s ease-in-out infinite;
+}
+
+@keyframes sv-alert {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Статичный финальный кадр: никаких движений, но всё содержимое на месте. */
+@media (prefers-reduced-motion: reduce) {
+  [data-flow] .sv-flow,
+  [data-flow] .sv-cell,
+  [data-flow] .sv-exp,
+  [data-flow] .sv-pathc,
+  [data-flow] .sv-edge,
+  [data-flow] .sv-halo,
+  [data-flow] .sv-chip,
+  [data-flow] .sv-stream,
+  [data-flow] .sv-alert,
+  [data-flow] .sv-bar,
+  [data-flow] .sv-row,
+  [data-flow] .sv-needle,
+  [data-flow] .sv-packet {
+    animation: none !important;
+  }
+
+  .sv-pkt {
+    display: none;
+  }
 }

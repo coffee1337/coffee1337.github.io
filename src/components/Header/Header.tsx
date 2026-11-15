@@ -21,6 +21,8 @@ export function Header() {
   const [hidden, setHidden] = useState(false);
   const [compact, setCompact] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const paletteButton = useRef<HTMLButtonElement>(null);
+  const paletteWasOpen = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useFocusTrap(menuRef, menuOpen);
   useScrollLock(menuOpen || paletteOpen);
@@ -72,6 +74,12 @@ export function Header() {
     (first ?? menuButton.current)?.focus();
   }, [menuOpen]);
 
+  // Фокус возвращается на триггер палитры, даже если её открыли хоткеем.
+  useEffect(() => {
+    if (paletteWasOpen.current && !paletteOpen) paletteButton.current?.focus();
+    paletteWasOpen.current = paletteOpen;
+  }, [paletteOpen]);
+
   const current = section === "education" ? "resume" : section;
 
   return (
@@ -89,7 +97,7 @@ export function Header() {
           <span className="text-[var(--accent)]">●</span> coffee1337
         </a>
 
-        <nav className="mx-5 hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav className="mx-5 hidden items-center gap-1 lg:flex" aria-label={dict.a11y.primaryNav}>
           {NAV_IDS.map((id) => (
             <a
               key={id}
@@ -111,6 +119,7 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <button
+            ref={paletteButton}
             type="button"
             className="hidden rounded-full px-1 py-1 lg:block"
             onClick={() => setPaletteOpen(true)}
@@ -179,7 +188,7 @@ export function Header() {
             aria-modal="true"
             data-lenis-prevent
           >
-            <nav className="flex flex-col" aria-label="Mobile">
+            <nav className="flex flex-col" aria-label={dict.a11y.mobileNav}>
               {MOBILE_IDS.map((id, index) => (
                 <a
                   key={id}

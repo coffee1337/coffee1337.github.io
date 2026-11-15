@@ -36,7 +36,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--focus);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
 
@@ -81,7 +81,7 @@ body::before {
   inset: 0;
   z-index: 70;
   pointer-events: none;
-  background: var(--lime);
+  background: var(--accent);
   transform-origin: var(--wipe-x, 90%) var(--wipe-y, 8%);
   clip-path: circle(0% at var(--wipe-x, 90%) var(--wipe-y, 8%));
 }
@@ -154,7 +154,7 @@ html.lenis body {
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--ink-dim);
 }
 
 .rule {
@@ -203,12 +203,12 @@ html.lenis body {
 .btn-ghost {
   background: transparent;
   border-color: var(--line-strong);
-  color: var(--text);
+  color: var(--ink);
 }
 
 .btn-ghost:hover {
-  border-color: var(--text);
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
 }
 
 .chip {
@@ -217,7 +217,7 @@ html.lenis body {
   padding: 0.35rem 0.7rem;
   border: 1px solid var(--line);
   border-radius: 999px;
-  color: var(--muted);
+  color: var(--ink-dim);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.04em;
@@ -269,7 +269,7 @@ html.lenis body {
 .nav-link {
   position: relative;
   font-size: 0.86rem;
-  color: var(--muted);
+  color: var(--ink-dim);
 }
 
 .nav-link::after {
@@ -279,7 +279,7 @@ html.lenis body {
   bottom: -0.3rem;
   width: 100%;
   height: 1px;
-  background: var(--lime);
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease);
@@ -287,7 +287,7 @@ html.lenis body {
 
 .nav-link:hover,
 .nav-link[aria-current="true"] {
-  color: var(--text);
+  color: var(--ink);
 }
 
 .nav-link:hover::after,
@@ -299,7 +299,7 @@ html.lenis body {
   position: relative;
   min-height: 320px;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--bg-2);
   border: 1px solid var(--line);
 }
 
@@ -314,12 +314,12 @@ html.lenis body {
 }
 
 .stack-item:hover {
-  color: var(--text);
+  color: var(--ink);
   padding-left: 0.6rem;
 }
 
 .stack-item:hover .idx {
-  color: var(--lime);
+  color: var(--accent);
 }
 
 .marquee {
@@ -397,7 +397,7 @@ html.lenis body {
   top: calc(100% + 0.4rem);
   right: 0;
   padding: 0.2rem 0.45rem;
-  background: var(--text);
+  background: var(--ink);
   color: var(--bg);
   font-family: var(--font-mono);
   font-size: 0.62rem;
@@ -441,7 +441,7 @@ html.lenis body {
   height: 100%;
   width: 100%;
   transform-origin: left;
-  background: var(--lime);
+  background: var(--accent);
   transition: transform 0.35s var(--ease);
 }
 
@@ -451,7 +451,7 @@ html.lenis body {
   bottom: 0.9rem;
   z-index: 40;
   font-size: 0.62rem;
-  color: var(--faint);
+  color: var(--ink-faint);
   pointer-events: none;
 }
 
@@ -479,7 +479,7 @@ html.lenis body {
   font-size: 0.85rem;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .loader-caption {
@@ -498,40 +498,207 @@ html.lenis body {
   line-height: 0.9;
 }
 
-.hero-gradient,
-.hero-gradient > span {
+.hero-gradient {
   background: linear-gradient(180deg, var(--ink) 0%, color-mix(in srgb, var(--ink) 40%, transparent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.hero-caret {
-  position: absolute;
-  right: 0;
-  bottom: 0.12em;
+/* ── Scramble: слова не рвутся, ширина символа фиксирована под финальный глиф. ── */
+.scramble {
+  position: relative;
+}
+
+.scramble-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.scramble-char {
+  display: inline-block;
+  text-align: center;
+}
+
+.scramble-char.is-pending {
+  color: var(--ink-dim);
+  opacity: 0.8;
+}
+
+.hero-caret-inline {
+  display: inline-block;
   width: 0.08em;
   height: 0.72em;
+  margin-left: 0.08em;
   background: var(--accent);
+  vertical-align: -0.02em;
   pointer-events: none;
 }
 
-.hero-stage {
+.scramble.is-done .hero-caret-inline {
+  animation: caret-blink 240ms steps(1, end) 3;
+}
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Hero: облако эмбеддингов. Ни рамки, ни жёсткой обрезки: canvas уходит
+   за правый край вьюпорта, края растворяются маской, под текстом приглушено. ── */
+.hero-field {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(64vw, 1000px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-field__bleed {
   position: relative;
-  height: min(52vh, 460px);
-  min-height: 240px;
+  height: 100%;
+  width: 100%;
+  -webkit-mask-image: radial-gradient(
+    ellipse 62% 58% at 62% 50%,
+    #000 0%,
+    #000 42%,
+    rgb(0 0 0 / 0.55) 66%,
+    transparent 84%
+  );
+  mask-image: radial-gradient(
+    ellipse 62% 58% at 62% 50%,
+    #000 0%,
+    #000 42%,
+    rgb(0 0 0 / 0.55) 66%,
+    transparent 84%
+  );
 }
 
-@media (max-width: 760px) {
-  .hero-stage {
-    height: 42vw;
-    min-height: 180px;
-    opacity: 0.55;
+.emb-fallback {
+  position: absolute;
+  inset: 0;
+  color: var(--ink-faint);
+  opacity: 1;
+  transition: opacity 0.6s var(--ease);
+}
+
+.emb-fallback.is-hidden {
+  opacity: 0;
+}
+
+.emb-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.emb-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.emb-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease);
+  pointer-events: auto;
+  touch-action: pan-y;
+  outline: none;
+}
+
+.emb-canvas.is-ready {
+  opacity: 1;
+}
+
+.emb-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.emb-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+  will-change: transform;
+}
+
+.emb-label--query {
+  color: var(--accent);
+}
+
+.emb-label--score {
+  color: var(--accent-2);
+}
+
+.emb-label--cluster {
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.emb-hud {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 0.85rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  pointer-events: none;
+  z-index: 2;
+}
+
+@media (max-width: 1023px) {
+  .hero-field {
+    top: 16%;
+    bottom: auto;
+    width: 100%;
+    height: 42%;
+    opacity: 0.2;
   }
-}
 
-@media (min-width: 1024px) {
-  .hero-stage { height: min(68vh, 620px); }
+  .hero-field__bleed {
+    -webkit-mask-image: radial-gradient(
+      ellipse 62% 44% at 52% 26%,
+      #000 0%,
+      #000 26%,
+      rgb(0 0 0 / 0.45) 58%,
+      transparent 82%
+    );
+    mask-image: radial-gradient(
+      ellipse 62% 44% at 52% 26%,
+      #000 0%,
+      #000 26%,
+      rgb(0 0 0 / 0.45) 58%,
+      transparent 82%
+    );
+  }
+
+  .emb-canvas {
+    pointer-events: none;
+  }
+
+  .emb-hud {
+    right: 0.75rem;
+    bottom: 0.5rem;
+    font-size: 9px;
+  }
 }
 
 .hero-logs {
@@ -577,7 +744,7 @@ html.lenis body {
 .cap-rule {
   height: 1px;
   width: 3.5rem;
-  background: var(--lime);
+  background: var(--accent);
   transform: scaleX(0.35);
   transform-origin: right;
   transition: transform 0.45s var(--ease);
@@ -617,14 +784,14 @@ html.lenis body {
 
 .resume-sheet {
   border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--bg) 88%, var(--surface));
+  background: color-mix(in srgb, var(--bg) 88%, var(--bg-2));
 }
 
 .brand-mark {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .brand-orb {
@@ -662,7 +829,7 @@ html.lenis body {
   padding: 0.4rem 0.85rem;
   border: 1px solid var(--line-strong);
   background: transparent;
-  color: var(--muted);
+  color: var(--ink-dim);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
@@ -671,8 +838,8 @@ html.lenis body {
 }
 
 .copy-btn:hover {
-  color: var(--text);
-  border-color: var(--text);
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 .hero-copy {
@@ -707,7 +874,7 @@ html.lenis body {
   transition: background-position 0.8s var(--ease);
   background:
     radial-gradient(circle at 16% 12%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 46%),
-    var(--surface);
+    var(--bg-2);
 }
 
 :root[data-theme="light"] .project-art {
@@ -719,13 +886,13 @@ html.lenis body {
 .art-ledger {
   background:
     repeating-linear-gradient(90deg, transparent 0 42px, var(--line) 42px 43px),
-    var(--surface);
+    var(--bg-2);
 }
 
 .art-search {
   background:
-    radial-gradient(circle at 78% 30%, color-mix(in srgb, var(--lime) 24%, transparent), transparent 26%),
-    var(--surface);
+    radial-gradient(circle at 78% 30%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 26%),
+    var(--bg-2);
 }
 
 .case-visual { transition: transform 0.6s var(--ease); }

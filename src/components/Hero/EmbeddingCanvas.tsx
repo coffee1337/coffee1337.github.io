@@ -1,47 +1,48 @@
 import { useEffect, useRef, useState } from "react";
 import { useSite } from "../../context/site";
+import type { EmbeddingHandle } from "../../three/embedding";
 
-type ClusterHover = { id: string; n: number } | null;
-type QueryOverlay = {
-  text: string;
-  query: { x: number; y: number };
-  neighbors: { x: number; y: number; score: string }[];
-} | null;
-type EmbeddingHandle = {
-  dispose: () => void;
-  resize: () => void;
-  setActive: (on: boolean) => void;
-  setTheme: () => void;
-  setReduced: (on: boolean) => void;
-};
+const LEGEND_DIM = 384;
+const TOP_K = 5;
 
-const Fallback = () => (
-  <img src="/embedding-fallback.svg" alt="" className="h-full w-full object-cover" />
-);
-
-export function EmbeddingCanvas() {
+/**
+ * Canvas «Embedding Space». Палитра читается модулем один раз и перекрашивается
+ * по событию themechange; подписи — DOM-оверлей, позиция пишется в rAF.
+ */
+export function EmbeddingCanvas({ onLive }: { onLive?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { theme, reduced, lowPower } = useSite();
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const { dict, reduced, lowPower } = useSite();
   const [failed, setFailed] = useState(false);
-  const [cluster, setCluster] = useState<ClusterHover>(null);
-  const [query, setQuery] = useState<QueryOverlay>(null);
+  const [ready, setReady] = useState(false);
+  const [count, setCount] = useState(0);
   const handle = useRef<EmbeddingHandle | null>(null);
+  const clusterWord = useRef(dict.hero.cluster);
+  const liveRef = useRef(onLive);
+  liveRef.current = onLive;
+  clusterWord.current = dict.hero.cluster;
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const overlay = overlayRef.current;
+    if (!canvas || !overlay) return;
     let dead = false;
-    const mobile = window.matchMedia("(max-width: 760px)").matches || lowPower;
+    const mobile = window.matchMedia("(max-width: 1023px)").matches;
     void import("../../three/embedding")
       .then(({ createEmbedding }) =>
         createEmbedding(canvas, {
+          overlay,
           mobile,
+          lite: mobile || lowPower,
           reduced,
-          onCluster: (next) => {
-            if (!dead) setCluster(next);
-          },
-          onQuery: (next) => {
-            if (!dead) setQuery(next);
+          getClusterWord: () => clusterWord.current,
+          onReady: (n) => {
+            if (!dead) {
+              setCount(n);
+              setReady(true);
+              liveRef.current?.();
+            }
           },
         }),
       )
@@ -51,7 +52,6 @@ export function EmbeddingCanvas() {
           return;
         }
         handle.current = h;
-        h.setTheme();
         h.setReduced(reduced);
       })
       .catch(() => {
@@ -62,66 +62,40 @@ export function EmbeddingCanvas() {
       handle.current?.dispose();
       handle.current = null;
     };
+    // сцена пересоздаётся только при смене «мобильного» профиля
   }, [lowPower]);
-
-  useEffect(() => {
-    handle.current?.setTheme();
-  }, [theme]);
 
   useEffect(() => {
     handle.current?.setReduced(reduced);
   }, [reduced]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const root = canvas.parentElement;
-    if (!root) return;
+    const stage = stageRef.current;
+    if (!stage) return;
     const io = new IntersectionObserver(
       ([entry]) => handle.current?.setActive(entry.isIntersecting),
-      { threshold: 0.05 },
+      { threshold: 0.02 },
     );
-    io.observe(root);
+    io.observe(stage);
     const ro = new ResizeObserver(() => handle.current?.resize());
-    ro.observe(root);
+    ro.observe(stage);
     return () => {
       io.disconnect();
       ro.disconnect();
     };
   }, []);
 
-  if (failed) return <Fallback />;
+  if (failed) return null;
 
   return (
-    <>
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
-      {cluster && (
-        <p className="pointer-events-none absolute left-3 top-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--ink-dim)]">
-          cluster: {cluster.id} · n={cluster.n}
-        </p>
-      )}
-      {query && (
-        <>
-          <span
-            className="pointer-events-none absolute font-mono text-[10px] text-[var(--accent)]"
-            style={{ left: query.query.x, top: query.query.y, transform: "translate(8px, -12px)" }}
-          >
-            query: "{query.text}"
-          </span>
-          {query.neighbors.map((n) => (
-            <span
-              key={`${n.x}-${n.y}-${n.score}`}
-              className="pointer-events-none absolute font-mono text-[10px] text-[var(--accent-2)]"
-              style={{ left: n.x, top: n.y, transform: "translate(6px, 4px)" }}
-            >
-              {n.score}
-            </span>
-          ))}
-        </>
-      )}
-      <p className="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--ink-faint)]">
-        dim=384 · n=2048 · metric=cosine · top_k=5
+    <div ref={stageRef} className="emb-wrap">
+      <div className="emb-stage">
+        <canvas ref={canvasRef} className={`emb-canvas ${ready ? "is-ready" : ""}`} aria-hidden />
+        <div ref={overlayRef} className="emb-overlay" aria-hidden />
+      </div>
+      <p className="emb-hud" aria-hidden>
+        dim={LEGEND_DIM} · n={count} · metric=euclidean · top_k={TOP_K}
       </p>
-    </>
+    </div>
   );
 }

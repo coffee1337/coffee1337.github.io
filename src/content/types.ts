@@ -201,6 +201,8 @@ export interface Dictionary {
     metricRepos: string;
     metricYear: string;
     metricLangs: string;
+    metricYearValue: number;
+    metricLangsValue: number;
     linkEmail: string;
     linkTelegram: string;
     linkGithub: string;
@@ -258,6 +260,7 @@ export interface Dictionary {
     title: string;
     groups: { name: string; items: string[] }[];
     hint: string;
+    hintTouch: string;
     usedIn: string;
     showInProjects: string;
     noProject: string;
@@ -325,6 +328,8 @@ export interface Dictionary {
     openPalette: string;
     close: string;
     kbd: string;
+    primaryNav: string;
+    mobileNav: string;
     notFound: { title: string; body: string; back: string };
   };
   visuals: Visuals;

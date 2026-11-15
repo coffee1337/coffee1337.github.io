@@ -53,11 +53,10 @@ function CountUp({ value }: { value: number }) {
 }
 
 export function Hero() {
-  const { dict, reduced, loaderDone } = useSite();
+  const { dict, loaderDone } = useSite();
   const exploreRef = useMagnetic<HTMLAnchorElement>();
   const root = useRef<HTMLElement>(null);
   const [clock, setClock] = useState("--:--:--");
-  const [caretOn, setCaretOn] = useState(true);
 
   useEffect(() => {
     setClock(moscowClock());
@@ -65,28 +64,11 @@ export function Hero() {
     return () => window.clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    if (!loaderDone || reduced) {
-      setCaretOn(true);
-      return;
-    }
-    let flashes = 0;
-    const id = window.setInterval(() => {
-      flashes += 1;
-      setCaretOn((on) => !on);
-      if (flashes >= 6) {
-        window.clearInterval(id);
-        setCaretOn(true);
-      }
-    }, 220);
-    return () => window.clearInterval(id);
-  }, [loaderDone, reduced]);
-
   const metrics = [
     { value: github.commitsLastYear, label: dict.hero.metricCommits, href: links.github },
     { value: github.publicRepos, label: dict.hero.metricRepos, href: links.github },
-    { value: 3, label: dict.hero.metricYear, href: "#about" },
-    { value: 6, label: dict.hero.metricLangs, href: "#projects" },
+    { value: dict.hero.metricYearValue, label: dict.hero.metricYear, href: "#about" },
+    { value: dict.hero.metricLangsValue, label: dict.hero.metricLangs, href: "#projects" },
   ];
 
   const status = dict.hero.status.replace("{time}", clock);
@@ -100,23 +82,20 @@ export function Hero() {
     >
       <HeroLogs />
       <div className="dot-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden />
-      <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(240px,0.85fr)]">
+      <EmbeddingSpace />
+      <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-dim)]">
             <span className="status-dot bg-[var(--ok)]" aria-hidden />
             {status}
           </p>
-          <div className="relative mt-5">
+          <div className="mt-5">
             <ScrambleHeading
               as="h1"
               text={dict.hero.headline}
+              start={loaderDone}
+              caret
               className="hero-name hero-gradient display"
-            />
-            <span
-              data-caret
-              className="hero-caret"
-              style={{ opacity: caretOn ? 1 : 0 }}
-              aria-hidden
             />
           </div>
           <p className="mt-6 max-w-[38rem] text-[18px] leading-relaxed text-[var(--ink-dim)] md:text-[20px]">
@@ -158,7 +137,7 @@ export function Hero() {
             ))}
           </div>
         </div>
-        <EmbeddingSpace />
+        <div aria-hidden className="hidden lg:block" />
       </div>
     </section>
   );

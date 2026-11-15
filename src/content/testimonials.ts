@@ -10,15 +10,10 @@ export interface Testimonial {
   date?: string;
 }
 
-// TODO: заменить реальными отзывами (§13). Пустой массив = секция не рендерится.
-export const testimonials: Testimonial[] = [
-  {
-    id: "placeholder-1",
-    quote: {
-      ru: "Здесь будет реальный отзыв. Пока это заглушка, чтобы проверить вёрстку карусели.",
-      en: "A real review goes here. For now this placeholder exists to test the carousel layout.",
-    },
-    author: "—",
-    role: { ru: "заглушка", en: "placeholder" },
-  },
-];
+/**
+ * Реальные отзывы от владельца не пришли (блок данных в мандате пуст),
+ * поэтому массив пуст: секция Reviews не рендерится вообще.
+ * Формат для добавления:
+ * { id, quote: { ru, en }, author, role: { ru, en }, link?, date? }
+ */
+export const testimonials: Testimonial[] = [];

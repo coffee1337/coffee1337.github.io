@@ -6,23 +6,24 @@ import { useToast } from "../Toast/ToastProvider";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { Explorer } from "./Explorer";
 import { ProjectVisual } from "./ProjectVisual";
+import { sameTech } from "../../lib/tech";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
-const matches = (stack: string[], filter: string): boolean => {
-  if (filter === "All") return true;
-  const lowered = stack.map((s) => s.toLowerCase());
-  if (filter === "AI/ML") return lowered.some((s) => ["pytorch", "rag", "llm", "numpy", "a*"].includes(s));
-  if (filter === "C#") return lowered.some((s) => s.startsWith("c#") || s === ".net 8");
-  if (filter === "C++") return lowered.some((s) => s.startsWith("c++"));
-  return lowered.includes(filter.toLowerCase());
+const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*", "numpy"];
+
+/** Фильтр принимает любую технологию: из стека клавиатуры приходит произвольная строка. */
+const matches = (stack: string[], filter: string | null): boolean => {
+  if (!filter) return true;
+  if (filter === "AI/ML") return stack.some((s) => AI_ML.includes(s.toLowerCase()));
+  return stack.some((s) => sameTech(s, filter));
 };
 
 export function Projects() {
   const { dict, pathBase } = useSite();
   const { toast } = useToast();
   const ref = useReveal<HTMLElement>();
-  const [filter, setFilter] = useState<string>("All");
+  const [filter, setFilter] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string>(dict.projects.items[0]?.id ?? "");
   const [detailsOpen, setDetailsOpen] = useState(false);
 
@@ -44,9 +45,10 @@ export function Projects() {
 
   useEffect(() => {
     const onFilter = (event: Event) => {
-      const tech = String((event as CustomEvent<string>).detail || "");
-      const match = FILTERS.find((filter) => filter.toLowerCase() === tech.toLowerCase());
-      setFilter(match ?? "All");
+      const tech = String((event as CustomEvent<string>).detail || "").trim();
+      if (!tech) return;
+      const preset = FILTERS.find((item) => item.toLowerCase() === tech.toLowerCase());
+      setFilter(preset && preset !== "All" ? preset : tech);
     };
     window.addEventListener("stack-filter", onFilter);
     return () => window.removeEventListener("stack-filter", onFilter);
@@ -61,7 +63,17 @@ export function Projects() {
   const visible = projects.filter((p) => !dimmed.has(p.id));
   const active = projects.find((p) => p.id === activeId) ?? visible[0] ?? projects[0];
 
+  // при смене фильтра активная карточка не должна оставаться вне выборки
+  useEffect(() => {
+    if (!active) return;
+    if (!dimmed.has(active.id)) return;
+    const next = visible[0];
+    if (next) setActiveId(next.id);
+  }, [dimmed, visible, active]);
+
   if (!active) return null;
+
+  const customFilter = filter && !FILTERS.includes(filter as (typeof FILTERS)[number]) ? filter : null;
 
   const copy = (value: string) => {
     void navigator.clipboard.writeText(value).then(() => toast(`✓ ${dict.contact.copied}: ${value}`));
@@ -83,21 +95,36 @@ export function Projects() {
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label={dict.projects.label}>
-          {FILTERS.map((item) => (
+          {FILTERS.map((item) => {
+            const value = item === "All" ? null : item;
+            const pressed = filter === value;
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setFilter(value)}
+                aria-pressed={pressed}
+                className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors ${
+                  pressed
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]"
+                    : "border-[var(--line)] text-[var(--ink-dim)] hover:border-[var(--accent)] hover:text-[var(--ink)]"
+                }`}
+              >
+                {item === "All" ? dict.sections.projectsUi.filterAll : item}
+              </button>
+            );
+          })}
+          {customFilter && (
             <button
-              key={item}
               type="button"
-              onClick={() => setFilter(item)}
-              aria-pressed={filter === item}
-              className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors ${
-                filter === item
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]"
-                  : "border-[var(--line)] text-[var(--ink-dim)] hover:border-[var(--accent)] hover:text-[var(--ink)]"
-              }`}
+              onClick={() => setFilter(null)}
+              aria-label={dict.sections.projectsUi.clearFilter}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--bg)]"
             >
-              {item === "All" ? dict.sections.projectsUi.filterAll : item}
+              {customFilter}
+              <span aria-hidden>×</span>
             </button>
-          ))}
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
@@ -105,7 +132,8 @@ export function Projects() {
             <Explorer projects={projects} activeId={active.id} onSelect={setActiveId} dimmed={dimmed} />
           </div>
 
-          <div className="lg:hidden -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+          <div className="lg:hidden -mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-2">
+
             {visible.map((project) => (
               <button
                 key={project.id}
@@ -127,7 +155,7 @@ export function Projects() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -14 }}
               transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-              className="border border-[var(--line)] bg-[var(--bg)]"
+              className="min-w-0 border border-[var(--line)] bg-[var(--bg)]"
             >
               <ProjectVisual project={active} />
 
@@ -139,7 +167,7 @@ export function Projects() {
                   </div>
                   {active.status && (
                     <span className="border border-[var(--accent)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--accent)]">
-                      active
+                      {dict.sections.projectsUi.active}
                     </span>
                   )}
                 </div>
