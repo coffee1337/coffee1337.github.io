@@ -1,0 +1,11 @@
+export { answerLocal, followUpChips } from "./answers";
+export { detectIntent, TECHS, PROJECT_ALIASES } from "./intent";
+export { detectLang, normalize, tokens } from "./lang";
+export { expandQuery, hasOverlap, makeSearcher, searcherFromDocs } from "./search";
+export type { MiniSearchLike } from "./search";
+export { pickProfileChunk, workerChunks } from "./kb";
+export { createSseParser, parseDelta } from "./sse";
+export { isSafeHref, parseInline, parseMarkdown } from "./markdown";
+export type { Answer, Chunk, LocalAnswerOptions, SearchHit, Searcher } from "./types";
+export { assistantUi } from "../../content/assistant-ui";
+export type { AnswerIntent } from "../../content/assistant-ui";

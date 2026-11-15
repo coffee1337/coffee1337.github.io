@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/fetch-github.mjs && node scripts/build-kb.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/gen-llms.mjs && node scripts/check-links.mjs",
+    "build": "node scripts/fetch-readmes.mjs && node scripts/fetch-github.mjs && node scripts/build-kb.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/gen-llms.mjs && node scripts/check-links.mjs",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "sync:resume": "curl -fsSL -o public/resume/Egor_Trefilov_Resume.pdf https://raw.githubusercontent.com/coffee1337/resume/main/Egor_Trefilov_Resume.pdf",
-    "check-links": "node scripts/check-links.mjs"
+    "check-links": "node scripts/check-links.mjs",
+    "test:assistant": "node scripts/test-assistant.mjs"
   },
   "dependencies": {
     "@fontsource/pixelify-sans": "^5.3.0",

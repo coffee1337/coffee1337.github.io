@@ -3,12 +3,16 @@ main = "index.js"
 compatibility_date = "2026-01-01"
 
 [vars]
-ALLOWED_ORIGIN = "https://coffee1337.github.io"
-LLM_MODEL = "gemini-2.0-flash"
+# CORS: прод-домен + локальная разработка. Несколько origin — через запятую.
+ALLOWED_ORIGINS = "https://coffee1337.github.io,http://localhost:5173"
+# RATE_LIMIT = "20"        # запросов в час на IP (работает при биндинге RATE_KV)
+# LLM_URL = "https://api.groq.com/openai/v1/chat/completions"
+# LLM_MODEL = "llama-3.3-70b-versatile"   # обязателен: без него Worker отвечает 503 not_configured
+# LLM_MAX_TOKENS = "400"
 
-# kv namespace для rate limit: wrangler kv namespace create RATE_KV → вставить id
+# Rate limit через KV: wrangler kv namespace create RATE_KV → вставить id сюда
 # [[kv_namespaces]]
 # binding = "RATE_KV"
 # id = "<id>"
 
-# секреты: wrangler secret put LLM_API_KEY
+# Секрет (не коммитится): wrangler secret put LLM_API_KEY

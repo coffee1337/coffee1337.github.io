@@ -30,7 +30,10 @@ jobs:
         run: node scripts/fetch-github.mjs
         env:
           GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
-      - run: npm run build
+      - name: Build site
+        run: npm run build
+        env:
+          VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
       - name: check links
         run: node scripts/check-links.mjs
       - uses: actions/upload-pages-artifact@v3

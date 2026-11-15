@@ -1,0 +1,101 @@
+<!-- lang: ru -->
+# Neural A* Heuristic — README
+
+Source: https://github.com/coffee1337/neural-astar-heuristic
+
+Neural A* Heuristic
+
+Learned neural heuristic for A* search across multiple puzzle environments.
+
+The project trains a small neural network `V(s)` to estimate the remaining distance from a puzzle state to a solved state. The learned value function is then used as the heuristic in A* search:
+
+The model is environment-agnostic and interacts with puzzles through a shared environment API, allowing the same architecture to work across multiple state spaces.
+
+Supported Environments
+
+- **15 Puzzle** — classic sliding puzzle
+- **Toggle Lights** — row/column light-switching puzzle
+- **Cylinder Game** — cylindrical state-space puzzle
+
+How It Works
+
+The network does not contain puzzle-specific logic. Each environment exposes a common API for state encoding, valid actions and transitions.
+
+Tech Stack
+
+- Python 3.11
+- PyTorch
+- NumPy
+- A* search
+- Docker
+
+Бейзлайн
+
+Учим маленькую `V(s)` оценивать, сколько шагов осталось до решённого,
+и используем её эвристикой в A* (`f = g + V`).
+
+Сеть про конкретную игру ничего не знает: ходит через `env.encode_state`,
+`env.valid_actions`, `env.step`, поэтому одна и та же модель работает
+на всех играх из `gym.py`.
+
+Файлы
+
+Файлы задачи:
+- `gym.py` — три головоломки, выбираются через `ENV_ID`:
+  - `game_15_2d` — пятнашки;
+  - `toggle_lights` — погасить все лампочки, нажатие переключает строку и столбец;
+  - `cylinder_game` — варикон / советский цилиндр-светофор.
+- `generate_states.py` — генерирует `input_states.jsonl` так же, как организаторы.
+- `check.py` — считает скор по `output_actions.csv`, пишет `verdict.txt` и `score.json`.
+
+Файлы решения:
+- `common.py` — токенизация состояния + случайные блуждания от решённого
+  для сбора данных.
+- `model.py` — `ValueNet`: эмбеддинги значений, MLP по токенам, mean+max
+  pool, маленькая голова, `softplus` на выходе.
+- `search.py` — A* с батчевой оценкой детей через `V`.
+- `train.py` — собирает датасет, обучает `V`, сохраняет `model.pt`.
+- `solve.py` — грузит `model.pt`, запускает A* на каждом инстансе,
+  пишет `output_actions.csv`.
+- `Dockerfile` — `python:3.11-slim` + `numpy` + `torch`.
+
+Быстрый запуск (без Docker)
+
+Например,
+
+Для быстрого теста:
+
+Запуск с docker, как в тестирующей системе
+
+API среды
+
+Все игры реализуют `BasePuzzleEnv` из `gym.py`:
+
+- `reset(seed=None)` — вернуть среду в решённое состояние.
+- `get_state()` / `set_state(state)` — снимок состояния, JSON-сериализуемый через `gym.to_jsonable`.
+- `solved_state()`, `is_solved()` — цель и проверка.
+- `valid_actions()` — список действий, допустимых сейчас (`"X+"`, `"3_4"`, `"L_2"`, …).
+- `step(action)` → `(state, reward, done, info)`.
+- `inverse_action(action)`, `scramble(length, seed, no_backtrack=True)`.
+- `encode_state(state=None)` — dict с `positions` (Nx3), `content_types`/`content_values`, `target_types`/`target_values`.
+- `encode_actions(actions=None, state=None)` — структурное описание действий
+
+Как работает
+
+**Данные.** `backward_walks` стартует из решённого состояния и делает
+случайные шаги до глубины `max_walk`. Каждый шаг даёт пару (состояние,
+номер шага) — оценка расстояния до цели.
+
+**Представление.** Каждая ячейка превращается в вектор из 15 чисел:
+позиция в 3D, тип и индекс содержимого, тип и индекс цели, флаги
+совпадения. Размер словаря значений зафиксирован — формат один и тот
+же для всех игр, сетка не зависит от количества клеток.
+
+**Сеть.** Per-token MLP → mean+max pool → MLP-голова → `softplus`.
+
+**A\*.** Классический алгоритм с использованием эвристики V(s) от модели
+
+Запуск
+
+Для быстрой проверки локально все скрипты принимают `--time_limit`
+в секундах:
