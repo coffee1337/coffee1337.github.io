@@ -162,12 +162,15 @@ const STOPWORDS = new Set([
   "расскажи","подскажи","можно","нужно","почему","когда","какой","какие","какая","каких","ли","или","ещё",
 ]);
 
+/** Короткие технические токены, которые нельзя отбрасывать по длине. */
+const SHORT_TERMS = new Set(["ai", "ии", "ml", "c#", "ci", "db", "go", "js", "ts", "ui"]);
+
 function terms(text) {
   return String(text)
     .toLowerCase()
     .replace(/[^\p{L}\p{N}+#.\-\s]/gu, " ")
     .split(/\s+/)
-    .filter((word) => word.length >= 3 && !STOPWORDS.has(word));
+    .filter((word) => (word.length >= 3 || SHORT_TERMS.has(word)) && !STOPWORDS.has(word));
 }
 
 /** Контекст собирается на сервере: скоринг по вопросу + профильный чанк всегда. */
@@ -178,7 +181,7 @@ async function selectContext(question, lang, env) {
   const scored = [];
   for (const doc of docs) {
     const docLang = doc.lang === "ru" || doc.lang === "en" ? doc.lang : "both";
-    if (docLang !== "both" && docLang !== lang) continue;
+    const sameLang = docLang === "both" || docLang === lang;
     const title = String(doc.title || "").toLowerCase();
     const text = String(doc.text || "").toLowerCase();
     let score = 0;
@@ -187,6 +190,9 @@ async function selectContext(question, lang, env) {
       const hits = text.split(term).length - 1;
       if (hits) score += Math.min(hits, 4);
     }
+    // README проектов бывают только на языке репозитория — их не отбрасываем,
+    // но чанки языка вопроса получают приоритет.
+    if (score > 0 && sameLang) score += 2;
     scored.push({ doc, score });
   }
   const pool = scored.length ? scored : [];

@@ -118,7 +118,7 @@ export function Hero() {
             <span aria-hidden>·</span>
             <a href={links.resumePdf} target="_blank" rel="noopener noreferrer">{dict.hero.linkResume}</a>
           </p>
-          <div className="mt-10 grid grid-cols-2 gap-px bg-[var(--line)] sm:grid-cols-4">
+          <div className="hero-metrics mt-10 grid grid-cols-2 gap-px bg-[var(--line)] sm:grid-cols-4">
             {metrics.map((metric) => (
               <a
                 key={metric.label}

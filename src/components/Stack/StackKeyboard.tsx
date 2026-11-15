@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useSite } from "../../context/site";
 import { canon, projectsWithRelated, projectsWithTech } from "../../lib/tech";
 import type { KeyboardHandle, KeyboardRow } from "../../three/keyboard";
@@ -81,6 +81,41 @@ export function StackKeyboard() {
     handleRef.current?.setSelected(label);
   };
 
+  /** Плоский список клавиш для клавиатурной навигации — один Tab-шаг на всю доску. */
+  const flatKeys = useMemo(() => rows.flatMap((row) => row.keys.map((key) => key.label)), [rows]);
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const total = flatKeys.length;
+    if (!total) return;
+    const index = active ? flatKeys.indexOf(active) : -1;
+    let next = index;
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        next = (index + 1 + total) % total;
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        next = (index - 1 + total) % total;
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = total - 1;
+        break;
+      case "Escape":
+        event.preventDefault();
+        setActive(null);
+        handleRef.current?.setSelected(null);
+        return;
+      default:
+        return;
+    }
+    event.preventDefault();
+    select(flatKeys[next]);
+  };
+
   const showInProjects = () => {
     if (!active) return;
     window.dispatchEvent(new CustomEvent("stack-filter", { detail: active }));
@@ -151,13 +186,17 @@ export function StackKeyboard() {
       <div className={`grid gap-4 ${active ? "lg:grid-cols-[minmax(0,1fr)_300px]" : ""}`}>
         <div>
           {webgl ? (
-            <div className="relative h-[360px] w-full border border-[var(--line)] bg-[var(--bg-2)] md:h-[440px]">
-              <canvas
-                ref={canvasRef}
-                className="h-full w-full touch-pan-y"
-                role="img"
-                aria-label={dict.stack.keysLabel}
-              />
+            <div
+              className="relative h-[360px] w-full border border-[var(--line)] bg-[var(--bg-2)] outline-none focus-visible:border-[var(--accent)] md:h-[440px]"
+              tabIndex={0}
+              role="group"
+              aria-label={
+                active ? `${dict.stack.keysLabel}: ${active}` : dict.stack.keysLabel
+              }
+              aria-describedby="stack-hint"
+              onKeyDown={onKeyDown}
+            >
+              <canvas ref={canvasRef} className="h-full w-full touch-pan-y" aria-hidden />
               {!ready && (
                 <div
                   aria-hidden
@@ -285,7 +324,12 @@ export function StackKeyboard() {
         </aside>
       </div>
 
-      <p className="sr-only">{dict.stack.hint}</p>
+      <p id="stack-hint" className="sr-only">
+        {dict.stack.hint}
+      </p>
+      <p className="sr-only" aria-live="polite">
+        {active ?? ""}
+      </p>
     </div>
   );
 }

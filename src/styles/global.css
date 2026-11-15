@@ -1022,6 +1022,13 @@ html.lenis body {
   footer {
     padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
   }
+  /* Метрики hero: подпись правой нижней ячейки не уходит под FAB. */
+  #top {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+  .hero-metrics > :last-child {
+    padding-right: 3.5rem;
+  }
 }
 
 

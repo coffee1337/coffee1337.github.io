@@ -15,9 +15,22 @@ const fallbackProjects = [
   { id: "knn", name: "k-nearest-neighbors", github: "https://github.com/coffee1337/k-nearest-neighbors" },
   { id: "portfolio-analytics", name: "portfolio-analytics", github: "https://github.com/coffee1337/portfolio-analytics" },
 ];
-const { projectMeta } = await loadTs("src/content/projects.ts", ["projectMeta"]).catch(() => ({ projectMeta: fallbackProjects }));
-const caseLines = projectMeta
-  .map((project) => `- [${project.name} — case study](${SITE}/projects/${project.id}/) · [GitHub](${project.github})`)
+// Названия проектов живут в словарях (projectMeta их не содержит).
+const { dictionaries } = await loadTs("src/content/index.ts", ["dictionaries"]).catch(() => ({ dictionaries: null }));
+const items = dictionaries?.en?.projects?.items?.length
+  ? dictionaries.en.projects.items
+  : fallbackProjects;
+
+const broken = items.filter((project) => !project?.id || !project?.name || !project?.github);
+if (broken.length) {
+  throw new Error(`llms: у проектов нет id/name/github — ${JSON.stringify(broken.map((p) => p?.id ?? p))}`);
+}
+
+const caseLines = items
+  .map(
+    (project) =>
+      `- [${project.name} — case study](${SITE}/projects/${project.id}/) · [RU](${SITE}/ru/projects/${project.id}/) · [GitHub](${project.github})`,
+  )
   .join("\n");
 
 const head = `# Egor Trefilov (coffee1337)
@@ -71,6 +84,13 @@ const kb = files(KB)
 
 writeFileSync(join(DIST, "llms.txt"), head);
 writeFileSync(join(DIST, "llms-full.txt"), `${head}\n\n---\n\n# Knowledge base\n\n${kb}\n`);
+
+// Страховка от регрессий: ни одна ссылка не должна печатать «undefined».
+for (const name of ["llms.txt", "llms-full.txt"]) {
+  const body = readFileSync(join(DIST, name), "utf8");
+  const line = body.split("\n").find((row) => /\bundefined\b/.test(row));
+  if (line) throw new Error(`llms: "${name}" содержит undefined → ${line.slice(0, 160)}`);
+}
 
 const sizes = ["llms.txt", "llms-full.txt"].map((name) => `${name}: ${statSync(join(DIST, name)).size} B`);
 console.log(`llms: ${sizes.join(", ")}`);

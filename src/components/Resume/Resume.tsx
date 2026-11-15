@@ -72,7 +72,7 @@ function Cell({ title, id, children }: { title: string; id?: string; children: R
     <div
       id={id}
       data-reveal
-      className="scroll-mt-24 border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:px-8"
+      className="scroll-mt-24 border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:px-8 md:odd:border-r"
     >
       <h3 className="kicker mb-3">{title}</h3>
       {children}
