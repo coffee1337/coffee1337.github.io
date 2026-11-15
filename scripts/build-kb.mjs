@@ -171,7 +171,7 @@ export async function contentDocs() {
       textSource,
       lang === "ru" ? "Что я делаю" : "Capabilities",
       dict.capabilities.items.map((item) => `${item.title} — ${item.tags}. ${item.body}`).join("\n\n"),
-      section("about"),
+      section("capabilities"),
     );
 
     const card = dict.sections.educationCard;
@@ -184,7 +184,7 @@ export async function contentDocs() {
 
     push(
       textSource,
-      "Contacts",
+      lang === "ru" ? "Контакты" : "Contacts",
       [
         `Email: ${links.email}.`,
         `Telegram: ${links.telegramHandle} (${links.telegram}).`,

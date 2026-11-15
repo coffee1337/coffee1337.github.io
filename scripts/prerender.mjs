@@ -3,7 +3,8 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildRoutes, renderRoute, routeMeta } from "../dist-ssr/entry.js";
+import { execFileSync } from "node:child_process";
+import { buildRoutes, renderRoute, routeJsonLd, routeMeta } from "../dist-ssr/entry.js";
 
 const SITE = "https://coffee1337.github.io";
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -54,28 +55,43 @@ function renderPage(route) {
   html = patchOnce(html, /<html lang="en">/, `<html lang="${route.lang}">`, "html lang");
   html = patchOnce(html, /<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`, "title");
   html = patchOnce(html, /(name="description"\s+content=")[^"]*(")/, `$1${esc(description)}$2`, "meta description");
+  if (route.kind === "notfound") {
+    // 404 не индексируется и не имеет языковой пары — canonical/hreflang только вредят.
+    html = html.replace(/<link rel="canonical"[^>]*\/>\s*\n?/g, "");
+  } else {
+    html = patchOnce(
+      html,
+      /<link rel="canonical"\s+href="[^"]*"\s*\/>/,
+      `<link rel="canonical" href="${url}" />\n    <link rel="alternate" hreflang="en" href="${SITE}${enPath}" />\n    <link rel="alternate" hreflang="ru" href="${SITE}${ruPath}" />\n    <link rel="alternate" hreflang="x-default" href="${SITE}${enPath}" />`,
+      "canonical",
+    );
+  }
+  html = patchOnce(html, /(<meta[^>]*property="og:locale"[^>]*content=")[^"]*(")/, `$1${locale}$2`, "og:locale");
   html = patchOnce(
     html,
-    /<link rel="canonical"\s+href="[^"]*"\s*\/>/,
-    `<link rel="canonical" href="${url}" />\n    <link rel="alternate" hreflang="en" href="${SITE}${enPath}" />\n    <link rel="alternate" hreflang="ru" href="${SITE}${ruPath}" />\n    <link rel="alternate" hreflang="x-default" href="${SITE}${enPath}" />`,
-    "canonical",
+    /(<meta[^>]*property="og:locale:alternate"[^>]*content=")[^"]*(")/,
+    `$1${locale === "ru_RU" ? "en_US" : "ru_RU"}$2`,
+    "og:locale:alternate",
   );
-  html = patchOnce(html, /(<meta[^>]*property="og:locale"[^>]*content=")[^"]*(")/, `$1${locale}$2`, "og:locale");
   html = patchOnce(html, /(<meta[^>]*property="og:title"[^>]*content=")[^"]*(")/, `$1${esc(title)}$2`, "og:title");
   html = patchOnce(html, /(<meta[^>]*property="og:description"[^>]*content=")[^"]*(")/, `$1${esc(description)}$2`, "og:description");
   html = patchOnce(html, /(<meta[^>]*property="og:url"[^>]*content=")[^"]*(")/, `$1${url}$2`, "og:url");
   html = patchOnce(html, /(<meta[^>]*name="twitter:title"[^>]*content=")[^"]*(")/, `$1${esc(title)}$2`, "twitter:title");
   html = patchOnce(html, /(<meta[^>]*name="twitter:description"[^>]*content=")[^"]*(")/, `$1${esc(description)}$2`, "twitter:description");
 
-  // Without JS the boot loader would cover the content forever — hide it.
-  if (route.kind === "home") {
-    html = patchOnce(
-      html,
-      /<\/head>/,
-      "<noscript><style>.loader-screen{display:none!important}</style></noscript>\n  </head>",
-      "</head>",
-    );
+  // На подстраницах критический оверлей не нужен: контент должен быть виден сразу.
+  if (route.kind !== "home") {
+    html = html.replace(/<!-- boot:start -->[\s\S]*?<!-- boot:end -->\s*/g, "");
   }
+
+  // Структурированные данные страницы (WebSite/ProfilePage/Person или SoftwareSourceCode+BreadcrumbList).
+  const jsonLd = routeJsonLd(route);
+  html = html.replace(
+    /<!-- jsonld:start -->[\s\S]*?<!-- jsonld:end -->/,
+    jsonLd
+      ? `<!-- jsonld:start -->\n    <script type="application/ld+json">${jsonLd}</script>\n    <!-- jsonld:end -->`
+      : "<!-- jsonld:start --><!-- jsonld:end -->",
+  );
 
   const content = renderRoute(route);
   const patched = patchOnce(html, /<div id="root"><\/div>/, `<div id="root">${content}</div>`, "#root");
@@ -105,7 +121,22 @@ if (notFoundRoute) {
   console.log("prerender: /404.html (notfound)");
 }
 
-const lastmod = new Date().toISOString().slice(0, 10);
+const today = new Date().toISOString().slice(0, 10);
+/** Дата последнего коммита по контенту страницы; без git (shallow/CI) — сегодня. */
+function gitDate(paths) {
+  try {
+    const out = execFileSync("git", ["log", "-1", "--format=%cs", "--", ...paths], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : today;
+  } catch {
+    return today;
+  }
+}
+const contentDate = gitDate(["src/content", "index.html"]);
+
 const urls = routes
   .filter((route) => route.kind !== "notfound")
   .map((route) => {
@@ -116,7 +147,7 @@ const urls = routes
     <xhtml:link rel="alternate" hreflang="en" href="${SITE}${en}"/>
     <xhtml:link rel="alternate" hreflang="ru" href="${SITE}${ru}"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${en}"/>
-    <lastmod>${lastmod}</lastmod>
+    <lastmod>${contentDate}</lastmod>
   </url>`;
   })
   .join("\n");

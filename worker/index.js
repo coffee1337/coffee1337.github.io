@@ -1,6 +1,7 @@
 // Cloudflare Worker: единственное место, где живёт ключ LLM.
 // Работает с любым OpenAI-совместимым API: LLM_URL + LLM_MODEL + LLM_API_KEY.
-// Клиент присылает вопрос, язык, историю и найденные локально чанки; Worker отвечает SSE.
+// Клиент присылает вопрос, язык и историю; контекст Worker собирает сам из базы знаний сайта,
+// чтобы его нельзя было использовать как открытый LLM-прокси с произвольным контекстом.
 
 const SYSTEM_PROMPT = `You are the assistant on the portfolio site of Egor Trefilov (coffee1337), a Python backend and AI automation developer.
 
@@ -43,7 +44,6 @@ export default {
     if (!question) return json({ error: "empty_question" }, 400, cors);
 
     const lang = body?.lang === "ru" ? "ru" : "en";
-    const chunks = normaliseChunks(body?.chunks);
     const history = normaliseHistory(body?.history);
 
     // Никакой модели по умолчанию: владелец обязан задать LLM_URL, LLM_MODEL и LLM_API_KEY.
@@ -53,9 +53,15 @@ export default {
 
     if (await rateLimited(request, env)) return json({ error: "rate_limited" }, 429, cors);
 
-    const context = chunks.length
-      ? chunks.map((chunk, index) => `[${index + 1}] ${chunk.title}\n${chunk.text}`).join("\n\n")
-      : "(empty)";
+    let chunks;
+    try {
+      chunks = await selectContext(question, lang, env);
+    } catch {
+      return json({ error: "kb_unavailable" }, 503, cors);
+    }
+    if (!chunks.length) return json({ error: "kb_unavailable" }, 503, cors);
+
+    const context = chunks.map((chunk, index) => `[${index + 1}] ${chunk.title}\n${chunk.text}`).join("\n\n");
 
     const payload = {
       model: env.LLM_MODEL,
@@ -132,15 +138,66 @@ function sseHeaders(cors) {
   };
 }
 
-function normaliseChunks(value) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .slice(0, MAX_CHUNKS)
-    .map((chunk) => ({
-      title: String(chunk?.title ?? "").slice(0, 140),
-      text: String(chunk?.text ?? "").slice(0, 1200),
-    }))
-    .filter((chunk) => chunk.text.length > 0);
+/** Кэш базы знаний: один общий объект на edge, обновляется раз в час. */
+async function loadKb(env) {
+  const base = String(env.SITE_URL || "https://coffee1337.github.io").replace(/\/+$/, "");
+  const url = `${base}/kb-index.json`;
+  const cache = caches.default;
+  const key = new Request(url, { method: "GET" });
+  let cached = await cache.match(key);
+  if (!cached) {
+    const fresh = await fetch(url, { cf: { cacheTtl: 3600, cacheEverything: true } });
+    if (!fresh.ok) throw new Error("kb_fetch_failed");
+    await cache.put(key, fresh.clone());
+    cached = fresh;
+  }
+  const data = await cached.json();
+  return Array.isArray(data?.docs) ? data.docs : [];
+}
+
+const STOPWORDS = new Set([
+  "the","and","for","with","what","who","how","why","when","where","your","you","his","her","about","does","did",
+  "tell","more","please","can","could","would","should","there","this","that","these","those","from","have",
+  "про","что","как","где","кто","чем","для","это","его","она","они","мне","меня","тебе","вас","ваш","есть",
+  "расскажи","подскажи","можно","нужно","почему","когда","какой","какие","какая","каких","ли","или","ещё",
+]);
+
+function terms(text) {
+  return String(text)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}+#.\-\s]/gu, " ")
+    .split(/\s+/)
+    .filter((word) => word.length >= 3 && !STOPWORDS.has(word));
+}
+
+/** Контекст собирается на сервере: скоринг по вопросу + профильный чанк всегда. */
+async function selectContext(question, lang, env) {
+  const docs = await loadKb(env);
+  if (!docs.length) return [];
+  const query = terms(question);
+  const scored = [];
+  for (const doc of docs) {
+    const docLang = doc.lang === "ru" || doc.lang === "en" ? doc.lang : "both";
+    if (docLang !== "both" && docLang !== lang) continue;
+    const title = String(doc.title || "").toLowerCase();
+    const text = String(doc.text || "").toLowerCase();
+    let score = 0;
+    for (const term of query) {
+      if (title.includes(term)) score += 3;
+      const hits = text.split(term).length - 1;
+      if (hits) score += Math.min(hits, 4);
+    }
+    scored.push({ doc, score });
+  }
+  const pool = scored.length ? scored : [];
+  pool.sort((a, b) => b.score - a.score);
+  const picked = pool.filter((item) => item.score > 0).slice(0, MAX_CHUNKS - 1).map((item) => item.doc);
+  const profile = docs.find((doc) => doc.source === `content-${lang}` && /^(Profile|Профиль)$/.test(String(doc.title || "")));
+  if (profile) picked.unshift(profile);
+  return picked.slice(0, MAX_CHUNKS).map((doc) => ({
+    title: String(doc.title || "").slice(0, 140),
+    text: String(doc.text || "").slice(0, 1400),
+  }));
 }
 
 function normaliseHistory(value) {

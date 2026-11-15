@@ -3,5 +3,4 @@ Allow: /
 
 Sitemap: https://coffee1337.github.io/sitemap.xml
 
-Sitemap: https://coffee1337.github.io/sitemap.xml
-# llms.txt: https://coffee1337.github.io/llms.txt
+# LLM context: https://coffee1337.github.io/llms.txt
