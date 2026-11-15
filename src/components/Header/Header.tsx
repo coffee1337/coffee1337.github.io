@@ -7,8 +7,8 @@ import { KbdShortcut } from "../Kbd/KbdShortcut";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useScrollLock } from "../../hooks/useScrollLock";
 
-const NAV_IDS = ["about", "projects", "stack", "resume", "contact"] as const;
-const MOBILE_IDS = [...NAV_IDS, "capabilities", "experience"] as const;
+const NAV_IDS = ["about", "stack", "projects", "resume", "contact"] as const;
+const MOBILE_IDS = ["about", "capabilities", "experience", "stack", "projects", "resume", "contact"] as const;
 
 type NavKey = keyof ReturnType<typeof useSite>["dict"]["nav"];
 
@@ -203,6 +203,44 @@ export function Header() {
                 </a>
               ))}
             </nav>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div
+                className="flex rounded-full border border-[var(--line)] p-0.5"
+                role="group"
+                aria-label={dict.a11y.lang}
+              >
+                {(["en", "ru"] as const).map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => switchLang(code)}
+                    aria-pressed={lang === code}
+                    className={`rounded-full px-3 py-1.5 font-mono text-[11px] uppercase transition-colors ${
+                      lang === code
+                        ? "bg-[var(--accent)] text-[var(--bg)]"
+                        : "text-[var(--ink-dim)] hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    {code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setPaletteOpen(true);
+                }}
+                aria-label={dict.a11y.openPalette}
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] px-3 py-1.5 font-mono text-[11px] uppercase text-[var(--ink-dim)] transition-colors hover:border-[var(--accent)] hover:text-[var(--ink)]"
+              >
+                <span aria-hidden>⌕</span>
+                <KbdShortcut />
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={() => setMenuOpen(false)}

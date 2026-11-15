@@ -47,7 +47,21 @@ export function ScrambleHeading<T extends ElementType = "h2">({
     const holder = root.querySelector<HTMLElement>(".scramble__text");
     if (!holder) return;
 
+    root.classList.remove("is-done");
+
+    /** Финальный вид: обычный текст (резиновый при ресайзе) + каретка. */
+    const renderPlain = () => {
+      holder.textContent = text;
+      if (caret) {
+        const sign = document.createElement("span");
+        sign.className = "hero-caret-inline";
+        sign.setAttribute("data-caret", "");
+        holder.appendChild(sign);
+      }
+    };
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      renderPlain();
       root.classList.add("is-done");
       return;
     }
@@ -120,6 +134,9 @@ export function ScrambleHeading<T extends ElementType = "h2">({
             chars[i].classList.remove("is-pending");
             chars[i].textContent = finals[i];
           }
+          // Снимаем фиксированные ширины: дальше заголовок живёт как обычный текст
+          // и корректно пере-flow'ится при ресайзе, выделяется и копируется.
+          renderPlain();
           root.classList.add("is-done");
         }
       };
@@ -158,6 +175,12 @@ export function ScrambleHeading<T extends ElementType = "h2">({
       cancelAnimationFrame(raf);
       window.clearTimeout(timer);
       io?.disconnect();
+      // Если размонтировали/перезапустили посреди анимации — в DOM не должно
+      // остаться случайных символов и фиксированных ширин.
+      if (played.current) {
+        renderPlain();
+        root.classList.add("is-done");
+      }
     };
   }, [text, start, caret]);
 

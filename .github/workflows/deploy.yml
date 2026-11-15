@@ -26,16 +26,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: GitHub stats
-        run: node scripts/fetch-github.mjs
-        env:
-          GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
       - name: Build site
         run: npm run build
         env:
+          GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
           VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
-      - name: check links
-        run: node scripts/check-links.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

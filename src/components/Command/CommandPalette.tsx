@@ -13,10 +13,10 @@ type Props = {
   onClose: () => void;
 };
 
-const SECTION_IDS = ["about", "projects", "stack", "resume", "contact"] as const;
+const SECTION_IDS = ["about", "stack", "projects", "resume", "contact"] as const;
 
 export function CommandPalette({ open, onClose }: Props) {
-  const { dict, lang, switchLang, toggleTheme, setSection, pathBase } = useSite();
+  const { dict, lang, switchLang, toggleTheme, setSection, pathBase, route } = useSite();
   const { lockUntilSettled } = useScrollSpy();
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, open);
@@ -34,6 +34,11 @@ export function CommandPalette({ open, onClose }: Props) {
   }, [open, onClose]);
 
   const jump = (id: string) => {
+    if (route.kind !== "home") {
+      // На странице проекта/404 секций главной в DOM нет — уходим на главную с якорем.
+      window.location.href = `${pathBase}/#${id}`;
+      return;
+    }
     setSection(id);
     lockUntilSettled();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -93,7 +93,7 @@ export function Footer() {
               <a className="footer-link" href={links.resumePdf}><Resume className="footer-link__icon" /><span>{dict.footer.resume}</span><ArrowUpRight className="footer-link__arrow" /></a>
               <a className="footer-link" href="/llms.txt"><Llms className="footer-link__icon" /><span>llms.txt</span><ArrowUpRight className="footer-link__arrow" /></a>
             </nav>
-            <div className="flex flex-col items-start gap-4 text-sm"><p className="text-[var(--ink-dim)]">{dict.footer.location}</p><time className="font-mono tabular-nums text-2xl" dateTime={new Date().toISOString()}>{time}</time><a href={links.mailto} className="rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-xs text-[var(--bg)]">{dict.footer.sayHello} ↗</a></div>
+            <div className="flex flex-col items-start gap-4 text-sm"><p className="text-[var(--ink-dim)]">{dict.footer.location}</p><time className="font-mono tabular-nums text-2xl" dateTime={new Date().toISOString()} suppressHydrationWarning>{time}</time><a href={links.mailto} className="rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-xs text-[var(--bg)]">{dict.footer.sayHello} ↗</a></div>
           </div>
           <div className="flex flex-col gap-2 pt-5 font-mono text-[11px] text-[var(--ink-faint)] md:flex-row md:items-center md:justify-between">
             <span>© {year} {dict.footer.rights} (coffee1337)</span>

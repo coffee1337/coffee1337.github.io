@@ -3,7 +3,7 @@ import { useSite } from "../../context/site";
 import { links } from "../../content";
 
 type Topic = "hire" | "project" | "other";
-type State = "idle" | "sending" | "success" | "error";
+type State = "idle" | "sending" | "sent" | "error";
 
 const KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
 const ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
@@ -27,21 +27,6 @@ export function ContactForm() {
 
   const subject = `${f.topics[topic]} — coffee1337.github.io`;
 
-  if (PROVIDER === "none") {
-    return (
-      <div className="border border-[var(--line)] bg-[var(--bg-2)] p-6">
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-faint)]">{f.title}</p>
-        <p className="mt-3 text-sm text-[var(--ink-dim)]">{f.unavailable}</p>
-        <a
-          href={`${links.mailto}?subject=${encodeURIComponent(subject)}`}
-          className="mt-5 inline-flex rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
-        >
-          {f.mailtoCta} ↗
-        </a>
-      </div>
-    );
-  }
-
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (honeypot) return;
@@ -55,6 +40,15 @@ export function ContactForm() {
       message: String(data.get("message") || ""),
       subject,
     };
+
+    // Без внешнего провайдера форма всё равно работает: собираем письмо в mailto.
+    if (PROVIDER === "none") {
+      const mailSubject = `[Portfolio] ${f.topics[topic]} — ${payload.name}`;
+      const mailBody = `${payload.message}\n\n---\nFrom: ${payload.name} (${payload.email})`;
+      window.location.href = `${links.mailto}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      setState("sent");
+      return;
+    }
 
     setState("sending");
     try {
@@ -80,7 +74,7 @@ export function ContactForm() {
       } else {
         throw new Error("not_configured");
       }
-      setState("success");
+      setState("sent");
       form.reset();
     } catch {
       setState("error");
@@ -151,7 +145,7 @@ export function ContactForm() {
         </button>
 
         <p role="status" aria-live="polite" className="min-h-[1.2em] font-mono text-[11px] text-[var(--ink-dim)]">
-          {state === "success" && <span className="text-[var(--ok)]">{f.success}</span>}
+          {state === "sent" && <span className="text-[var(--ok)]">{f.success}</span>}
           {state === "error" && <span className="text-[var(--accent)]">{f.error}</span>}
           {state === "idle" && f.privacy}
         </p>

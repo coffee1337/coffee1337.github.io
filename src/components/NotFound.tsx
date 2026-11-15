@@ -1,8 +1,7 @@
-import { links } from "../content";
 import { useSite } from "../context/site";
 
 export function NotFound() {
-  const { dict } = useSite();
+  const { dict, pathBase } = useSite();
   const page = dict.a11y.notFound;
   return (
     <main className="grid min-h-[100svh] place-items-center px-6">
@@ -19,7 +18,7 @@ export function NotFound() {
         <p className="kicker mt-8">404</p>
         <h1 className="display mt-4 text-4xl md:text-6xl">{page.title}</h1>
         <p className="mt-4 text-[var(--ink-dim)]">{page.body}</p>
-        <a className="btn btn-primary mt-8" href={links.site}>
+        <a className="btn btn-primary mt-8" href={`${pathBase}/`}>
           {page.back}
         </a>
       </div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useSite } from "../context/site";
 
-const IDS = ["top", "about", "capabilities", "experience", "projects", "stack", "resume", "contact"];
+const IDS = ["top", "about", "education", "stack", "capabilities", "projects", "reviews", "resume", "experience", "contact"];
 
 /** Active section is the one containing a line just below the header. */
 export function useScrollSpy() {

@@ -10,7 +10,7 @@ import { sameTech } from "../../lib/tech";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
-const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*", "numpy"];
+const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*"];
 
 /** Фильтр принимает любую технологию: из стека клавиатуры приходит произвольная строка. */
 const matches = (stack: string[], filter: string | null): boolean => {
@@ -37,7 +37,13 @@ export function Projects() {
   useEffect(() => {
     if (!activeId) return;
     const target = `#projects/${activeId}`;
-    if (window.location.hash !== target) {
+    const current = window.location.hash;
+    // Не перетираем якорь секции (#about, #stack, …), с которым пришли на страницу.
+    if (current && !current.startsWith("#projects/")) {
+      setDetailsOpen(false);
+      return;
+    }
+    if (current !== target) {
       history.replaceState(null, "", target);
     }
     setDetailsOpen(false);

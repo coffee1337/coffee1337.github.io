@@ -4,3 +4,4 @@ dist-ssr/
 .env
 .env.local
 *.tsbuildinfo
+brigade/

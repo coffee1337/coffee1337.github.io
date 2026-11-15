@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { dictionaries, type Lang } from "../content";
 import { SiteContext, type RouteInfo, type Theme } from "./site";
 import { trackEvent } from "../analytics";
@@ -9,11 +10,13 @@ const hasWindow = typeof window !== "undefined";
 export const SECTION_ORDER = [
   "top",
   "about",
-  "capabilities",
-  "experience",
-  "projects",
+  "education",
   "stack",
+  "capabilities",
+  "projects",
+  "reviews",
   "resume",
+  "experience",
   "contact",
 ];
 
@@ -61,6 +64,17 @@ export function SiteProvider({
   // Project pages have no boot loader, so reveals and smooth scroll can start right away.
   const [loaderDone, setLoaderDone] = useState(route.kind !== "home");
   const [section, setSection] = useState("top");
+
+  /**
+   * Критический оверлей #boot живёт в index.html и снимается только здесь.
+   * На главной это делает Loader, но на страницах проектов и 404 лоадера нет —
+   * без этого эффекта они навсегда остаются под чёрным экраном.
+   */
+  useEffect(() => {
+    if (!loaderDone) return;
+    document.documentElement.classList.add("boot-done");
+    document.getElementById("boot")?.remove();
+  }, [loaderDone]);
 
   const pathBase = lang === "ru" ? "/ru" : "";
 
@@ -122,29 +136,31 @@ export function SiteProvider({
   const toggleTheme = useCallback(
     (origin?: { x: number; y: number }) => {
       const next: Theme = theme === "dark" ? "light" : "dark";
-      const root = document.documentElement;
-      if (origin) {
-        root.style.setProperty("--wipe-x", `${origin.x}px`);
-        root.style.setProperty("--wipe-y", `${origin.y}px`);
-      }
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduce || typeof document.startViewTransition !== "function" || typeof document.body.animate !== "function") {
+      if (reduce || typeof document.startViewTransition !== "function") {
         commitTheme(next);
         return;
       }
-      const wipe = document.createElement("div");
-      wipe.className = "theme-wipe";
-      wipe.style.background = next === "light" ? "#f8f4ee" : "#0c0a09";
-      document.body.appendChild(wipe);
-      wipe.animate(
-        [
-          { clipPath: `circle(0% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
-          { clipPath: `circle(150% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
-        ],
-        { duration: 520, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" },
+      // Настоящий View Transition: снимок старой темы внизу, новая раскрывается
+      // кругом из точки клика (CSS — в global.css, ::view-transition-new(root)).
+      const x = origin?.x ?? window.innerWidth - 40;
+      const y = origin?.y ?? 28;
+      const endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y),
       );
-      window.setTimeout(() => commitTheme(next), 180);
-      window.setTimeout(() => wipe.remove(), 560);
+      const root = document.documentElement;
+      root.style.setProperty("--vt-x", `${x}px`);
+      root.style.setProperty("--vt-y", `${y}px`);
+      root.style.setProperty("--vt-r", `${endRadius}px`);
+      const transition = document.startViewTransition(() => {
+        flushSync(() => commitTheme(next));
+      });
+      void transition.finished.finally(() => {
+        root.style.removeProperty("--vt-x");
+        root.style.removeProperty("--vt-y");
+        root.style.removeProperty("--vt-r");
+      });
     },
     [commitTheme, theme],
   );

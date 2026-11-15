@@ -21,7 +21,7 @@ export function Stack() {
           <StackKeyboard />
         </div>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div id="capabilities" className="mt-8 grid scroll-mt-24 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {dict.capabilities.items.map((item) => (
             <article key={item.index} data-reveal className="border border-[var(--line)] bg-[var(--bg)] p-4">
               <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--accent)]">{item.index}</p>

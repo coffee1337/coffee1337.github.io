@@ -32,7 +32,7 @@ export function Resume() {
         <div className="resume-sheet mt-10">
           <div className="grid md:grid-cols-2">
             <Cell title={r.profileTitle}><p>{r.profile}</p></Cell>
-            <Cell title={r.experienceTitle}>
+            <Cell id="experience" title={r.experienceTitle}>
               <p className="text-[var(--ink)]">{exp.role}</p>
               <p className="mt-1">{exp.employment}</p>
               <p className="mono mt-3 text-[11px] text-[var(--accent)]">{exp.period}</p>
@@ -67,9 +67,13 @@ export function Resume() {
   );
 }
 
-function Cell({ title, children }: { title: string; children: ReactNode }) {
+function Cell({ title, id, children }: { title: string; id?: string; children: ReactNode }) {
   return (
-    <div data-reveal className="border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:border-r md:px-8">
+    <div
+      id={id}
+      data-reveal
+      className="scroll-mt-24 border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:border-r md:px-8"
+    >
       <h3 className="kicker mb-3">{title}</h3>
       {children}
     </div>
