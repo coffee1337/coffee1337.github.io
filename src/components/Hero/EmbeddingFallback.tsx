@@ -25,7 +25,7 @@ const NODES: Node[] = (() => {
     [300, 200],
   ];
   const list: Node[] = [];
-  for (let i = 0; i < 96; i++) {
+  for (let i = 0; i < 44; i++) {
     const c = centers[i % centers.length];
     const token = rng() < 0.09;
     list.push({

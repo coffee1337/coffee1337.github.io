@@ -29,36 +29,47 @@ export function EmbeddingCanvas({ onLive }: { onLive?: () => void }) {
     if (!canvas || !overlay) return;
     let dead = false;
     const mobile = window.matchMedia("(max-width: 1023px)").matches;
-    void import("../../three/embedding")
-      .then(({ createEmbedding }) =>
-        createEmbedding(canvas, {
-          overlay,
-          mobile,
-          lite: mobile || lowPower,
-          reduced,
-          getClusterWord: () => clusterWord.current,
-          onReady: (n) => {
-            if (!dead) {
-              setCount(n);
-              setReady(true);
-              liveRef.current?.();
-            }
-          },
-        }),
-      )
-      .then((h) => {
-        if (dead) {
-          h.dispose();
-          return;
-        }
-        handle.current = h;
-        h.setReduced(reduced);
-      })
-      .catch(() => {
-        if (!dead) setFailed(true);
-      });
+    // Инициализацию WebGL откладываем на простой поток: заголовок и счётчики
+    // должны отрисоваться раньше тяжёлой сцены.
+    const idleId = (
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback
+        : (cb: () => void) => window.setTimeout(cb, 120)
+    )(() => {
+      if (dead) return;
+      void import("../../three/embedding")
+        .then(({ createEmbedding }) =>
+          createEmbedding(canvas, {
+            overlay,
+            mobile,
+            lite: mobile || lowPower,
+            reduced,
+            getClusterWord: () => clusterWord.current,
+            onReady: (n) => {
+              if (!dead) {
+                setCount(n);
+                setReady(true);
+                liveRef.current?.();
+              }
+            },
+          }),
+        )
+        .then((h) => {
+          if (dead) {
+            h.dispose();
+            return;
+          }
+          handle.current = h;
+          h.setReduced(reduced);
+        })
+        .catch(() => {
+          if (!dead) setFailed(true);
+        });
+    });
     return () => {
       dead = true;
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleId);
+      else window.clearTimeout(idleId);
       handle.current?.dispose();
       handle.current = null;
     };

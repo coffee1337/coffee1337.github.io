@@ -1,40 +1,50 @@
 npm notice run coffee1337.github.io@1.0.0 build
-npm notice run node scripts/fetch-github.mjs && node scripts/build-kb.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/gen-llms.mjs && node scripts/check-links.mjs
-build-kb: 16 чанков из 8 файлов → public/kb-index.json
+npm notice run node scripts/fetch-readmes.mjs && node scripts/fetch-github.mjs && node scripts/build-kb.mjs && tsc -b --pretty false && vite build && vite build --ssr src/prerender/entry.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/gen-llms.mjs && node scripts/check-links.mjs
+fetch-readmes: ai-python-mentor — 5823 символов
+fetch-readmes: ngieuapp — 5722 символов
+fetch-readmes: TransactionMonitor — 5658 символов
+fetch-readmes: neural-astar-heuristic — 3559 символов
+fetch-readmes: k-nearest-neighbors — 3290 символов
+fetch-readmes: portfolio-analytics — 1696 символов
+fetch-readmes: обновлено 6, снапшотов 0, пропущено 0, файлов 6
+build-kb: 83 чанков из 20 источников (ru:40, en:43) → public/kb-index.json
 vite v7.3.7 building client environment for production...
 transforming...
 Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
-✓ 579 modules transformed.
+✓ 612 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                            3.71 kB │ gzip:   1.21 kB
-dist/assets/index-CVg_MCCy.css            39.67 kB │ gzip:   9.00 kB
-dist/assets/EmbeddingCanvas-D_LI5Ega.js    2.38 kB │ gzip:   1.10 kB
-dist/assets/keyboard-Cx3rlXgF.js           5.79 kB │ gzip:   2.75 kB
-dist/assets/embedding-DrgScmxI.js          7.48 kB │ gzip:   3.42 kB
+dist/index.html                            4.68 kB │ gzip:   1.72 kB
+dist/assets/index-BoWgnjqj.css            52.54 kB │ gzip:  11.64 kB
+dist/assets/EmbeddingCanvas-B9_XvBFp.js    1.98 kB │ gzip:   0.96 kB
+dist/assets/keyboard-DJ-i4F4W.js           7.79 kB │ gzip:   3.59 kB
 dist/assets/index-BMqwubCq.js             17.98 kB │ gzip:   5.91 kB
 dist/assets/lenis-BBml_0t9.js             18.71 kB │ gzip:   5.45 kB
+dist/assets/embedding-B9-iJ9wz.js         31.84 kB │ gzip:  11.11 kB
 dist/assets/ScrollTrigger-BrDuEirF.js     43.55 kB │ gzip:  18.11 kB
 dist/assets/index-D4-8ALNT.js             70.43 kB │ gzip:  27.68 kB
-dist/assets/three.module-D4kkC7wv.js     477.96 kB │ gzip: 119.11 kB
-dist/assets/index-CdnGcPU-.js            544.41 kB │ gzip: 175.66 kB
+dist/assets/three.module-D2AYbzpk.js     485.25 kB │ gzip: 121.18 kB
+dist/assets/index-B0OpVht8.js            604.55 kB │ gzip: 196.74 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 7.74s
+✓ built in 8.78s
 vite v7.3.7 building ssr environment for production...
 transforming...
-✓ 56 modules transformed.
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 82 modules transformed.
 rendering chunks...
-dist-ssr/assets/EmbeddingCanvas-zYx5CqZF.js    3.63 kB
-dist-ssr/assets/keyboard-DroGoHIj.js           8.35 kB
-dist-ssr/assets/embedding-CeZabpCb.js         13.40 kB
-dist-ssr/entry.js                            182.15 kB
-✓ built in 937ms
+dist-ssr/assets/EmbeddingCanvas-Dsal0jWw.js    3.25 kB
+dist-ssr/assets/keyboard-WSxwdb0t.js          12.33 kB
+dist-ssr/assets/embedding-ZDS-XAGJ.js         27.94 kB
+dist-ssr/entry.js                            279.80 kB
+✓ built in 1.64s
 prerender: /
 prerender: /ru/
 prerender: /projects/ai-python-mentor/
@@ -51,5 +61,5 @@ prerender: /projects/portfolio-analytics/
 prerender: /ru/projects/portfolio-analytics/
 prerender: /404.html (notfound)
 prerender: sitemap.xml (14 urls)
-llms: llms.txt: 1789 B, llms-full.txt: 10120 B
+llms: llms.txt: 1789 B, llms-full.txt: 41564 B
 ссылки ok: 15 html-файлов, битых нет
