@@ -1,8 +1,7 @@
-import { createContext, useContext, type MutableRefObject } from "react";
+import { createContext, useContext } from "react";
 import type { FullDictionary, Lang } from "../content";
 
 export type Theme = "dark" | "light";
-export type OrbMode = "assemble" | "hero" | "exit";
 
 export type RouteKind = "home" | "project" | "notfound";
 
@@ -22,11 +21,8 @@ export interface SiteContextValue {
   dict: FullDictionary;
   reduced: boolean;
   lowPower: boolean;
-  orbMode: OrbMode;
-  setOrbMode: (mode: OrbMode) => void;
   loaderDone: boolean;
   setLoaderDone: (v: boolean) => void;
-  assembleRef: MutableRefObject<number>;
   section: string;
   setSection: (id: string) => void;
   sectionIndex: number;

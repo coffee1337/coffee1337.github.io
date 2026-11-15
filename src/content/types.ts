@@ -61,6 +61,10 @@ export interface Sections {
     open: string;
     close: string;
     chips: string[];
+    copy: string;
+    copied: string;
+    clear: string;
+    thinking: string;
   };
   projectsUi: {
     explorer: string;
@@ -76,6 +80,79 @@ export interface Sections {
     copied: string;
     empty: string;
     tabs: string;
+    active: string;
+    clearFilter: string;
+  };
+}
+
+/** Подписи SVG-схем кейсов. Моно-лейблы узлов могут оставаться латиницей. */
+export interface Visuals {
+  mentor: {
+    label: string;
+    eyebrow: string;
+    ui: string;
+    api: string;
+    gateway: string;
+    llm: string;
+    rag: string;
+    postgres: string;
+    worker: string;
+    queue: string;
+    telegram: string;
+    caption: string;
+  };
+  astar: {
+    label: string;
+    eyebrow: string;
+    legendOpen: string;
+    legendExpanded: string;
+    legendPath: string;
+    legendWall: string;
+    start: string;
+    goal: string;
+    caption: string;
+  };
+  ngieu: {
+    label: string;
+    eyebrow: string;
+    flutter: string;
+    cache: string;
+    schedule: string;
+    notify: string;
+    widget: string;
+    sync: string;
+  };
+  monitor: {
+    label: string;
+    eyebrow: string;
+    stream: string;
+    rules: string;
+    risk: string;
+    sql: string;
+    low: string;
+    mid: string;
+    high: string;
+    alert: string;
+  };
+  knn: {
+    label: string;
+    eyebrow: string;
+    query: string;
+    classA: string;
+    classB: string;
+    winner: string;
+    metric: string;
+  };
+  analytics: {
+    label: string;
+    eyebrow: string;
+    browser: string;
+    collector: string;
+    models: string;
+    dashboard: string;
+    events: string;
+    store: string;
+    footnote: string;
   };
 }
 
@@ -129,6 +206,7 @@ export interface Dictionary {
     linkGithub: string;
     linkLinkedin: string;
     linkResume: string;
+    cluster: string;
   };
   about: {
     index: string;
@@ -179,6 +257,14 @@ export interface Dictionary {
     label: string;
     title: string;
     groups: { name: string; items: string[] }[];
+    hint: string;
+    usedIn: string;
+    showInProjects: string;
+    noProject: string;
+    filter: string;
+    clear: string;
+    keysLabel: string;
+    panelLabel: string;
   };
   resume: {
     index: string;
@@ -225,6 +311,8 @@ export interface Dictionary {
     location: string;
     sayHello: string;
     builtWith: string;
+    resume: string;
+    linksAria: string;
   };
   a11y: {
     themeToLight: string;
@@ -234,6 +322,10 @@ export interface Dictionary {
     lang: string;
     skip: string;
     orb: string;
+    openPalette: string;
+    close: string;
+    kbd: string;
     notFound: { title: string; body: string; back: string };
   };
+  visuals: Visuals;
 }

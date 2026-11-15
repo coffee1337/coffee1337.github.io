@@ -1,14 +1,18 @@
 import { useEffect } from "react";
 import { useSite } from "../context/site";
 import { getScrollTrigger, refreshScrollTriggers } from "../lib/scrollRefresh";
+import { isScrollLocked } from "./useScrollLock";
+import { setLenis } from "../lib/lenis";
 
 export function useSmoothScroll(enabled: boolean) {
   const { reduced } = useSite();
 
   useEffect(() => {
-    if (!enabled || reduced) return;
+    if (!enabled || reduced) {
+      setLenis(null);
+      return;
+    }
     let destroyed = false;
-    let lenis: { raf: (t: number) => void; destroy: () => void } | null = null;
     let raf = 0;
 
     void import("lenis").then(({ default: Lenis }) => {
@@ -19,7 +23,9 @@ export function useSmoothScroll(enabled: boolean) {
         wheelMultiplier: 0.9,
         touchMultiplier: 1.1,
       });
-      lenis = instance;
+      setLenis(instance);
+      // Модалка могла открыться до готовности Lenis — уважаем текущий лок.
+      if (isScrollLocked()) instance.stop();
       // ScrollTrigger следит за нативным скроллом — Lenis должен его дёргать.
       instance.on("scroll", () => {
         void getScrollTrigger().then(({ ScrollTrigger }) => ScrollTrigger.update());
@@ -36,7 +42,7 @@ export function useSmoothScroll(enabled: boolean) {
     return () => {
       destroyed = true;
       cancelAnimationFrame(raf);
-      lenis?.destroy();
+      setLenis(null);
     };
   }, [enabled, reduced]);
 }

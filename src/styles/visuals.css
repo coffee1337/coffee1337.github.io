@@ -1,0 +1,24 @@
+/* ── SVG-схемы кейсов: геометрия анимаций и поток данных по связям.
+   Все трансформации — в системе координат самого элемента (fill-box),
+   иначе клетки/столбики «вылетают» из угла SVG. ── */
+
+.sv-node,
+.sv-cell,
+.sv-bar,
+.sv-needle,
+.sv-packet,
+.sv-flow {
+  transform-box: fill-box;
+}
+
+.sv-cell {
+  transform-origin: center;
+}
+
+.sv-bar {
+  transform-origin: center bottom;
+}
+
+.sv-needle {
+  transform-origin: 50% 100%;
+}

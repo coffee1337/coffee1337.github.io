@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { dictionaries, type Lang } from "../content";
-import { SiteContext, type OrbMode, type RouteInfo, type Theme } from "./site";
+import { SiteContext, type RouteInfo, type Theme } from "./site";
 import { trackEvent } from "../analytics";
 
 const THEME_KEY = "et-theme";
@@ -17,10 +17,22 @@ export const SECTION_ORDER = [
   "contact",
 ];
 
+/** Событие для canvas/WebGL: палитра темы уже применена к `documentElement`. */
+export const THEME_EVENT = "themechange";
+
+function readStoredTheme(): Theme | null {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
 function initialTheme(): Theme {
   if (!hasWindow) return "dark";
-  const stored = localStorage.getItem(THEME_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+  const stored = readStoredTheme();
+  if (stored) return stored;
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
 
@@ -46,13 +58,35 @@ export function SiteProvider({
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
     return Boolean(saveData) || (mem !== undefined && mem <= 4) || cores <= 4 || narrow;
   });
-  const [orbMode, setOrbMode] = useState<OrbMode>("assemble");
   // Project pages have no boot loader, so reveals and smooth scroll can start right away.
   const [loaderDone, setLoaderDone] = useState(route.kind !== "home");
-  const assembleRef = useRef(0.05);
   const [section, setSection] = useState("top");
 
   const pathBase = lang === "ru" ? "/ru" : "";
+
+  /**
+   * Тема применяется синхронно: `data-theme` пишется ДО setState, поэтому
+   * canvas-компоненты в своём эффекте читают уже новые CSS-переменные.
+   */
+  const commitTheme = useCallback((next: Theme) => {
+    if (!hasWindow) return;
+    const root = document.documentElement;
+    if (root.dataset.theme !== next) {
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch {
+        /* private mode */
+      }
+      window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: { theme: next } }));
+    }
+    setTheme(next);
+  }, []);
+
+  // Первый кадр: синхронизируем state с тем, что уже поставил inline-скрипт.
+  useLayoutEffect(() => {
+    commitTheme(theme);
+  }, [commitTheme, theme]);
 
   /** Language lives in the URL ("/" vs "/ru/"), so switching is a navigation. */
   const switchLang = (to: Lang) => {
@@ -70,11 +104,6 @@ export function SiteProvider({
   };
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
-
-  useEffect(() => {
     document.documentElement.lang = lang;
     if (route.kind !== "home") return;
     const dict = dictionaries[lang];
@@ -90,6 +119,36 @@ export function SiteProvider({
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  const toggleTheme = useCallback(
+    (origin?: { x: number; y: number }) => {
+      const next: Theme = theme === "dark" ? "light" : "dark";
+      const root = document.documentElement;
+      if (origin) {
+        root.style.setProperty("--wipe-x", `${origin.x}px`);
+        root.style.setProperty("--wipe-y", `${origin.y}px`);
+      }
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || typeof document.startViewTransition !== "function" || typeof document.body.animate !== "function") {
+        commitTheme(next);
+        return;
+      }
+      const wipe = document.createElement("div");
+      wipe.className = "theme-wipe";
+      wipe.style.background = next === "light" ? "#f8f4ee" : "#0c0a09";
+      document.body.appendChild(wipe);
+      wipe.animate(
+        [
+          { clipPath: `circle(0% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
+          { clipPath: `circle(150% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
+        ],
+        { duration: 520, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" },
+      );
+      window.setTimeout(() => commitTheme(next), 180);
+      window.setTimeout(() => wipe.remove(), 560);
+    },
+    [commitTheme, theme],
+  );
+
   const value = useMemo(
     () => ({
       lang,
@@ -97,45 +156,17 @@ export function SiteProvider({
       route,
       pathBase,
       theme,
-      toggleTheme: (origin?: { x: number; y: number }) => {
-        const root = document.documentElement;
-        if (origin) {
-          root.style.setProperty("--wipe-x", `${origin.x}px`);
-          root.style.setProperty("--wipe-y", `${origin.y}px`);
-        }
-        const next: Theme = theme === "dark" ? "light" : "dark";
-        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduce || typeof document.startViewTransition !== "function") {
-          setTheme(next);
-          return;
-        }
-        const wipe = document.createElement("div");
-        wipe.className = "theme-wipe";
-        wipe.style.background = next === "light" ? "#f8f4ee" : "#0c0a09";
-        document.body.appendChild(wipe);
-        wipe.animate(
-          [
-            { clipPath: `circle(0% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
-            { clipPath: `circle(150% at ${origin?.x ?? window.innerWidth * 0.9}px ${origin?.y ?? 40}px)` },
-          ],
-          { duration: 520, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" },
-        );
-        window.setTimeout(() => setTheme(next), 180);
-        window.setTimeout(() => wipe.remove(), 560);
-      },
+      toggleTheme,
       dict: dictionaries[lang],
       reduced,
       lowPower,
-      orbMode,
-      setOrbMode,
       loaderDone,
       setLoaderDone,
-      assembleRef,
       section,
       setSection,
       sectionIndex: Math.max(0, SECTION_ORDER.indexOf(section === "education" ? "resume" : section)),
     }),
-    [lang, theme, reduced, lowPower, orbMode, loaderDone, section, route, pathBase],
+    [lang, theme, toggleTheme, reduced, lowPower, loaderDone, section, route, pathBase],
   );
 
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;

@@ -1,0 +1,67 @@
+/* ── Скроллбар в палитре темы. Тонкий, прозрачный трек, терракотовый ползунок.
+   Firefox — scrollbar-width/scrollbar-color, Chrome/Edge/Safari — ::-webkit-scrollbar.
+   Внутренние скроллы (палитра, чат, меню) — на 2px тоньше. ── */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) transparent;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in srgb, var(--accent) 80%, var(--ink));
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Вложенные контейнеры: та же палитра, но тоньше и с отступом от края. */
+[data-lenis-prevent]::-webkit-scrollbar,
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[data-lenis-prevent]::-webkit-scrollbar-thumb,
+.scroll-thin::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-lenis-prevent] {
+  scrollbar-gutter: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+}

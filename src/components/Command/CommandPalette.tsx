@@ -6,6 +6,7 @@ import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 type Props = {
   open: boolean;
@@ -19,6 +20,7 @@ export function CommandPalette({ open, onClose }: Props) {
   const { lockUntilSettled } = useScrollSpy();
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, open);
+  useScrollLock(open);
   const { toast } = useToast();
   const p = dict.palette;
 
@@ -58,13 +60,12 @@ export function CommandPalette({ open, onClose }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onMouseDown={onClose}
-          role="presentation"
+          role="dialog"
+          aria-modal="true"
+          aria-label={p.nav}
         >
           <Command
             label={p.nav}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") onClose();
-            }}
             className="w-full max-w-xl border border-[var(--line)] bg-[var(--bg-2)] shadow-2xl"
             onMouseDown={(event) => event.stopPropagation()}
           >
@@ -77,7 +78,7 @@ export function CommandPalette({ open, onClose }: Props) {
               />
             </div>
 
-            <Command.List className="max-h-[52vh] overflow-auto p-2">
+            <Command.List className="max-h-[52vh] overflow-auto overscroll-contain p-2" data-lenis-prevent>
               <Command.Empty className="p-6 text-center font-mono text-xs text-[var(--ink-dim)]">
                 {p.empty}
               </Command.Empty>

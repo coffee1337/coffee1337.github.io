@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSite } from "../../context/site";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
 import { CommandPalette } from "../Command/CommandPalette";
+import { KbdShortcut } from "../Kbd/KbdShortcut";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 const NAV_IDS = ["about", "projects", "stack", "resume", "contact"] as const;
 const MOBILE_IDS = [...NAV_IDS, "capabilities", "experience"] as const;
@@ -21,6 +23,7 @@ export function Header() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   useFocusTrap(menuRef, menuOpen);
+  useScrollLock(menuOpen || paletteOpen);
   const lastY = useRef(0);
   const onHome = route.kind === "home";
 
@@ -47,18 +50,12 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const locked = menuOpen || paletteOpen;
-    document.body.style.overflow = locked ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen, paletteOpen]);
-
-  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      // e.code не зависит от раскладки: на RU «k» приходит как «л».
+      if ((event.metaKey || event.ctrlKey) && (event.code === "KeyK" || event.key.toLowerCase() === "k")) {
         event.preventDefault();
         setPaletteOpen(true);
+        return;
       }
       if (event.key === "Escape") {
         setMenuOpen(false);
@@ -70,7 +67,9 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (menuOpen) menuButton.current?.focus();
+    if (!menuOpen) return;
+    const first = menuRef.current?.querySelector<HTMLElement>("a[href], button");
+    (first ?? menuButton.current)?.focus();
   }, [menuOpen]);
 
   const current = section === "education" ? "resume" : section;
@@ -113,11 +112,11 @@ export function Header() {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="hidden rounded-full border border-[var(--line)] px-2 py-1 font-mono text-[10px] lg:block"
+            className="hidden rounded-full px-1 py-1 lg:block"
             onClick={() => setPaletteOpen(true)}
-            aria-label={dict.palette.nav}
+            aria-label={dict.a11y.openPalette}
           >
-            ⌘K
+            <KbdShortcut />
           </button>
 
           <div
@@ -162,7 +161,7 @@ export function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
           >
-            ⌘ {dict.nav.menu}
+            {dict.nav.menu}
           </button>
         </div>
       </header>
@@ -175,9 +174,10 @@ export function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-[var(--bg)] p-6 pt-28 lg:hidden"
+            className="fixed inset-0 z-40 overflow-y-auto bg-[var(--bg)] p-6 pt-28 lg:hidden"
             role="dialog"
             aria-modal="true"
+            data-lenis-prevent
           >
             <nav className="flex flex-col" aria-label="Mobile">
               {MOBILE_IDS.map((id, index) => (

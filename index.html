@@ -71,6 +71,15 @@
     </script>
   </head>
   <body>
+    <!-- Критический оверлей: виден с первого кадра, до гидрации. Loader снимает его
+         на первом кадре (html.boot-done), поэтому пререндер не мелькает. -->
+    <style>
+      #boot{position:fixed;inset:0;z-index:79;display:grid;place-items:center;background:#0c0a09;color:#7f7972;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
+      html[data-theme="light"] #boot{background:#f8f4ee;color:#846b5f}
+      html.boot-done #boot{display:none}
+    </style>
+    <div id="boot" aria-hidden="true"><span>coffee1337</span></div>
+    <noscript><style>#boot{display:none}.loader-screen{display:none!important}</style></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -81,6 +81,10 @@ const en: Sections = {
     fallback: "I don't have that in the knowledge base. Email Egor directly: trefilovegor84@gmail.com",
     open: "Ask the AI assistant",
     close: "Close",
+    copy: "Copy answer",
+    copied: "Copied",
+    clear: "Clear chat",
+    thinking: "typing",
     chips: [
       "What is your stack?",
       "Tell me about AI Python Mentor",
@@ -102,6 +106,8 @@ const en: Sections = {
     copied: "Copied",
     empty: "Nothing matches this filter.",
     tabs: "projects/",
+    active: "active",
+    clearFilter: "Reset filter",
   },
 };
 
@@ -182,6 +188,10 @@ const ru: Sections = {
     fallback: "В базе знаний этого нет. Напишите Егору напрямую: trefilovegor84@gmail.com",
     open: "Спросить AI-ассистента",
     close: "Закрыть",
+    copy: "Копировать ответ",
+    copied: "Скопировано",
+    clear: "Очистить чат",
+    thinking: "печатает",
     chips: [
       "Какой у тебя стек?",
       "Расскажи про AI Python Mentor",
@@ -203,6 +213,8 @@ const ru: Sections = {
     copied: "Скопировано",
     empty: "Под этот фильтр ничего нет.",
     tabs: "проекты/",
+    active: "в работе",
+    clearFilter: "Сбросить фильтр",
   },
 };
 

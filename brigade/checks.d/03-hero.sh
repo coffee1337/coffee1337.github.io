@@ -6,7 +6,8 @@ ok(){ printf '  ok   %s\n' "$*"; }
 bad(){ fails=$((fails+1)); printf '  FAIL %s\n' "$*"; }
 
 grep -rqi "sessionStorage" src && ok "сплэш помнит сессию" || bad "сплэш помнит сессию"
-grep -rqi "skip" src/components/*Splash* src/components/Splash 2>/dev/null | head -1 >/dev/null && ok "кнопка skip" || bad "кнопка skip"
+# Splash заменён на Loader — кнопка пропуска должна остаться.
+grep -rqi "skip" src/components/Loader 2>/dev/null && ok "кнопка skip" || bad "кнопка skip"
 
 grep -rq "THREE.Points\|<points" src/three src/components 2>/dev/null && ok "облако точек THREE.Points" || bad "облако точек THREE.Points"
 grep -rqi "embedding" src/three src/components 2>/dev/null && ok "Embedding Space" || bad "Embedding Space"

@@ -93,6 +93,12 @@ export function Loader({ onDone }: { onDone: () => void }) {
     };
   }, []);
 
+  // Критический оверлей из index.html снимаем, как только лоадер отрисовался.
+  useEffect(() => {
+    document.documentElement.classList.add("boot-done");
+    document.getElementById("boot")?.remove();
+  }, []);
+
   useEffect(() => {
     const onSkip = () => finish();
     window.addEventListener("keydown", onSkip);

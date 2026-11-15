@@ -1,5 +1,8 @@
 @import "./fonts.css";
 @import "./tokens.css";
+@import "./scroll.css";
+@import "./visuals.css";
+@import "./loader.css";
 
 @tailwind base;
 @tailwind components;
@@ -8,9 +11,12 @@
 @layer base {
   html, body, #root { min-height: 100%; }
 
+  /* Один overflow на весь документ: clip не создаёт scroll-container,
+     поэтому sticky и Lenis работают, а горизонтального скролла нет. */
   html {
     background: var(--bg);
-    overflow-x: hidden;
+    overflow-x: clip;
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -22,7 +28,6 @@
     line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
   }
 
   ::selection {
@@ -81,8 +86,32 @@ body::before {
   clip-path: circle(0% at var(--wipe-x, 90%) var(--wipe-y, 8%));
 }
 
+/* ── Lenis: базовые стили библиотеки + наши правила для вложенных скроллов.
+   data-lenis-prevent обязателен на каждом внутреннем контейнере (палитра, чат,
+   мобильное меню): Lenis пропускает такие события колеса до проверки stop(). ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+[data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -101,6 +130,23 @@ body::before {
   font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Подсказка клавиши: моно, тонкая рамка, острые углы. */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--ink-dim);
+  white-space: nowrap;
 }
 
 .kicker {

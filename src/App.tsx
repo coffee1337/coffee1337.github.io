@@ -16,7 +16,7 @@ import { ScrollProgress } from "./components/Progress/ScrollProgress";
 import { Assistant } from "./components/Assistant/Assistant";
 
 function Shell() {
-  const { loaderDone, setLoaderDone, setOrbMode, dict } = useSite();
+  const { loaderDone, setLoaderDone, dict } = useSite();
   const [booting, setBooting] = useState(false);
   useSmoothScroll(loaderDone);
 
@@ -30,7 +30,6 @@ function Shell() {
       {booting && (
         <Loader
           onDone={() => {
-            setOrbMode("hero");
             setLoaderDone(true);
             const hash = window.location.hash.replace("#", "");
             window.setTimeout(() => {
