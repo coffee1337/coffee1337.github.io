@@ -48,6 +48,17 @@ export function Explorer({ projects, activeId, onSelect, dimmed }: Props) {
     node?.focus();
   };
 
+  /** Enter/стрелки работают с элементом в фокусе, а не с последним выбранным проектом. */
+  const focused = (event: React.KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    return {
+      file: target?.closest<HTMLElement>("[data-file]")?.dataset.file,
+      dir: target?.closest<HTMLElement>("[data-dir]")?.dataset.dir,
+    };
+  };
+
+  const toggleDir = (dir: string) => setCollapsed((state) => ({ ...state, [dir]: !state[dir] }));
+
   const move = (delta: number) => {
     const current = rows.findIndex((row) => row.project.id === activeId);
     const next = Math.min(Math.max(current + delta, 0), rows.length - 1);
@@ -75,16 +86,15 @@ export function Explorer({ projects, activeId, onSelect, dimmed }: Props) {
         }
         if (event.key === "Enter") {
           event.preventDefault();
-          const row = rows.find((r) => r.project.id === activeId);
-          if (row) setCollapsed((state) => ({ ...state, [row.dir]: !state[row.dir] }));
+          const { file, dir } = focused(event);
+          if (file) onSelect(file);
+          else if (dir) toggleDir(dir);
         }
-        if (event.key === "ArrowLeft") {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
           event.preventDefault();
-          setCollapsed((state) => ({ ...state, [rows.find((r) => r.project.id === activeId)?.dir ?? ""]: true }));
-        }
-        if (event.key === "ArrowRight") {
-          event.preventDefault();
-          setCollapsed((state) => ({ ...state, [rows.find((r) => r.project.id === activeId)?.dir ?? ""]: false }));
+          const { dir } = focused(event);
+          if (!dir) return;
+          setCollapsed((state) => ({ ...state, [dir]: event.key === "ArrowLeft" }));
         }
       }}
     >
@@ -107,7 +117,8 @@ export function Explorer({ projects, activeId, onSelect, dimmed }: Props) {
                 type="button"
                 role="treeitem"
                 aria-expanded={!isCollapsed}
-                onClick={() => setCollapsed((state) => ({ ...state, [group.dir]: !state[group.dir] }))}
+                data-dir={group.dir}
+                onClick={() => toggleDir(group.dir)}
                 className="flex w-full items-center gap-2 px-3 py-1 text-left font-mono text-[11px] text-[var(--ink-dim)] hover:text-[var(--ink)]"
               >
                 <span className="text-[var(--accent)]">{isCollapsed ? "▸" : "▾"}</span>

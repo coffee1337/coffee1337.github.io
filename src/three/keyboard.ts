@@ -69,7 +69,7 @@ function readSkin(theme: "dark" | "light"): ThemeSkin {
   };
 }
 
-/** Текстура-наклейка: прозрачный фон, подпись в 1–2 строки, шрифт подгоняется. */
+/** Текстура-наклейка: прозрачный фон, подпись в 1–3 строки, шрифт подгоняется под ширину. */
 function drawLabel(canvas: HTMLCanvasElement, text: string, color: string): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -80,41 +80,46 @@ function drawLabel(canvas: HTMLCanvasElement, text: string, color: string): void
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const maxWidth = w * 0.84;
+  const maxWidth = w * 0.86;
   const setFont = (size: number) => {
     ctx.font = `600 ${size}px "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace`;
   };
   const measure = (value: string) => ctx.measureText(value).width;
 
-  let size = Math.floor(h * 0.27);
-  setFont(size);
-  while (size > 11 && measure(text) > maxWidth) {
-    size -= 1;
-    setFont(size);
+  // Переносим только по пробелам: «PostgreSQL» одной строкой читается лучше, чем «Postg»/«reSQL».
+  const words = text.split(/\s+/).filter(Boolean);
+  const splitWords = (parts: number): string[] | null => {
+    if (words.length < parts) return null;
+    return Array.from({ length: parts }, (_, i) =>
+      words.slice(Math.round((i * words.length) / parts), Math.round(((i + 1) * words.length) / parts)).join(" "),
+    );
+  };
+
+  const candidates: string[][] = [[text]];
+  for (const parts of [2, 3]) {
+    const split = splitWords(parts);
+    if (split) candidates.push(split);
   }
 
-  let lines: string[] = [text];
-  if (measure(text) > maxWidth) {
-    const words = text.split(/\s+/).filter(Boolean);
-    let split: string[] | null = null;
-    if (words.length > 1) {
-      const mid = Math.ceil(words.length / 2);
-      split = [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
-    } else {
-      const mid = Math.ceil(text.length / 2);
-      split = [text.slice(0, mid), text.slice(mid)];
-    }
-    const longest = Math.max(...split.map((line) => measure(line)));
-    if (longest > maxWidth) {
-      size = Math.max(10, Math.floor((size * maxWidth) / longest));
+  const fitSize = (lines: string[], from: number): number => {
+    for (let size = from; size >= 12; size -= 1) {
       setFont(size);
+      if (lines.every((line) => measure(line) <= maxWidth)) return size;
     }
-    if (split.every((line) => measure(line) <= maxWidth)) lines = split;
+    return 12;
+  };
+
+  let best = { lines: [text], size: 12 };
+  for (const lines of candidates) {
+    if (lines.some((line) => !line)) continue;
+    const size = fitSize(lines, Math.floor(h * 0.3));
+    if (size > best.size) best = { lines, size };
   }
 
-  const lineHeight = size * 1.18;
-  const top = h / 2 - ((lines.length - 1) * lineHeight) / 2;
-  lines.forEach((line, i) => ctx.fillText(line, w / 2, top + i * lineHeight));
+  setFont(best.size);
+  const lineHeight = best.size * 1.16;
+  const top = h / 2 - ((best.lines.length - 1) * lineHeight) / 2;
+  best.lines.forEach((line, i) => ctx.fillText(line, w / 2, top + i * lineHeight));
 }
 
 /** Изометрическая клавиатура стека. Возвращает handle: dispose + пауза рендера. */
@@ -177,8 +182,8 @@ export function createKeyboardScene(
   const disposables: Array<{ dispose: () => void }> = [capGeometry, stickerGeometry];
 
   rows.forEach((row, rowIndex) => {
+    // startX уже центрирует ряд по его длине — дополнительный offset сдвигал короткие ряды вправо.
     const startX = -(row.keys.length * (KEY_W + GAP)) / 2 + KEY_W / 2;
-    const offset = ((maxPerRow - row.keys.length) * (KEY_W + GAP)) / 2;
     row.keys.forEach((key, keyIndex) => {
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(key.accent ? skin.accent : skin.cap),
@@ -200,7 +205,7 @@ export function createKeyboardScene(
       });
 
       const mesh = new THREE.Mesh(capGeometry, material);
-      const x = startX + keyIndex * (KEY_W + GAP) + offset;
+      const x = startX + keyIndex * (KEY_W + GAP);
       const z = (rowIndex - (rows.length - 1) / 2) * (KEY_D + GAP);
       mesh.position.set(x, KEY_H / 2, z);
       const sticker = new THREE.Mesh(stickerGeometry, stickerMaterial);

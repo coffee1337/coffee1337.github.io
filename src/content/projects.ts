@@ -38,7 +38,7 @@ export const projectMeta = [
     visual: "neighbors" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/k-nearest-neighbors",
-    stack: ["C++17", "CMake", "WinAPI"],
+    stack: ["C++17", "CMake", "WinAPI", "k-NN"],
     status: false,
   },
   {

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSite } from "../../context/site";
 import { links } from "../../content";
+import { CopyButton } from "../CopyButton";
 
 type Topic = "hire" | "project" | "other";
-type State = "idle" | "sending" | "sent" | "error";
+type Field = "name" | "email" | "message";
+type State = "idle" | "sending" | "sent" | "mailto" | "error";
 
 const KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
 const ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
@@ -15,6 +17,7 @@ export function ContactForm() {
   const [topic, setTopic] = useState<Topic>("hire");
   const [state, setState] = useState<State>("idle");
   const [honeypot, setHoneypot] = useState("");
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
 
   useEffect(() => {
     const onTopic = (event: Event) => {
@@ -27,26 +30,50 @@ export function ContactForm() {
 
   const subject = `${f.topics[topic]} — coffee1337.github.io`;
 
+  const setError = (field: Field, message: string) =>
+    setErrors((prev) => (prev[field] === message ? prev : { ...prev, [field]: message }));
+
+  const clearError = (field: Field) =>
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+
+  /** Нативная валидация остаётся включённой; здесь мы дублируем её сообщением под полем. */
+  const onInvalid =
+    (field: Field) => (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      event.preventDefault();
+      const el = event.currentTarget;
+      setError(field, el.validity.valueMissing || el.validity.tooShort ? f.errRequired : f.errEmail);
+    };
+
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (honeypot) return;
 
     const form = event.currentTarget;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const data = new FormData(form);
     const payload = {
-      name: String(data.get("name") || ""),
-      email: String(data.get("email") || ""),
+      name: String(data.get("name") || "").trim(),
+      email: String(data.get("email") || "").trim(),
       topic,
-      message: String(data.get("message") || ""),
+      message: String(data.get("message") || "").trim(),
       subject,
     };
 
-    // Без внешнего провайдера форма всё равно работает: собираем письмо в mailto.
+    // Без внешнего провайдера форма работает через почтовый клиент пользователя.
     if (PROVIDER === "none") {
       const mailSubject = `[Portfolio] ${f.topics[topic]} — ${payload.name}`;
       const mailBody = `${payload.message}\n\n---\nFrom: ${payload.name} (${payload.email})`;
       window.location.href = `${links.mailto}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-      setState("sent");
+      setState("mailto");
       return;
     }
 
@@ -81,22 +108,56 @@ export function ContactForm() {
     }
   };
 
-  const field = "w-full border border-[var(--line)] bg-[var(--bg)] px-3 py-2 font-mono text-sm text-[var(--ink)] outline-none focus:border-[var(--accent)]";
+  const baseField =
+    "w-full border bg-[var(--bg)] px-3 py-2 font-mono text-sm text-[var(--ink)] outline-none focus:border-[var(--accent)]";
+  const field = (name: Field) =>
+    `${baseField} ${errors[name] ? "border-[var(--accent)]" : "border-[var(--line)]"}`;
   const label = "font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-faint)]";
+  const errorText = "font-mono text-[10px] leading-relaxed text-[var(--accent)]";
 
   return (
-    <form onSubmit={onSubmit} className="border border-[var(--line)] bg-[var(--bg-2)] p-6" noValidate>
+    <form onSubmit={onSubmit} className="border border-[var(--line)] bg-[var(--bg-2)] p-6">
       <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-faint)]">{f.title}</p>
 
       <div className="mt-5 grid gap-4">
         <label className="grid gap-1.5">
           <span className={label}>{f.name}</span>
-          <input name="name" required autoComplete="name" className={field} />
+          <input
+            name="name"
+            required
+            minLength={2}
+            autoComplete="name"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "contact-err-name" : undefined}
+            className={field("name")}
+            onInvalid={onInvalid("name")}
+            onInput={() => clearError("name")}
+          />
+          {errors.name && (
+            <span id="contact-err-name" role="alert" className={errorText}>
+              {errors.name}
+            </span>
+          )}
         </label>
 
         <label className="grid gap-1.5">
           <span className={label}>{f.email}</span>
-          <input name="email" type="email" required autoComplete="email" className={field} />
+          <input
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "contact-err-email" : undefined}
+            className={field("email")}
+            onInvalid={onInvalid("email")}
+            onInput={() => clearError("email")}
+          />
+          {errors.email && (
+            <span id="contact-err-email" role="alert" className={errorText}>
+              {errors.email}
+            </span>
+          )}
         </label>
 
         <div className="grid gap-1.5">
@@ -122,7 +183,22 @@ export function ContactForm() {
 
         <label className="grid gap-1.5">
           <span className={label}>{f.message}</span>
-          <textarea name="message" required rows={5} className={`${field} resize-y`} />
+          <textarea
+            name="message"
+            required
+            minLength={10}
+            rows={5}
+            aria-invalid={Boolean(errors.message)}
+            aria-describedby={errors.message ? "contact-err-message" : undefined}
+            className={`${field("message")} resize-y`}
+            onInvalid={onInvalid("message")}
+            onInput={() => clearError("message")}
+          />
+          {errors.message && (
+            <span id="contact-err-message" role="alert" className={errorText}>
+              {errors.message}
+            </span>
+          )}
         </label>
 
         <input
@@ -144,11 +220,17 @@ export function ContactForm() {
           {state === "sending" ? f.sending : f.send}
         </button>
 
-        <p role="status" aria-live="polite" className="min-h-[1.2em] font-mono text-[11px] text-[var(--ink-dim)]">
+        <div role="status" aria-live="polite" className="min-h-[1.2em] font-mono text-[11px] text-[var(--ink-dim)]">
           {state === "sent" && <span className="text-[var(--ok)]">{f.success}</span>}
           {state === "error" && <span className="text-[var(--accent)]">{f.error}</span>}
           {state === "idle" && f.privacy}
-        </p>
+          {state === "mailto" && (
+            <span className="flex flex-wrap items-center gap-2">
+              <span>{f.mailtoOpened}</span>
+              <CopyButton value={links.email} label={dict.contact.copyEmail} copiedLabel={dict.contact.copied} />
+            </span>
+          )}
+        </div>
       </div>
     </form>
   );

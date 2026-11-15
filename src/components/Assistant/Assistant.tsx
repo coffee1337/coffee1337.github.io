@@ -125,7 +125,7 @@ function Markdown({ text, onNavigate }: { text: string; onNavigate: () => void }
 
 /** AI-ассистент: локальный режим работает всегда, LLM через Worker — если задан VITE_CHAT_API_URL. */
 export function Assistant() {
-  const { lang } = useSite();
+  const { lang, loaderDone } = useSite();
   const ui = assistantUi[lang];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(restore);
@@ -420,13 +420,14 @@ export function Assistant() {
 
   return (
     <>
+      {loaderDone && (
       <button
         type="button"
         onClick={() => setOpen((state) => !state)}
         aria-label={open ? ui.close : ui.open}
         aria-expanded={open}
         aria-controls="ai-assistant-panel"
-        className="fixed bottom-5 right-5 z-[80] grid h-14 w-14 place-items-center rounded-full border border-[var(--line)] bg-[var(--bg-2)] shadow-lg transition-transform hover:scale-105"
+        className="assistant-fab fixed bottom-5 right-5 z-[80] grid h-14 w-14 place-items-center rounded-full border border-[var(--line)] bg-[var(--bg-2)] shadow-lg transition-transform hover:scale-105"
       >
         <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
           <rect x={7} y={10} width={14} height={13} rx={2} fill="none" stroke="var(--accent)" strokeWidth={1.5} />
@@ -435,6 +436,7 @@ export function Assistant() {
           <path d="M12 5c0 2-2 2-2 4M17 4c0 2-2 2-2 4" stroke="var(--accent-2)" strokeWidth={1.2} opacity={0.7} />
         </svg>
       </button>
+      )}
 
       <AnimatePresence>
         {open && (
@@ -609,13 +611,23 @@ export function Assistant() {
                 autoComplete="off"
                 className="w-full bg-transparent font-mono text-sm outline-none placeholder:text-[var(--ink-faint)]"
               />
-              <button
-                type="submit"
-                disabled={busy || value.trim().length === 0}
-                className="bg-[var(--accent)] px-3 py-1 font-mono text-[10px] uppercase text-[var(--bg)] transition-opacity disabled:opacity-40"
-              >
-                {ui.send}
-              </button>
+              {busy ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  className="border border-[var(--line)] px-3 py-1 font-mono text-[10px] uppercase text-[var(--ink-dim)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                >
+                  {ui.stop}
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={value.trim().length === 0}
+                  className="bg-[var(--accent)] px-3 py-1 font-mono text-[10px] uppercase text-[var(--bg)] transition-opacity disabled:opacity-40"
+                >
+                  {ui.send}
+                </button>
+              )}
             </form>
           </motion.div>
         )}

@@ -139,8 +139,11 @@ function sectionOf(el: Element | null): string | undefined {
   return section?.dataset.section;
 }
 
+let analyticsStarted = false;
+
 export function initAnalytics(): void {
-  if (!enabled) return;
+  if (!enabled || analyticsStarted) return;
+  analyticsStarted = true;
   trackEvent("pageview");
 
   document.addEventListener(

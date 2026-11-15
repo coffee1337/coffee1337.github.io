@@ -10,7 +10,7 @@ import { sameTech } from "../../lib/tech";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
-const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*"];
+const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*", "k-nn", "knn", "машинное обучение", "machine learning"];
 
 /** Фильтр принимает любую технологию: из стека клавиатуры приходит произвольная строка. */
 const matches = (stack: string[], filter: string | null): boolean => {
@@ -34,20 +34,16 @@ export function Projects() {
     if (hash && projects.some((p) => p.id === hash)) setActiveId(hash);
   }, [projects]);
 
-  useEffect(() => {
-    if (!activeId) return;
-    const target = `#projects/${activeId}`;
-    const current = window.location.hash;
-    // Не перетираем якорь секции (#about, #stack, …), с которым пришли на страницу.
-    if (current && !current.startsWith("#projects/")) {
-      setDetailsOpen(false);
-      return;
-    }
-    if (current !== target) {
-      history.replaceState(null, "", target);
-    }
+  /**
+   * Хэш пишется только по явному действию пользователя (клик по проекту).
+   * На монтировании URL остаётся чистым, а входящий #about/#top не затирается.
+   */
+  const selectProject = (id: string) => {
+    setActiveId(id);
+    const target = `#projects/${id}`;
+    if (window.location.hash !== target) history.replaceState(null, "", target);
     setDetailsOpen(false);
-  }, [activeId]);
+  };
 
   useEffect(() => {
     const onFilter = (event: Event) => {
@@ -135,7 +131,7 @@ export function Projects() {
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
           <div className="hidden lg:block">
-            <Explorer projects={projects} activeId={active.id} onSelect={setActiveId} dimmed={dimmed} />
+            <Explorer projects={projects} activeId={active.id} onSelect={selectProject} dimmed={dimmed} />
           </div>
 
           <div className="lg:hidden -mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-2">
@@ -144,7 +140,7 @@ export function Projects() {
               <button
                 key={project.id}
                 type="button"
-                onClick={() => setActiveId(project.id)}
+                onClick={() => selectProject(project.id)}
                 className={`whitespace-nowrap rounded-full border px-3 py-1 font-mono text-[11px] ${
                   project.id === active.id ? "border-[var(--accent)] text-[var(--accent)]" : "border-[var(--line)] text-[var(--ink-dim)]"
                 }`}

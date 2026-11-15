@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSite } from "../../context/site";
-import { canon, projectsWithTech } from "../../lib/tech";
+import { canon, projectsWithRelated, projectsWithTech } from "../../lib/tech";
 import type { KeyboardHandle, KeyboardRow } from "../../three/keyboard";
 
 /** Акцентные колпачки: технологии, на которых держатся проекты. */
@@ -35,6 +35,7 @@ export function StackKeyboard() {
   const [tooltip, setTooltip] = useState<{ label: string; x: number; y: number } | null>(null);
   const [active, setActive] = useState<string | null>(null);
   const [narrow, setNarrow] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -67,6 +68,12 @@ export function StackKeyboard() {
     () => (active ? projectsWithTech(projects, active) : []),
     [active, projects],
   );
+  /** Если прямого совпадения нет — показываем смежные проекты, а не заглушку. */
+  const relatedProjects = useMemo(
+    () => (active && usedProjects.length === 0 ? projectsWithRelated(projects, active) : []),
+    [active, usedProjects.length, projects],
+  );
+  const shownProjects = usedProjects.length > 0 ? usedProjects : relatedProjects;
 
   /** Клик/выбор клавиши: только выделение и панель, без скролла страницы. */
   const select = (label: string) => {
@@ -86,6 +93,7 @@ export function StackKeyboard() {
 
   useEffect(() => {
     if (!webgl) return;
+    setReady(false);
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
     if (!canvas || !wrap) return;
@@ -102,6 +110,7 @@ export function StackKeyboard() {
           onHover: (key, x, y) => setTooltip(key ? { label: key.label, x, y } : null),
           onSelect: select,
         });
+        setReady(true);
       });
     };
 
@@ -146,8 +155,29 @@ export function StackKeyboard() {
               <canvas
                 ref={canvasRef}
                 className="h-full w-full touch-pan-y"
-                aria-hidden
+                role="img"
+                aria-label={dict.stack.keysLabel}
               />
+              {!ready && (
+                <div
+                  aria-hidden
+                  className="absolute inset-0 grid place-items-center bg-[var(--bg-2)]"
+                >
+                  <div className="flex w-3/4 max-w-[420px] flex-col gap-2">
+                    {[6, 7, 5].map((count, rowIndex) => (
+                      <div key={rowIndex} className="flex justify-center gap-2">
+                        {Array.from({ length: count }).map((_, keyIndex) => (
+                          <span
+                            key={keyIndex}
+                            className="h-8 flex-1 animate-pulse border border-[var(--line)] bg-[var(--bg-3)]"
+                            style={{ animationDelay: `${(rowIndex * 6 + keyIndex) * 60}ms` }}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {tooltip && !reduced && (
                 <div
                   className="pointer-events-none absolute z-10 max-w-[220px] -translate-x-1/2 -translate-y-full border border-[var(--line)] bg-[var(--bg)] px-3 py-1.5 font-mono text-[10px] text-[var(--ink)] shadow-lg"
@@ -217,9 +247,15 @@ export function StackKeyboard() {
                 </button>
               </div>
 
-              {usedProjects.length > 0 ? (
+              {usedProjects.length === 0 && relatedProjects.length > 0 && (
+                <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--ink-faint)]">
+                  {dict.stack.related}
+                </p>
+              )}
+
+              {shownProjects.length > 0 ? (
                 <ul className="mt-3 space-y-1">
-                  {usedProjects.map((project) => (
+                  {shownProjects.map((project) => (
                     <li key={project.id}>
                       <a
                         href={`${pathBase}/projects/${project.id}/`}
@@ -249,26 +285,7 @@ export function StackKeyboard() {
         </aside>
       </div>
 
-      {/* Accessible list: the same keys for keyboard and screen readers */}
-      <ul className="sr-only" aria-label={dict.stack.keysLabel}>
-        {rows.flatMap((row) =>
-          row.keys.map((key) => (
-            <li key={`${row.name}-${key.label}`}>
-              <button
-                type="button"
-                onClick={() => select(key.label)}
-                aria-pressed={active === key.label}
-                aria-describedby="stack-hint"
-              >
-                {key.label} — {row.name}
-              </button>
-            </li>
-          )),
-        )}
-      </ul>
-      <p id="stack-hint" className="sr-only">
-        {dict.stack.hint}
-      </p>
+      <p className="sr-only">{dict.stack.hint}</p>
     </div>
   );
 }

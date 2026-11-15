@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { NotFound } from "./components/NotFound";
@@ -25,27 +25,36 @@ function parseRoute(): ClientRoute {
   const ru = path === "/ru" || path.startsWith("/ru/");
   const lang: Lang = ru ? "ru" : "en";
   const rest = ru ? path.slice(3) || "/" : path;
-  if (rest === "/" || rest === "/projects") return { kind: "home", lang };
+  // /projects/index.html не пререндерится: прямой HTTP-запрос отдаёт 404, клиент не должен думать иначе.
+  if (rest === "/") return { kind: "home", lang };
   const match = rest.match(/^\/projects\/([a-z0-9-]+)$/i);
   if (match) return { kind: "project", lang, projectId: match[1] };
   return { kind: "notfound", lang };
 }
 
 const route = parseRoute();
-initAnalytics();
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <SiteProvider initialLang={route.lang} route={route}>
-      <ToastProvider>
-        {route.kind === "home" ? (
-          <App />
-        ) : route.kind === "project" ? (
-          <ProjectPage id={route.projectId} />
-        ) : (
-          <NotFound />
-        )}
-      </ToastProvider>
-    </SiteProvider>
-  </StrictMode>,
-);
+/** Аналитика инициализируется после монтирования: IntersectionObserver должен видеть живые [data-section]. */
+function Root() {
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
+  return (
+    <StrictMode>
+      <SiteProvider initialLang={route.lang} route={route}>
+        <ToastProvider>
+          {route.kind === "home" ? (
+            <App />
+          ) : route.kind === "project" ? (
+            <ProjectPage id={route.projectId} />
+          ) : (
+            <NotFound />
+          )}
+        </ToastProvider>
+      </SiteProvider>
+    </StrictMode>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Root />);

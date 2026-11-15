@@ -62,6 +62,7 @@ export interface AssistantUi {
   note: string;
   placeholder: string;
   send: string;
+  stop: string;
   sources: string;
   fallback: string;
   open: string;
@@ -85,6 +86,7 @@ const en: AssistantUi = {
   note: "runs on caffeine, may be wrong",
   placeholder: "Ask about stack, projects, hiring…",
   send: "Send",
+  stop: "Stop",
   sources: "sources",
   fallback: "I don't have that in the knowledge base. Email Egor directly: trefilovegor84@gmail.com",
   open: "Ask the AI assistant",
@@ -167,6 +169,7 @@ const ru: AssistantUi = {
   note: "работает на кофеине, может ошибаться",
   placeholder: "Спросите про стек, проекты, найм…",
   send: "Отправить",
+  stop: "Стоп",
   sources: "источники",
   fallback: "В базе знаний этого нет. Напишите Егору напрямую: trefilovegor84@gmail.com",
   open: "Спросить AI-ассистента",

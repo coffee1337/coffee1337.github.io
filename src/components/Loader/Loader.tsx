@@ -6,9 +6,9 @@ import { BRAND, createLoaderScene } from "../../loader/scene";
 const VISIT_KEY = "et-seen";
 
 /** Первый визит: символы → coffee1337 → сайт. */
-const FULL_MS = 4000;
+const FULL_MS = 1100;
 /** Повторный визит в сессии: короткий reveal. */
-const SHORT_MS = 1000;
+const SHORT_MS = 600;
 /** prefers-reduced-motion: статичный ник и fade. */
 const REDUCED_MS = 400;
 

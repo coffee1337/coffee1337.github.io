@@ -38,7 +38,36 @@ export function sameTech(a: string, b: string): boolean {
   return ca.length >= 3 && cb.length >= 3 && (ca.includes(cb) || cb.includes(ca));
 }
 
+/** Технологии, которые не названы в стеках напрямую, но стоят за ними. */
+const RELATED: Record<string, string[]> = {
+  asyncio: ["python"],
+  pandas: ["python"],
+  "data processing": ["python"],
+  automation: ["python"],
+  python: ["fastapi"],
+  linux: ["docker"],
+  docker: ["linux"],
+  typescript: ["next.js"],
+  "next.js": ["typescript"],
+  sqlalchemy: ["postgresql", "sqlite"],
+  postgresql: ["sqlalchemy"],
+};
+
+/** Технологии, которые есть в любом публичном проекте (все они — git-репозитории). */
+const GLOBAL = new Set(["git"]);
+
 /** Проекты, в стеке которых есть технология. */
 export function projectsWithTech<T extends { stack: string[] }>(projects: T[], tech: string): T[] {
+  const key = canon(tech);
+  if (GLOBAL.has(key)) return projects.filter((project) => (project as { github?: string }).github);
   return projects.filter((project) => project.stack.some((item) => sameTech(item, tech)));
+}
+
+/** Ближайшие проекты, если прямого совпадения нет: смежные технологии из RELATED. */
+export function projectsWithRelated<T extends { stack: string[] }>(projects: T[], tech: string): T[] {
+  const related = RELATED[canon(tech)] ?? [];
+  if (!related.length) return [];
+  return projects.filter((project) =>
+    project.stack.some((item) => related.some((alias) => sameTech(item, alias))),
+  );
 }
