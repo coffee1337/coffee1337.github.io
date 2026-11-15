@@ -8,7 +8,7 @@ import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useScrollLock } from "../../hooks/useScrollLock";
 
 const NAV_IDS = ["about", "stack", "projects", "resume", "contact"] as const;
-const MOBILE_IDS = ["about", "capabilities", "experience", "stack", "projects", "resume", "contact"] as const;
+const MOBILE_IDS = ["about", "stack", "capabilities", "projects", "resume", "experience", "contact"] as const;
 
 type NavKey = keyof ReturnType<typeof useSite>["dict"]["nav"];
 
@@ -80,7 +80,7 @@ export function Header() {
     paletteWasOpen.current = paletteOpen;
   }, [paletteOpen]);
 
-  const current = section === "education" ? "resume" : section;
+  const current = section === "education" ? "about" : section === "capabilities" ? "stack" : section === "experience" ? "resume" : section;
 
   return (
     <>

@@ -38,6 +38,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Context" />
+    <!-- jsonld:start -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -61,6 +63,7 @@
         ]
       }
     </script>
+    <!-- jsonld:end -->
     <script>
       (function () {
         try {
@@ -73,6 +76,7 @@
     </script>
   </head>
   <body>
+    <!-- boot:start -->
     <!-- Критический оверлей: виден с первого кадра, до гидрации. Loader снимает его
          на первом кадре (html.boot-done), поэтому пререндер не мелькает. -->
     <style>
@@ -82,6 +86,7 @@
     </style>
     <div id="boot" aria-hidden="true"><span>coffee1337</span></div>
     <noscript><style>#boot{display:none}.loader-screen{display:none!important}</style></noscript>
+    <!-- boot:end -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

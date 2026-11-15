@@ -24,6 +24,8 @@ export interface Sections {
     cards: { id: "hire" | "freelance" | "code"; title: string; body: string; action: string }[];
   };
   educationCard: {
+    aria: string;
+    label: string;
     labels: { code: string; profile: string; term: string };
     badge: string;
     school: string;
@@ -49,6 +51,9 @@ export interface Sections {
     privacy: string;
     unavailable: string;
     mailtoCta: string;
+    errRequired: string;
+    errEmail: string;
+    mailtoOpened: string;
   };
   assistant: {
     title: string;
@@ -217,24 +222,12 @@ export interface Dictionary {
     paragraphs: string[];
   };
   experience: {
-    index: string;
-    label: string;
-    title: string;
     role: string;
     employment: string;
     period: string;
-    intro: string;
-    tracksTitle: string;
     tracks: { period: string; title: string; body: string }[];
-    builtTitle: string;
-    built: string[];
-    practiceTitle: string;
-    practice: string[];
   };
   capabilities: {
-    index: string;
-    label: string;
-    title: string;
     items: { index: string; title: string; tags: string; body: string }[];
   };
   projects: {
@@ -264,6 +257,7 @@ export interface Dictionary {
     usedIn: string;
     showInProjects: string;
     noProject: string;
+    related: string;
     filter: string;
     clear: string;
     keysLabel: string;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LOG_LINES } from "../../content/logs";
 import { useSite } from "../../context/site";
 
@@ -9,6 +9,9 @@ import { useSite } from "../../context/site";
  */
 export function HeroLogs() {
   const { reduced } = useSite();
+  // В статическом HTML логов быть не должно: AI-скраперы принимают их за метрики.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const text = useMemo(() => [...LOG_LINES, ...LOG_LINES].join("\n"), []);
   const ref = useRef<HTMLPreElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -73,6 +76,8 @@ export function HeroLogs() {
       document.removeEventListener("visibilitychange", sync);
     };
   }, [reduced]);
+
+  if (!mounted) return null;
 
   return (
     <div

@@ -72,7 +72,7 @@ const en: Dictionary = {
     cluster: "cluster",
   },
   about: {
-    index: "01",
+    index: "02",
     label: "About",
     statement: "Systems that stay useful after the demo.",
     paragraphs: [
@@ -83,9 +83,6 @@ const en: Dictionary = {
     ],
   },
   capabilities: {
-    index: "02",
-    label: "Capabilities",
-    title: "What I do",
     items: [
       {
         index: "01",
@@ -114,46 +111,13 @@ const en: Dictionary = {
     ],
   },
   experience: {
-    index: "03",
-    label: "Experience",
-    title: "Building services, not slides.",
     role: "Python Backend & AI Automation Developer",
     employment: "Independent / Freelance",
     period: "August 2025 — Present",
-    intro: "Independent work since August 2025, across backend services, AI integrations and practical automation.",
-    tracksTitle: "Focus",
     tracks: [
       { period: "2025 — now", title: "Backend services", body: "REST APIs, PostgreSQL, SQLAlchemy, Alembic, authentication and background jobs." },
       { period: "2025 — now", title: "AI integrations", body: "LLM APIs, RAG pipelines and usage-aware AI features inside real products." },
       { period: "2025 — now", title: "Automation", body: "Telegram bots, parsers, external APIs and data-processing scripts." },
-    ],
-    builtTitle: "What I build",
-    built: [
-      "Backend services",
-      "REST APIs",
-      "Telegram bots",
-      "Parsers",
-      "Automation tools",
-      "Websites",
-      "Data-processing scripts",
-    ],
-    practiceTitle: "In practice",
-    practice: [
-      "Python / FastAPI",
-      "PostgreSQL",
-      "SQLAlchemy",
-      "Alembic migrations",
-      "Authentication",
-      "Session management",
-      "External APIs",
-      "LLM integrations",
-      "RAG",
-      "Background jobs",
-      "Docker",
-      "CI",
-      "Automated tests",
-      "Scraping",
-      "Data processing",
     ],
   },
   projects: {
@@ -276,7 +240,7 @@ const en: Dictionary = {
     next: "Next project",
   },
   stack: {
-    index: "05",
+    index: "03",
     label: "Technology",
     title: "A stack I actually ship with.",
     hint: "Hover or press a key — I'll show where I use it.",
@@ -284,6 +248,7 @@ const en: Dictionary = {
     usedIn: "Where it's used",
     showInProjects: "Show in projects",
     noProject: "No public project on this site uses this technology yet.",
+    related: "No project uses it directly — closest work:",
     filter: "filter",
     clear: "Reset filter",
     keysLabel: "Technology keys",
@@ -308,7 +273,7 @@ const en: Dictionary = {
     ],
   },
   resume: {
-    index: "06",
+    index: "05",
     label: "Resume",
     title: "On paper, briefly.",
     name: "Egor Trefilov",
@@ -331,7 +296,7 @@ const en: Dictionary = {
     period: "2024 — Present",
   },
   contact: {
-    index: "08",
+    index: "06",
     label: "Contact",
     title: "Let's build something useful.",
     status: "Available for work / freelance / collaboration",
@@ -346,7 +311,7 @@ const en: Dictionary = {
     resume: "Resume",
   },
   footer: {
-    location: "Nizhny Novgorod region · MSK (UTC+3)", // TODO: подтвердить у владельца (§13)
+    location: "Nizhny Novgorod region · MSK (UTC+3)",
     sayHello: "Say hello",
     builtWith: "Built with React 19 · Vite · Three.js",
     role: "Python Backend / AI / Automation",

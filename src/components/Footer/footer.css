@@ -32,6 +32,18 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* В светлой теме нижняя часть букв не должна пропадать на кремовом фоне. */
+:root[data-theme="light"] .footer-word {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ink) 82%, transparent) 0%,
+    color-mix(in srgb, var(--ink) 78%, transparent) 20%,
+    color-mix(in srgb, var(--ink) 52%, transparent) 62%,
+    color-mix(in srgb, var(--ink) 26%, transparent) 92%,
+    color-mix(in srgb, var(--ink) 16%, transparent) 100%
+  );
+}
+
 /* Если background-clip:text не поддержан — слово просто приглушённое, но видимое. */
 @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
   .footer-word {

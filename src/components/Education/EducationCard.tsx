@@ -6,9 +6,9 @@ export function EducationCard() {
   const e = dict.sections.educationCard;
 
   return (
-    <aside id="education" className="scroll-mt-24 border border-[var(--line)] bg-[var(--bg-2)] p-6" aria-label="Education">
+    <aside id="education" className="scroll-mt-24 border border-[var(--line)] bg-[var(--bg-2)] p-6" aria-label={e.aria}>
       <div className="flex items-start justify-between gap-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-faint)]">education</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-faint)]">{e.label}</p>
         <span className="border border-[var(--accent)] px-2 py-0.5 font-pixel text-[10px] uppercase tracking-wider text-[var(--accent)]">
           {e.badge}
         </span>

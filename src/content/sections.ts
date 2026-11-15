@@ -31,6 +31,8 @@ const en: Sections = {
     ],
   },
   educationCard: {
+    aria: "Education",
+    label: "education",
     labels: { code: "code", profile: "profile", term: "term" },
     badge: "3RD YEAR",
     school: "NGIEU — Nizhny Novgorod State Engineering and Economic University",
@@ -70,6 +72,9 @@ const en: Sections = {
     privacy: "Used only to answer you. No lists, no tracking.",
     unavailable: "Form is not configured yet — use email.",
     mailtoCta: "Open mail client",
+    errRequired: "Required field",
+    errEmail: "Enter a valid email",
+    mailtoOpened: "Your mail client is open — send the email from there.",
   },
   assistant: {
     title: "Egor's AI assistant",
@@ -138,6 +143,8 @@ const ru: Sections = {
     ],
   },
   educationCard: {
+    aria: "Образование",
+    label: "образование",
     labels: { code: "код", profile: "профиль", term: "срок" },
     badge: "3 КУРС",
     school: "НГИЭУ — Нижегородский государственный инженерно-экономический университет",
@@ -177,6 +184,9 @@ const ru: Sections = {
     privacy: "Только для ответа вам. Без рассылок и трекинга.",
     unavailable: "Форма пока не настроена — напишите на email.",
     mailtoCta: "Открыть почтовый клиент",
+    errRequired: "Обязательное поле",
+    errEmail: "Проверьте формат email",
+    mailtoOpened: "Открыт почтовый клиент — отправьте письмо из него.",
   },
   assistant: {
     title: "AI-ассистент Егора",

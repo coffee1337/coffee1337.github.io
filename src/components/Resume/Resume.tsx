@@ -50,7 +50,7 @@ export function Resume() {
           </div>
           <div className="border-t border-[var(--line)] px-5 py-6 md:px-8">
             <h3 className="kicker">{r.workTitle}</h3>
-            <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {dict.projects.items.map((p, i) => (
                 <li key={p.id}>
                   <a href={p.github} target="_blank" rel="noopener noreferrer" className="group block">
@@ -72,7 +72,7 @@ function Cell({ title, id, children }: { title: string; id?: string; children: R
     <div
       id={id}
       data-reveal
-      className="scroll-mt-24 border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:border-r md:px-8"
+      className="scroll-mt-24 border-b border-[var(--line)] px-5 py-6 text-[var(--ink-dim)] md:px-8"
     >
       <h3 className="kicker mb-3">{title}</h3>
       {children}

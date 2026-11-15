@@ -3,9 +3,9 @@ import { mergeProjects } from "./projects";
 
 const ru: Dictionary = {
   meta: {
-    title: "Егор Трефилов — Python Backend & AI Automation Developer",
+    title: "Егор Трефилов (coffee1337) — Python Backend и AI/LLM разработчик | Портфолио",
     description:
-      "Портфолио Егора Трефилова — Python Backend & AI Automation Developer. Backend-системы, AI-приложения и инструменты автоматизации.",
+      "Портфолио Егора Трефилова (coffee1337): Python, FastAPI, PostgreSQL, LLM и RAG. Backend-сервисы, AI-приложения и автоматизация — кейсы, стек и контакты.",
   },
   palette: {
     search: "Поиск по секциям, проектам, действиям…",
@@ -72,7 +72,7 @@ const ru: Dictionary = {
     cluster: "кластер",
   },
   about: {
-    index: "01",
+    index: "02",
     label: "Обо мне",
     statement: "Системы, которые остаются полезными после демо.",
     paragraphs: [
@@ -83,9 +83,6 @@ const ru: Dictionary = {
     ],
   },
   capabilities: {
-    index: "02",
-    label: "Что я делаю",
-    title: "Направления",
     items: [
       {
         index: "01",
@@ -114,46 +111,13 @@ const ru: Dictionary = {
     ],
   },
   experience: {
-    index: "03",
-    label: "Опыт",
-    title: "Сервисы, а не слайды.",
     role: "Python Backend & AI Automation Developer",
     employment: "Independent / Freelance",
     period: "Август 2025 — настоящее время",
-    intro: "Независимая работа с августа 2025: backend-сервисы, AI-интеграции и практическая автоматизация.",
-    tracksTitle: "Фокус",
     tracks: [
       { period: "2025 — сейчас", title: "Backend-сервисы", body: "REST API, PostgreSQL, SQLAlchemy, Alembic, аутентификация и фоновые задачи." },
       { period: "2025 — сейчас", title: "AI-интеграции", body: "LLM API, RAG-пайплайны и учёт использования AI внутри рабочих продуктов." },
       { period: "2025 — сейчас", title: "Автоматизация", body: "Telegram-боты, парсеры, внешние API и скрипты обработки данных." },
-    ],
-    builtTitle: "Что разрабатываю",
-    built: [
-      "Backend-сервисы",
-      "REST API",
-      "Telegram-боты",
-      "Парсеры",
-      "Инструменты автоматизации",
-      "Сайты",
-      "Скрипты обработки данных",
-    ],
-    practiceTitle: "На практике",
-    practice: [
-      "Python / FastAPI",
-      "PostgreSQL",
-      "SQLAlchemy",
-      "Миграции Alembic",
-      "Аутентификация",
-      "Управление сессиями",
-      "Внешние API",
-      "LLM-интеграции",
-      "RAG",
-      "Фоновые задачи",
-      "Docker",
-      "CI",
-      "Автотесты",
-      "Скрапинг",
-      "Обработка данных",
     ],
   },
   projects: {
@@ -276,7 +240,7 @@ const ru: Dictionary = {
     next: "Следующий проект",
   },
   stack: {
-    index: "05",
+    index: "03",
     label: "Технологии",
     title: "Стек, на котором я реально собираю системы.",
     hint: "Наведи или нажми на клавишу — покажу, где я это использую.",
@@ -284,6 +248,7 @@ const ru: Dictionary = {
     usedIn: "Где используется",
     showInProjects: "Показать в проектах",
     noProject: "Пока нет публичного проекта на сайте с этой технологией.",
+    related: "Прямого проекта с этой технологией нет — ближайшее:",
     filter: "фильтр",
     clear: "Сбросить фильтр",
     keysLabel: "Клавиши технологий",
@@ -308,7 +273,7 @@ const ru: Dictionary = {
     ],
   },
   resume: {
-    index: "06",
+    index: "05",
     label: "Резюме",
     title: "Коротко, на бумаге.",
     name: "Егор Трефилов",
@@ -331,7 +296,7 @@ const ru: Dictionary = {
     period: "2024 — настоящее время",
   },
   contact: {
-    index: "08",
+    index: "06",
     label: "Контакты",
     title: "Давайте создадим что-нибудь полезное.",
     status: "Открыт к работе, фрилансу и сотрудничеству",
@@ -346,7 +311,7 @@ const ru: Dictionary = {
     resume: "Резюме",
   },
   footer: {
-    location: "Нижегородская обл. · MSK (UTC+3)", // TODO: подтвердить у владельца (§13)
+    location: "Нижегородская обл. · MSK (UTC+3)",
     sayHello: "Написать",
     builtWith: "Сделано на React 19 · Vite · Three.js",
     role: "Python Backend / AI / Automation",

@@ -1,6 +1,7 @@
 import { useSite } from "../../context/site";
+import { SECTION_ORDER } from "../../context/SiteProvider";
 
-const TOTAL = 8;
+const TOTAL = SECTION_ORDER.length;
 
 export function ScrollProgress() {
   const { sectionIndex, reduced } = useSite();

@@ -471,7 +471,7 @@ html.lenis body {
 
 .progress-index {
   position: fixed;
-  right: 0.8rem;
+  left: 0.9rem;
   bottom: 0.9rem;
   z-index: 40;
   font-size: 0.62rem;
@@ -523,7 +523,7 @@ html.lenis body {
 }
 
 .hero-gradient {
-  background: linear-gradient(180deg, var(--ink) 0%, color-mix(in srgb, var(--ink) 40%, transparent) 100%);
+  background: linear-gradient(180deg, var(--ink) 0%, color-mix(in srgb, var(--ink) 62%, transparent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -542,9 +542,14 @@ html.lenis body {
 .scramble-char {
   display: inline-block;
   text-align: center;
+  font-variant-ligatures: none;
+  font-kerning: none;
 }
 
+/* Ширина ячейки = ширине финального глифа. Случайный глиф может быть шире —
+   обрезаем его в ячейке, иначе соседние буквы наезжают друг на друга. */
 .scramble-char.is-pending {
+  overflow: hidden;
   color: var(--ink-dim);
   opacity: 0.8;
 }
@@ -991,4 +996,40 @@ html.lenis body {
   [data-flow] .sv-packet {
     animation: none !important;
   }
+}
+
+
+/* Плавающая кнопка ассистента: не наезжает на счётчик секций и учитывает safe-area. */
+.assistant-fab {
+  bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  right: calc(1.25rem + env(safe-area-inset-right));
+}
+
+@media (max-width: 640px) {
+  .assistant-fab {
+    width: 2.75rem;
+    height: 2.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    right: calc(0.75rem + env(safe-area-inset-right));
+  }
+  .assistant-fab svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  /* Последний экран не должен прятаться под кнопкой. */
+  #contact,
+  footer {
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* Слой фоновых логов hero: вне <main>, клиентский, не перехватывает события. */
+.hero-logs-layer {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
 }

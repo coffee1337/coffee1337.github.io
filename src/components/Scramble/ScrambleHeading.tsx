@@ -185,7 +185,9 @@ export function ScrambleHeading<T extends ElementType = "h2">({
   }, [text, start, caret]);
 
   return (
-    <Tag ref={rootRef} className={`scramble ${className}`} aria-label={text} {...props}>
+    <Tag ref={rootRef} className={`scramble ${className}`} {...props}>
+      {/* Настоящий текст всегда в DOM: его читают скринридеры, поисковики и AI-парсеры. */}
+      <span className="sr-only">{text}</span>
       <span className="scramble__text" aria-hidden>
         {text}
       </span>

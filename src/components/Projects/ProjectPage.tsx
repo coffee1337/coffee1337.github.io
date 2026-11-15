@@ -55,7 +55,7 @@ export function ProjectPage({ id }: { id?: string }) {
       <main id="content">
         <section ref={ref} className="section-anchor relative z-[2] pt-36 pb-16 md:pt-44 md:pb-24">
           <div className="site-wrap">
-            <div data-reveal className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <p className="kicker">
                 {position} / {total} — {copy.label}
               </p>
@@ -66,42 +66,42 @@ export function ProjectPage({ id }: { id?: string }) {
                 </span>
               )}
             </div>
-            <h1 data-reveal className="display mt-6 text-[clamp(2.6rem,6vw,5.2rem)]">{project.name}</h1>
-            <p data-reveal className="mt-5 max-w-2xl text-xl leading-snug text-[var(--ink-dim)] md:text-2xl">
+            <h1 className="display mt-6 text-[clamp(2.6rem,6vw,5.2rem)]">{project.name}</h1>
+            <p className="mt-5 max-w-2xl text-xl leading-snug text-[var(--ink-dim)] md:text-2xl">
               {project.statement}
             </p>
 
             <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
                 <div className="space-y-5 text-[var(--ink-dim)]">
-                  <p data-reveal>
+                  <p>
                     <span className="kicker mr-3 text-[var(--ink)]">{copy.purpose}</span>
                     {project.purpose}
                   </p>
-                  <p data-reveal>
+                  <p>
                     <span className="kicker mr-3 text-[var(--ink)]">{copy.built}</span>
                     {project.built}
                   </p>
                 </div>
-                <h2 data-reveal className="kicker mt-10">{copy.highlights}</h2>
+                <h2 className="kicker mt-10">{copy.highlights}</h2>
                 <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                   {project.highlights.map((h) => (
-                    <li key={h} data-reveal className="border-t border-[var(--line)] py-2 text-sm">{h}</li>
+                    <li key={h} className="border-t border-[var(--line)] py-2 text-sm">{h}</li>
                   ))}
                 </ul>
-                <h2 data-reveal className="kicker mt-10">{copy.technology}</h2>
-                <div data-reveal className="mt-4 flex flex-wrap gap-2">
+                <h2 className="kicker mt-10">{copy.technology}</h2>
+                <div className="mt-4 flex flex-wrap gap-2">
                   {project.stack.map((s) => (
                     <span key={s} className="chip">{s}</span>
                   ))}
                 </div>
               </div>
-              <div data-reveal>
+              <div>
                 <ProjectVisual project={project} position={position} />
               </div>
             </div>
 
-            <div data-reveal className="mt-16 flex flex-wrap gap-3">
+            <div className="mt-16 flex flex-wrap gap-3">
               <a className="btn btn-primary" href={project.github} target="_blank" rel="noopener noreferrer">
                 {copy.github}
               </a>

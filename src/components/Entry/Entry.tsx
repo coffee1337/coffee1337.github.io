@@ -4,7 +4,7 @@ import { useReveal } from "../../hooks/useMotion";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 
 const TARGETS: Record<string, string> = {
-  hire: "#about",
+  hire: links.resumePdf,
   freelance: "#contact",
   code: "#projects",
 };
@@ -14,17 +14,11 @@ export function Entry() {
   const ref = useReveal<HTMLElement>({ stagger: 0.06 });
   const entry = dict.sections.entry;
 
+  /** «Hire» ведёт прямо в PDF, «freelance» — обычный якорь + подсказка формы. */
   const onCard = (id: string) => {
-    if (id === "hire") {
-      window.open(links.resumePdf, "_blank", "noopener,noreferrer");
-      return;
-    }
     if (id === "freelance") {
       window.dispatchEvent(new CustomEvent("contact-topic", { detail: "project" }));
-      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
     }
-    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -42,10 +36,9 @@ export function Entry() {
             <a
               key={card.id}
               href={TARGETS[card.id]}
-              onClick={(event) => {
-                event.preventDefault();
-                onCard(card.id);
-              }}
+              target={card.id === "hire" ? "_blank" : undefined}
+              rel={card.id === "hire" ? "noopener noreferrer" : undefined}
+              onClick={() => onCard(card.id)}
               data-reveal
               className="group relative flex min-h-[190px] flex-col justify-between border border-[var(--line)] bg-[var(--bg-2)] p-5 transition-colors hover:border-[var(--accent)]"
             >

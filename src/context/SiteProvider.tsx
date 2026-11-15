@@ -7,18 +7,18 @@ import { trackEvent } from "../analytics";
 const THEME_KEY = "et-theme";
 const hasWindow = typeof window !== "undefined";
 
-export const SECTION_ORDER = [
-  "top",
-  "about",
-  "education",
-  "stack",
-  "capabilities",
-  "projects",
-  "reviews",
-  "resume",
-  "experience",
-  "contact",
-];
+/**
+ * Видимые секции главной в порядке DOM. Вложенные блоки (#education, #capabilities,
+ * #experience) не считаются отдельными шагами — они части обёрток.
+ */
+export const SECTION_ORDER = ["top", "about", "stack", "projects", "resume", "contact"];
+
+const SECTION_PARENT: Record<string, string> = {
+  education: "about",
+  capabilities: "stack",
+  experience: "resume",
+  reviews: "projects",
+};
 
 /** Событие для canvas/WebGL: палитра темы уже применена к `documentElement`. */
 export const THEME_EVENT = "themechange";
@@ -180,7 +180,7 @@ export function SiteProvider({
       setLoaderDone,
       section,
       setSection,
-      sectionIndex: Math.max(0, SECTION_ORDER.indexOf(section === "education" ? "resume" : section)),
+      sectionIndex: Math.max(0, SECTION_ORDER.indexOf(SECTION_PARENT[section] ?? section)),
     }),
     [lang, theme, toggleTheme, reduced, lowPower, loaderDone, section, route, pathBase],
   );

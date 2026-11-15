@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
@@ -78,7 +77,7 @@ export function Footer() {
     <footer className="relative z-[2] overflow-hidden border-t border-[var(--line)] bg-[var(--bg)] pb-8 pt-12">
       <div className="site-wrap relative">
         <PixelCup className="footer-mascot" />
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px 0px -80px" }}>
+        <div>
           <div ref={markRef} className="footer-mark" aria-hidden="true">
             <span ref={wordRef} className="footer-word" style={wordSize ? { fontSize: `${wordSize}px` } : undefined}>COFFEE1337</span>
           </div>
@@ -100,7 +99,7 @@ export function Footer() {
             <span>{dict.footer.builtWith}</span>
             <span className="inline-flex items-center gap-2" title={dict.a11y.kbd}><KbdShortcut /><span className="sr-only">{dict.a11y.openPalette}</span></span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );

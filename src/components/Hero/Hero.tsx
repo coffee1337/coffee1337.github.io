@@ -6,7 +6,6 @@ import { CopyButton } from "../CopyButton";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import github from "../../generated/github.json";
 import { EmbeddingSpace } from "./EmbeddingSpace";
-import { HeroLogs } from "./HeroLogs";
 
 function moscowClock() {
   return new Intl.DateTimeFormat("ru-RU", {
@@ -80,7 +79,6 @@ export function Hero() {
       ref={root}
       className="section-anchor relative flex min-h-[100svh] items-end overflow-hidden pb-16 pt-28 md:items-center md:pb-0"
     >
-      <HeroLogs />
       <div className="dot-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden />
       <EmbeddingSpace />
       <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
@@ -112,13 +110,13 @@ export function Hero() {
           <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-dim)]">
             <CopyButton value={links.email} label={dict.hero.linkEmail} copiedLabel={dict.contact.copied} className="hero-copy" />
             <span aria-hidden>·</span>
-            <a href={links.telegram}>{dict.hero.linkTelegram}</a>
+            <a href={links.telegram} target="_blank" rel="noopener noreferrer">{dict.hero.linkTelegram}</a>
             <span aria-hidden>·</span>
-            <a href={links.github}>{dict.hero.linkGithub}</a>
+            <a href={links.github} target="_blank" rel="noopener noreferrer">{dict.hero.linkGithub}</a>
             <span aria-hidden>·</span>
-            <a href={links.linkedin}>{dict.hero.linkLinkedin}</a>
+            <a href={links.linkedin} target="_blank" rel="noopener noreferrer">{dict.hero.linkLinkedin}</a>
             <span aria-hidden>·</span>
-            <a href={links.resumePdf}>{dict.hero.linkResume}</a>
+            <a href={links.resumePdf} target="_blank" rel="noopener noreferrer">{dict.hero.linkResume}</a>
           </p>
           <div className="mt-10 grid grid-cols-2 gap-px bg-[var(--line)] sm:grid-cols-4">
             {metrics.map((metric) => (
