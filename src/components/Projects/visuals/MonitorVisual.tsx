@@ -1,60 +1,115 @@
-import { Label, Link, Node, VisualFrame } from "./kit";
+import { useSite } from "../../../context/site";
+import { Defs, Label, Link, Node, VisualFrame, bx, connect, useSvgId } from "./kit";
 
 const ROWS = [0, 1, 2, 3, 4, 5];
 
-/** transaction-monitor: поток транзакций → rule engine → risk score → SQL Server. */
+/** Gauge geometry: upper semicircle, left = low risk, right = high risk. */
+const CX = 322;
+const CY = 192;
+const R = 56;
+const NEEDLE = 46;
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+const polar = (deg: number, r: number): [number, number] => [CX + r * Math.cos(rad(deg)), CY - r * Math.sin(rad(deg))];
+const arc = (from: number, to: number) => {
+  const a = polar(from, R);
+  const b = polar(to, R);
+  return `M${a[0].toFixed(2)} ${a[1].toFixed(2)} A${R} ${R} 0 0 1 ${b[0].toFixed(2)} ${b[1].toFixed(2)}`;
+};
+
+/**
+ * transaction-monitor: transaction stream -> rule engine -> risk score grid,
+ * with the risk gauge (low / medium / high) and SQL Server behind it.
+ */
 export function MonitorVisual() {
+  const { dict } = useSite();
+  const t = dict.visuals.monitor;
+  const uid = useSvgId();
+
+  const rows = ROWS.map((i) => bx(14, 56 + i * 24, 104, 16));
+  const engine = bx(150, 84, 96, 52);
+  const risk = bx(274, 84, 92, 52);
+  const sql = bx(388, 84, 76, 52);
+
   return (
-    <VisualFrame label="TransactionMonitor: transaction stream, rule engine, risk gauge and SQL Server">
+    <VisualFrame label={t.label}>
       {(flow) => (
         <>
-          <Label x={16} y={16} text="stream → rules → risk" accent />
+          <Defs uid={uid} />
+          <Label x={16} y={24} text={t.eyebrow} tone="accent" />
 
-          {ROWS.map((i) => (
+          {rows.map((row, i) => (
             <rect
               key={i}
-              x={16}
-              y={40 + i * 26}
-              width={104}
-              height={16}
+              x={row.x}
+              y={row.y}
+              width={row.w}
+              height={row.h}
               rx={2}
               fill="var(--bg-3)"
               stroke="var(--line-2)"
               className={flow ? "sv-row" : undefined}
-              style={flow ? { animationDelay: `${i * 220}ms` } : undefined}
+              style={flow ? { animationDelay: `${i * 200}ms` } : undefined}
             />
           ))}
-          <Label x={16} y={24 + 6 * 26 + 8} text="transactions" />
+          <Label x={14} y={212} text={t.stream} />
 
-          <Node x={150} y={96} w={96} h={44} title="rule engine" sub="py · rules" accent />
-          <Link d="M120 108 C 138 108, 138 118, 150 118" animate={flow} />
-          <Link d="M120 134 C 138 134, 138 118, 150 118" animate={flow} delay={180} />
-
-          <Node x={284} y={96} w={80} h={44} title="risk score" sub="0..100" strong />
-          <Link d="M246 118 H284" accent animate={flow} delay={120} />
-
-          <g transform="translate(288 168)">
-            <path d="M0 0 A 36 36 0 0 1 72 0" fill="none" stroke="var(--line)" strokeWidth={1} />
-            <path d="M0 0 A 36 36 0 0 1 72 0" fill="none" stroke="var(--ok)" strokeWidth={3} strokeDasharray="0 200" opacity={0.7} />
-            <path d="M36 0 A 36 36 0 0 1 68 22" fill="none" stroke="var(--accent-2)" strokeWidth={3} opacity={0.5} />
-            <path d="M58 8 A 36 36 0 0 1 71 26" fill="none" stroke="var(--accent)" strokeWidth={3} />
-            <line
-              x1={36}
-              y1={0}
-              x2={62}
-              y2={-18}
-              stroke="var(--ink)"
-              strokeWidth={1.5}
-              className={flow ? "sv-needle" : undefined}
-              style={{ transformOrigin: "36px 0px" }}
+          {rows.map((row, i) => (
+            <Link
+              key={i}
+              uid={uid}
+              d={connect(row, "r", engine, "l", { tb: 0.12 + i * 0.152, curve: true, stub: 8, radius: 4 })}
+              flow={flow}
+              delay={i * 90}
+              packets={i === 0 || i === 2 ? 1 : 0}
+              packetDur={3.2}
+              packetBegin={i * 0.4}
             />
-          </g>
-          <Label x={288} y={214} text="risk 0 → 100" />
+          ))}
 
-          <Node x={392} y={96} w={72} h={44} title="SQL" sub="server" />
-          <Link d="M364 118 H392" animate={flow} delay={260} />
+          <Link uid={uid} d={connect(engine, "r", risk, "l")} flow={flow} accent delay={120} packets={1} packetDur={2.6} />
+          <Link uid={uid} d={connect(risk, "r", sql, "l")} flow={flow} delay={240} packets={1} packetDur={2.8} />
 
-          <Label x={16} y={268} text="alert when risk > 80" />
+          <Node x={engine.x} y={engine.y} w={engine.w} h={engine.h} title={t.rules} tone="accent" />
+          <Node x={risk.x} y={risk.y} w={risk.w} h={risk.h} title={t.risk} tone="strong" />
+          <Node x={sql.x} y={sql.y} w={sql.w} h={sql.h} title={t.sql} />
+
+          {/* risk gauge */}
+          <path d={arc(178, 122)} fill="none" stroke="var(--ok)" strokeWidth={3} strokeLinecap="round" opacity={0.75} />
+          <path d={arc(118, 62)} fill="none" stroke="var(--accent-2)" strokeWidth={3} strokeLinecap="round" opacity={0.75} />
+          <path d={arc(58, 2)} fill="none" stroke="var(--accent)" strokeWidth={3} strokeLinecap="round" opacity={0.9} />
+          <path d={arc(180, 0)} fill="none" stroke="var(--line-2)" strokeWidth={1} />
+
+          <line
+            x1={CX}
+            y1={CY}
+            x2={CX}
+            y2={CY - NEEDLE}
+            stroke="var(--ink)"
+            strokeWidth={1.6}
+            strokeLinecap="round"
+          >
+            {flow ? (
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values={`-74 ${CX} ${CY}; 74 ${CX} ${CY}; -74 ${CX} ${CY}`}
+                keyTimes="0;0.5;1"
+                calcMode="spline"
+                keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+                dur="7s"
+                repeatCount="indefinite"
+              />
+            ) : null}
+          </line>
+          <circle cx={CX} cy={CY} r={3.2} fill="var(--ink)" />
+
+          <Label x={266} y={210} text={t.low} anchor="middle" />
+          <Label x={CX} y={210} text={t.mid} anchor="middle" />
+          <Label x={378} y={210} text={t.high} anchor="middle" />
+
+          <path d="M244 232 L250 242 L238 242 Z" fill="none" stroke="var(--accent)" strokeWidth={1} className={flow ? "sv-alert" : undefined} />
+          <Label x={256} y={242} text={t.alert} tone="accent" />
         </>
       )}
     </VisualFrame>

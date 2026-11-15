@@ -1,79 +1,165 @@
+import { useSite } from "../../../context/site";
 import { Label, VisualFrame } from "./kit";
 
 type Pt = { x: number; y: number; k: 0 | 1 };
 
+/** Points live in "data space"; the winner below is computed from them, not typed in. */
 const CLASS_A: Pt[] = [
-  { x: 90, y: 90, k: 0 }, { x: 120, y: 70, k: 0 }, { x: 76, y: 130, k: 0 },
-  { x: 140, y: 112, k: 0 }, { x: 108, y: 150, k: 0 }, { x: 62, y: 96, k: 0 },
+  { x: 90, y: 90, k: 0 },
+  { x: 120, y: 70, k: 0 },
+  { x: 76, y: 130, k: 0 },
+  { x: 140, y: 112, k: 0 },
+  { x: 108, y: 150, k: 0 },
+  { x: 62, y: 96, k: 0 },
 ];
 const CLASS_B: Pt[] = [
-  { x: 300, y: 120, k: 1 }, { x: 330, y: 96, k: 1 }, { x: 356, y: 140, k: 1 },
-  { x: 286, y: 168, k: 1 }, { x: 342, y: 188, k: 1 }, { x: 372, y: 108, k: 1 },
+  { x: 300, y: 120, k: 1 },
+  { x: 330, y: 96, k: 1 },
+  { x: 356, y: 140, k: 1 },
+  { x: 286, y: 168, k: 1 },
+  { x: 342, y: 188, k: 1 },
+  { x: 372, y: 108, k: 1 },
 ];
-const QUERY: Pt = { x: 246, y: 132, k: 0 };
-const ALL = [...CLASS_A, ...CLASS_B];
+const QUERY = { x: 246, y: 132 };
+const K = 5;
 
-const nearest = [...ALL]
-  .map((p, i) => ({ p, i, d: Math.hypot(p.x - QUERY.x, p.y - QUERY.y) }))
-  .sort((a, b) => a.d - b.d)
-  .slice(0, 5);
+/** Data space -> plot space (same scale on both axes, distances stay comparable). */
+const SCALE = 0.82;
+const CX = 232;
+const CY = 131;
+const plot = (p: { x: number; y: number }): [number, number] => [
+  CX + (p.x - QUERY.x) * SCALE,
+  CY + (p.y - QUERY.y) * SCALE,
+];
 
-/** k-nearest-neighbors: 2D scatter, query-точка, k=5 соседей и класс-победитель. */
+const RANKED = [...CLASS_A, ...CLASS_B]
+  .map((p) => ({ p, d: Math.hypot(p.x - QUERY.x, p.y - QUERY.y) }))
+  .sort((a, b) => a.d - b.d);
+const NEIGHBORS = RANKED.slice(0, K);
+const TALLY = [0, 1]
+  .map((k) => ({ k, n: NEIGHBORS.filter((n) => n.p.k === k).length }))
+  .sort((a, b) => b.n - a.n || a.k - b.k);
+const WINNER = TALLY[0];
+const REACH = NEIGHBORS[NEIGHBORS.length - 1].d * SCALE;
+
+const color = (k: number) => (k === 0 ? "var(--accent)" : "var(--accent-2)");
+
+/**
+ * k-nearest-neighbors: the cycle is query -> expanding radius -> neighbours
+ * light up one by one -> edges -> majority vote -> pause.
+ */
 export function KnnVisual() {
+  const { dict } = useSite();
+  const t = dict.visuals.knn;
+
+  const winnerLabel = WINNER.k === 0 ? t.classA : t.classB;
+  const winnerColor = color(WINNER.k);
+  const chip = `${t.winner}: ${winnerLabel} · ${WINNER.n}/${K}`;
+
   return (
-    <VisualFrame label="k-nearest-neighbors: 2D class cloud, query point and five nearest neighbours">
+    <VisualFrame label={t.label}>
       {(flow) => (
         <>
-          <Label x={16} y={16} text="k = 5 · cosine / euclid" accent />
+          <Label x={16} y={24} text={t.eyebrow} tone="accent" />
 
-          <rect x={16} y={32} width={448} height={196} fill="var(--bg-3)" stroke="var(--line)" opacity={0.5} />
-          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-            <line key={`v${i}`} x1={16 + i * 74.6} y1={32} x2={16 + i * 74.6} y2={228} stroke="var(--line-2)" />
+          <rect x={16} y={36} width={448} height={190} fill="var(--bg-3)" opacity={0.45} />
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <line key={`v${i}`} x1={16 + i * 56} y1={36} x2={16 + i * 56} y2={226} className="sv-grid" />
           ))}
-          {[0, 1, 2].map((i) => (
-            <line key={`h${i}`} x1={16} y1={32 + i * 65.3} x2={464} y2={32 + i * 65.3} stroke="var(--line-2)" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <line key={`h${i}`} x1={16} y1={36 + i * 47.5} x2={464} y2={36 + i * 47.5} className="sv-grid" />
           ))}
+          <rect x={16} y={36} width={448} height={190} fill="none" stroke="var(--line)" />
 
-          {ALL.map((p, i) => (
-            <circle
-              key={i}
-              cx={p.x}
-              cy={p.y}
-              r={3.2}
-              fill={p.k === 0 ? "var(--accent)" : "var(--accent-2)"}
-              opacity={0.85}
-            />
-          ))}
+          {/* expanding radius */}
+          <circle
+            cx={CX}
+            cy={CY}
+            r={REACH}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth={1}
+            strokeDasharray="2 4"
+            opacity={0.5}
+          >
+            {flow ? (
+              <>
+                <animate attributeName="r" values={`6;${REACH.toFixed(2)};${REACH.toFixed(2)}`} keyTimes="0;0.42;1" dur="6s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0;0.55;0.55;0" keyTimes="0;0.08;0.88;1" dur="6s" repeatCount="indefinite" />
+              </>
+            ) : null}
+          </circle>
 
-          {nearest.map(({ p, i }, n) => (
-            <line
-              key={`n${i}`}
-              x1={QUERY.x}
-              y1={QUERY.y}
-              x2={p.x}
-              y2={p.y}
-              stroke="var(--ink-faint)"
-              strokeWidth={0.8}
-              strokeDasharray="2 3"
-              opacity={flow ? 0.9 : 0.5}
+          {/* neighbour edges, drawn one after another */}
+          {NEIGHBORS.map(({ p }, n) => {
+            const [px, py] = plot(p);
+            return (
+              <line
+                key={`e${n}`}
+                x1={CX}
+                y1={CY}
+                x2={px}
+                y2={py}
+                pathLength={1}
+                stroke={color(p.k)}
+                strokeWidth={1.2}
+                strokeDasharray={1}
+                strokeDashoffset={0}
+                opacity={0.85}
+                className={flow ? "sv-edge" : undefined}
+                style={flow ? { animationDelay: `${600 + n * 300}ms` } : undefined}
+              />
+            );
+          })}
+
+          {/* the cloud */}
+          {[...CLASS_A, ...CLASS_B].map((p, i) => {
+            const [px, py] = plot(p);
+            return <circle key={i} cx={px} cy={py} r={3.4} fill={color(p.k)} opacity={0.85} />;
+          })}
+
+          {/* neighbours pulse in distance order */}
+          {NEIGHBORS.map(({ p }, n) => {
+            const [px, py] = plot(p);
+            return (
+              <circle
+                key={`h${n}`}
+                cx={px}
+                cy={py}
+                r={7.5}
+                fill="none"
+                stroke={color(p.k)}
+                strokeWidth={1.2}
+                opacity={0}
+                className={flow ? "sv-halo" : undefined}
+                style={flow ? { animationDelay: `${550 + n * 300}ms` } : undefined}
+              />
+            );
+          })}
+
+          <circle cx={CX} cy={CY} r={5.5} fill="none" stroke="var(--ink)" strokeWidth={1.2} />
+          <circle cx={CX} cy={CY} r={2.2} fill="var(--ink)" />
+          <Label x={CX - 11} y={CY + 14} text={t.query} tone="ink" anchor="end" />
+
+          <circle cx={18} cy={244} r={3.2} fill="var(--accent)" />
+          <Label x={29} y={247} text={t.classA} />
+          <circle cx={96} cy={244} r={3.2} fill="var(--accent-2)" />
+          <Label x={107} y={247} text={t.classB} />
+
+          <g className={flow ? "sv-chip" : undefined} style={flow ? { animationDelay: "0ms" } : undefined}>
+            <rect x={236} y={233} width={228} height={26} rx={2} fill="var(--bg-2)" stroke={winnerColor} strokeOpacity={0.7} />
+            <text
+              x={350}
+              y={249}
+              textAnchor="middle"
+              className="sv-chip-text"
+              fill={winnerColor}
             >
-              {flow && (
-                <animate attributeName="stroke-opacity" values="0.25;0.9;0.25" dur="2.4s" begin={`${n * 0.12}s`} repeatCount="indefinite" />
-              )}
-            </line>
-          ))}
+              {chip}
+            </text>
+          </g>
 
-          <circle cx={QUERY.x} cy={QUERY.y} r={5.5} fill="none" stroke="var(--ink)" strokeWidth={1.2} />
-          <circle cx={QUERY.x} cy={QUERY.y} r={2.2} fill="var(--ink)" />
-          <text x={QUERY.x + 10} y={QUERY.y - 8} style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, fill: "var(--ink-dim)" }}>
-            query
-          </text>
-
-          <Label x={16} y={252} text="class a" />
-          <circle cx={74} cy={248} r={3} fill="var(--accent)" />
-          <Label x={96} y={252} text="class b" />
-          <circle cx={154} cy={248} r={3} fill="var(--accent-2)" />
-          <Label x={320} y={252} text="winner: class a (4/5)" accent />
+          <Label x={350} y={276} text={t.metric} anchor="middle" />
         </>
       )}
     </VisualFrame>

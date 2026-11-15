@@ -17,10 +17,15 @@ const MAP = {
   analytics: AnalyticsVisual,
 } as const;
 
+/**
+ * Diagram slot with a fixed aspect ratio: switching projects crossfades in
+ * place instead of jumping in height. No border/padding here — the surface
+ * that wraps it owns the frame, this only paints the background.
+ */
 export function ProjectVisual({ project }: { project: ProjectContent; position?: string }) {
   const Visual = MAP[project.visual] ?? MentorVisual;
   return (
-    <div className="relative w-full border border-[var(--line)] bg-[var(--bg-2)] p-2 md:p-3">
+    <div className="relative w-full overflow-hidden bg-[var(--bg-2)] aspect-[480/300]">
       <Visual />
     </div>
   );
