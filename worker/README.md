@@ -90,19 +90,20 @@
 {
   "question": "Какие проекты на FastAPI?",
   "lang": "ru",
-  "history": [{ "role": "user", "content": "…" }, { "role": "assistant", "content": "…" }],
-  "chunks": [{ "title": "AI Python Mentor", "text": "…" }]
+  "history": [{ "role": "user", "content": "…" }, { "role": "assistant", "content": "…" }]
 }
 ```
 
 * `lang` — `ru` или `en`; ответ обязан быть на этом языке.
 * `history` — последние 6 реплик (клиент обрезает сам).
-* `chunks` — top-k чанков из локального индекса + профильный чанк, максимум 8, каждый до 1200 символов.
+* `chunks` из запроса **не используются**: Worker сам забирает `https://coffee1337.github.io/kb-index.json`
+  (переопределяется переменной `SITE_URL`), кэширует его на edge и выбирает top-8 чанков по вопросу
+  плюс профильный чанк. Так воркер нельзя превратить в открытый LLM-прокси с произвольным контекстом.
 
 Ответ — SSE-поток, совместимый с OpenAI `chat.completion.chunk`. Ошибки:
 `400 bad_json | empty_question`, `403 forbidden_origin`, `405 method_not_allowed`,
 `429 rate_limited`, `502 upstream_error | upstream_unreachable | empty_answer`,
-`503 not_configured`. Клиент на любую из них молча откатывается в локальный режим,
+`503 not_configured | kb_unavailable`. Клиент на любую из них молча откатывается в локальный режим,
 поэтому сайт не ломается без Worker.
 
 Системный промпт: о Егоре в третьем лице, только по контексту, короткий small talk,

@@ -541,6 +541,7 @@ html.lenis body {
 
 .scramble-char {
   display: inline-block;
+  vertical-align: top;
   text-align: center;
   font-variant-ligatures: none;
   font-kerning: none;

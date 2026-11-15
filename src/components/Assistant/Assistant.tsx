@@ -275,11 +275,11 @@ export function Assistant() {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
+        // Контекст собирает Worker из kb-index.json; клиентские чанки он игнорирует.
         body: JSON.stringify({
           question: payload.question,
           lang: payload.lang,
           history: payload.history,
-          chunks: payload.chunks.map((chunk) => ({ title: chunk.title, text: chunk.text })),
         }),
         signal: controller.signal,
       });

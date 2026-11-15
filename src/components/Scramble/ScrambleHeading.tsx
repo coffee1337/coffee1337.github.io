@@ -98,13 +98,19 @@ export function ScrambleHeading<T extends ElementType = "h2">({
         holder.appendChild(wordEl);
       });
 
-      // 1) фиксируем ширины всех символов (одна пачка чтений)
-      const widths = chars.map((el) => el.getBoundingClientRect().width);
+      // 1) фиксируем размеры всех символов (одна пачка чтений)
+      const boxes = chars.map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      });
       // 2) пишем стили и случайные глифы (одна пачка записей) — layout не прыгает
       const finals = chars.map((el) => el.textContent ?? "");
       const jitter = chars.map((_, i) => ((i * 2654435761) % 1000) / 1000);
       chars.forEach((el, i) => {
-        el.style.width = `${widths[i].toFixed(2)}px`;
+        el.style.width = `${boxes[i].width.toFixed(2)}px`;
+        // Высота фиксируется тоже: overflow:hidden на inline-block меняет baseline
+        // и строка «дышит» на несколько пикселей во время анимации.
+        el.style.height = `${boxes[i].height.toFixed(2)}px`;
         el.classList.add("is-pending");
         el.textContent = GLYPHS[i % GLYPHS.length];
       });
