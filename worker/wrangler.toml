@@ -2,15 +2,13 @@ name = "coffee1337-chat"
 main = "index.js"
 compatibility_date = "2026-01-01"
 
+# ...
 [vars]
-# CORS: прод-домен + локальная разработка. Несколько origin — через запятую.
 ALLOWED_ORIGINS = "https://coffee1337.github.io,http://localhost:5173"
-# Откуда Worker берёт базу знаний для контекста (по умолчанию — прод-сайт).
-# SITE_URL = "https://coffee1337.github.io"
-# RATE_LIMIT = "20"        # запросов в час на IP (работает при биндинге RATE_KV)
-# LLM_URL = "https://api.groq.com/openai/v1/chat/completions"
-# LLM_MODEL = "llama-3.3-70b-versatile"   # обязателен: без него Worker отвечает 503 not_configured
-# LLM_MAX_TOKENS = "400"
+LLM_MODEL = "minimax-m3.1-flash"
+LLM_URL = "https://ru.cheapvibecode.ru/v1/chat/completions"
+# ...
+
 
 # Rate limit через KV: wrangler kv namespace create RATE_KV → вставить id сюда
 # [[kv_namespaces]]
