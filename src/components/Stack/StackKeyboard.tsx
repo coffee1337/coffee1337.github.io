@@ -92,11 +92,13 @@ export function StackKeyboard() {
     switch (event.key) {
       case "ArrowRight":
       case "ArrowDown":
-        next = (index + 1 + total) % total;
+        // с пустого выбора вправо/вниз — первая клавиша
+        next = index < 0 ? 0 : (index + 1) % total;
         break;
       case "ArrowLeft":
       case "ArrowUp":
-        next = (index - 1 + total) % total;
+        // с пустого выбора влево/вверх — последняя клавиша, а не предпоследняя
+        next = index < 0 ? total - 1 : (index - 1 + total) % total;
         break;
       case "Home":
         next = 0;

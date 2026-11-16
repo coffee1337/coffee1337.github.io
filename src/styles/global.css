@@ -817,6 +817,14 @@ html.lenis body {
   background: color-mix(in srgb, var(--bg) 88%, var(--bg-2));
 }
 
+/* Нижняя граница последнего ряда не дублирует border-t блока Selected work. */
+@media (min-width: 768px) {
+  .resume-sheet > .grid > .resume-cell:nth-child(3),
+  .resume-sheet > .grid > .resume-cell:nth-child(4) {
+    border-bottom: 0;
+  }
+}
+
 .brand-mark {
   display: inline-flex;
   align-items: center;
