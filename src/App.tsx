@@ -4,7 +4,6 @@ import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { Header } from "./components/Header/Header";
 import { Loader } from "./components/Loader/Loader";
 import { Hero } from "./components/Hero/Hero";
-import { HeroLogs } from "./components/Hero/HeroLogs";
 import { Entry } from "./components/Entry/Entry";
 import { About } from "./components/About/About";
 import { Stack } from "./components/Stack/Stack";
@@ -48,10 +47,6 @@ function Shell() {
       )}
       <a className="skip-link" href="#content">{dict.a11y.skip}</a>
       <Header />
-      {/* Фоновые логи живут вне <main>: в статическом HTML их нет вовсе. */}
-      <div className="hero-logs-layer" aria-hidden>
-        <HeroLogs />
-      </div>
       <main id="content">
         <Hero />
         <Entry />

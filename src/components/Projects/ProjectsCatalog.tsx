@@ -91,7 +91,7 @@ export function ProjectsCatalog() {
                   const meta = repoMeta(project.id);
                   const updated = formatRepoDate(meta?.pushedAt, lang);
                   return (
-                    <li key={project.id} data-project-card data-reveal className="flex flex-col bg-[var(--bg)] p-6">
+                    <li key={project.id} data-project-card className="project-card flex flex-col bg-[var(--bg)] p-6">
                       <div className="flex items-baseline justify-between gap-3">
                         <h2 className="font-display text-xl">{project.name}</h2>
                         {project.status && (

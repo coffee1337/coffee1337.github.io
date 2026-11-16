@@ -18,6 +18,8 @@ export function EmbeddingCanvas({ onLive }: { onLive?: () => void }) {
   const [ready, setReady] = useState(false);
   const [count, setCount] = useState(0);
   const handle = useRef<EmbeddingHandle | null>(null);
+  // Видимость до создания сцены: IO срабатывает раньше, чем готов WebGL.
+  const visible = useRef(true);
   const clusterWord = useRef(dict.hero.cluster);
   const liveRef = useRef(onLive);
   liveRef.current = onLive;
@@ -60,6 +62,7 @@ export function EmbeddingCanvas({ onLive }: { onLive?: () => void }) {
             return;
           }
           handle.current = h;
+          h.setActive(visible.current);
           h.setReduced(reduced);
         })
         .catch(() => {
@@ -84,7 +87,10 @@ export function EmbeddingCanvas({ onLive }: { onLive?: () => void }) {
     const stage = stageRef.current;
     if (!stage) return;
     const io = new IntersectionObserver(
-      ([entry]) => handle.current?.setActive(entry.isIntersecting),
+      ([entry]) => {
+        visible.current = entry.isIntersecting;
+        handle.current?.setActive(entry.isIntersecting);
+      },
       { threshold: 0.02 },
     );
     io.observe(stage);

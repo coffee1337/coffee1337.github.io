@@ -6,8 +6,8 @@ import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(join(root, "worker", "index.js"), "utf8").replace("export default {", "const __handler = {");
-const api = new Function(`${source}; return { terms, stem, selectContext, __handler };`)();
-const { terms, stem, selectContext, __handler } = api;
+const api = new Function(`${source}; return { terms, stem, tokenMatches, selectContext, __handler };`)();
+const { terms, stem, tokenMatches, selectContext, __handler } = api;
 
 const kb = JSON.parse(readFileSync(join(root, "public", "kb-index.json"), "utf8"));
 let telegramCalls = 0;
@@ -34,6 +34,11 @@ check("short terms kept", ["ai", "ml", "c#", "ci", "ts"].every((x) => t.includes
 check("ru stem проектах → проект", stem("проектах") === "проект", stem("проектах"));
 check("ru stem бэкендом → бэкенд", stem("бэкендом") === "бэкенд", stem("бэкендом"));
 check("en stem projects → project", stem("projects") === "project", stem("projects"));
+check("both не матчит bot", tokenMatches(stem("both"), "bot") === false, stem("both"));
+check("aim не матчит ai", tokenMatches(stem("aim"), "ai") === false, stem("aim"));
+check("air не матчит ai", tokenMatches(stem("air"), "ai") === false, stem("air"));
+check("bots матчит bot", tokenMatches(stem("bots"), "bot") === true, stem("bots"));
+check("ai матчит ai", tokenMatches(stem("ai"), "ai") === true, stem("ai"));
 
 // 2. Контекст: RU, EN, кросс-язычные README
 const sourcesOf = (picked) => picked.map((p) => p.title);
@@ -63,6 +68,20 @@ check(
   "ru нейросети → neural-astar",
   ruNeural.some((p) => /Neural A\*|neural-astar/i.test(p.title)),
   sourcesOf(ruNeural).join(" | "),
+);
+
+const enBots = await selectContext("telegram bots for the project", "en", {});
+check(
+  "en bots → README с Telegram",
+  enBots.some((p) => /AI Python Mentor/.test(p.title)),
+  sourcesOf(enBots).join(" | "),
+);
+
+const enFalseFriends = await selectContext("both aim", "en", {});
+check(
+  "both/aim не тянут синонимы bot/ai",
+  !enFalseFriends.some((p) => /Telegram|PyTorch|AI Python Mentor|Neural A\*/.test(p.title)),
+  sourcesOf(enFalseFriends).join(" | "),
 );
 
 const enStack = await selectContext("What is your stack?", "en", {});

@@ -17,9 +17,10 @@ export function HeroLogs() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!mounted || reduced) return;
     const el = ref.current;
     const wrap = wrapRef.current;
-    if (!el || !wrap || reduced) return;
+    if (!el || !wrap) return;
     let offset = 0;
     let half = 0;
     let raf = 0;
@@ -74,8 +75,10 @@ export function HeroLogs() {
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", sync);
+      // выключаем слой без «прыжка» при возврате reduced-motion
+      el.style.transform = "";
     };
-  }, [reduced]);
+  }, [reduced, mounted]);
 
   if (!mounted) return null;
 

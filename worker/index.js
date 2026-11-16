@@ -184,7 +184,7 @@ const SYNONYM_GROUPS = [
   ["fastapi", "фастапи"],
   ["postgres", "postgresql", "постгрес"],
   ["database", "db", "база", "бд", "sql", "sqlite"],
-  ["telegram", "телеграм", "tg", "bot", "бот"],
+  ["telegram", "телеграм", "tg", "bot", "bots", "бот"],
   ["llm", "gpt", "языковая", "нейросет", "neural", "ml", "pytorch", "ии", "ai", "модель"],
   ["rag", "retrieval", "эмбеддинг", "embedding", "вектор"],
   ["asyncio", "асинхрон", "async"],
@@ -215,7 +215,8 @@ function stem(word) {
     return cut.length >= 4 ? cut : clean;
   }
   const cut = clean.replace(/(ing|ed|es|s|ly|er)$/u, "");
-  return cut.length >= 4 ? cut : clean;
+  // «bots» → «bot»: для английского хватает трёх символов основы.
+  return cut.length >= 3 ? cut : clean;
 }
 
 const ALIAS = new Map();
@@ -236,6 +237,14 @@ function tokenize(text) {
 
 function terms(text) {
   return tokenize(text).filter((word) => (word.length >= 3 || SHORT_TERMS.has(word)) && !STOPWORDS.has(word));
+}
+
+/**
+ * Совпадение основы с токеном: короткие термы (ai, ml, db, tg, bot) — только точным равенством,
+ * иначе «both» ловило бы «bot», а «aim» — «ai». Длинные сравниваются по префиксу.
+ */
+function tokenMatches(token, item) {
+  return item.length <= 3 ? token === item : token.startsWith(item);
 }
 
 /** Все основы синонимов для термина запроса. */
@@ -259,10 +268,10 @@ async function selectContext(question, lang, env) {
     let score = 0;
     for (const term of query) {
       const stems = termStems(term);
-      if (titleTokens.some((token) => stems.some((item) => token.startsWith(item)))) score += 3;
+      if (titleTokens.some((token) => stems.some((item) => tokenMatches(token, item)))) score += 3;
       let hits = 0;
       for (const token of textTokens) {
-        if (stems.some((item) => token.startsWith(item))) {
+        if (stems.some((item) => tokenMatches(token, item))) {
           hits += 1;
           if (hits >= 4) break;
         }

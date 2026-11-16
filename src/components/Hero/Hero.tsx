@@ -6,6 +6,7 @@ import { CopyButton } from "../CopyButton";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import github from "../../generated/github.json";
 import { EmbeddingSpace } from "./EmbeddingSpace";
+import { HeroLogs } from "./HeroLogs";
 
 function moscowClock() {
   return new Intl.DateTimeFormat("ru-RU", {
@@ -79,6 +80,7 @@ export function Hero() {
       ref={root}
       className="section-anchor relative flex min-h-[100svh] items-end overflow-hidden pb-16 pt-28 md:items-center md:pb-0"
     >
+      <HeroLogs />
       <div className="dot-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden />
       <EmbeddingSpace />
       <div className="site-wrap relative z-[2] grid items-center gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
