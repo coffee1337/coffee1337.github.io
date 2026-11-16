@@ -3,7 +3,7 @@ import type { FullDictionary, Lang } from "../content";
 
 export type Theme = "dark" | "light";
 
-export type RouteKind = "home" | "project" | "notfound";
+export type RouteKind = "home" | "project" | "catalog" | "notfound";
 
 export interface RouteInfo {
   kind: RouteKind;

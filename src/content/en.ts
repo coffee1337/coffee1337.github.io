@@ -151,6 +151,16 @@ const en: Dictionary = {
           "CI",
           "Secure separated Python execution",
         ],
+        architecture: [
+          "Next.js UI and FastAPI API are separate layers: the browser talks to the API, never to the database.",
+          "PostgreSQL with Alembic migrations stores learning paths, progress and AI usage data.",
+          "The AI tutor runs retrieval over course material in pgvector, so answers are grounded in the platform's own content.",
+        ],
+        decisions: [
+          "PostgreSQL with migrations instead of an ad-hoc schema: the course model changes often and every change ships as a versioned migration.",
+          "Retrieval through pgvector instead of stuffing the prompt: the tutor pulls only the chunks relevant to the current lesson.",
+          "User Python runs in a separate, isolated execution path; the API process never executes submitted code.",
+        ],
       },
       {
         name: "NGIE University App",
@@ -169,6 +179,15 @@ const en: Dictionary = {
           "Android integrations",
           "Mobile CI",
         ],
+        architecture: [
+          "Feature-oriented Flutter structure with separate networking, storage, cache and presentation layers.",
+          "Drift over SQLite keeps schedule and campus data readable without a network round-trip.",
+          "Native Android and iOS widgets (Kotlin, Swift, WidgetKit), including lock-screen widgets, sit next to the Flutter app.",
+        ],
+        decisions: [
+          "Offline-first cache: the schedule opens instantly and still works in a dead zone.",
+          "Widgets are implemented natively because Flutter does not render home-screen or lock-screen widgets.",
+        ],
       },
       {
         name: "TransactionMonitor",
@@ -184,6 +203,15 @@ const en: Dictionary = {
           "Risk analysis",
           "CSV export",
         ],
+        architecture: [
+          "WinUI 3 desktop client on .NET 8 with SQL Server as the single data store.",
+          "Risk score is calculated by rules when a transaction is created and stored with its label.",
+          "Analytics and CSV export read the same transaction data as the monitoring views.",
+        ],
+        decisions: [
+          "Rule-based scoring instead of a model: every score stays explainable through the rules that produced it.",
+          "One relational store for transactions, clients, accounts and counterparties keeps reporting consistent.",
+        ],
       },
       {
         name: "Neural A* Heuristic",
@@ -198,6 +226,15 @@ const en: Dictionary = {
           "Neural value function V(s)",
           "A* search",
           "Solution",
+        ],
+        architecture: [
+          "One value network V(s) is trained on solved states and used as the A* heuristic: f = g + V.",
+          "The network holds no puzzle-specific logic; every environment implements encode_state, valid_actions and step.",
+          "The same training and search code runs on 15 Puzzle, Toggle Lights and Cylinder.",
+        ],
+        decisions: [
+          "A shared environment API instead of per-puzzle models: one architecture covers three different state spaces.",
+          "A learned heuristic instead of a hand-tuned one: the training loop generalises to new puzzles without new heuristics.",
         ],
       },
       {
@@ -215,6 +252,15 @@ const en: Dictionary = {
           "CSV datasets",
           "Desktop visualization",
         ],
+        architecture: [
+          "k-NN implemented from scratch in C++17 without machine-learning libraries.",
+          "Euclidean, Manhattan and cosine distances, simple and weighted voting, feature normalisation and selection.",
+          "WinAPI desktop UI loads CSV datasets, runs classification and exports results.",
+        ],
+        decisions: [
+          "No ML libraries on purpose: the algorithm itself is the subject of the project.",
+          "Distance metric, voting mode and normalisation are switchable in the UI, so their effect on results is visible.",
+        ],
       },
       {
         name: "portfolio-analytics",
@@ -231,6 +277,15 @@ const en: Dictionary = {
           "FastAPI collector",
           "SQLite via SQLAlchemy",
         ],
+        architecture: [
+          "JavaScript beacon posts events to a FastAPI collector; SQLAlchemy stores them in PostgreSQL (SQLite locally).",
+          "No cookies and no third-party trackers; raw IPs are never stored, only a daily salted hash.",
+          "Ingestion is gated by a public site key; the dashboard is protected by an admin token.",
+        ],
+        decisions: [
+          "A first-party collector instead of an analytics SaaS: no third-party script runs on the portfolio.",
+          "A daily salted hash instead of raw IPs: unique visitors are counted without storing addresses.",
+        ],
       },
     ]),
   },
@@ -238,6 +293,28 @@ const en: Dictionary = {
     open: "Case study",
     back: "All projects",
     next: "Next project",
+    architecture: "Architecture",
+    decisions: "Decisions",
+    demo: "Live demo",
+    docs: "API docs",
+    updated: "Updated",
+    language: "Language",
+    license: "License",
+    release: "Latest release",
+    screenshot: "Screenshot",
+    diagram: "Diagram",
+  },
+  catalog: {
+    index: "Projects",
+    label: "Catalog",
+    title: "All projects.",
+    lead: "Six public repositories with case studies: what the system does, how it is built and where the source lives.",
+    back: "Back to home",
+    all: "All",
+    open: "Open case study",
+    github: "GitHub",
+    empty: "No project in the public list uses this technology yet.",
+    stackLabel: "Filter by stack",
   },
   stack: {
     index: "03",

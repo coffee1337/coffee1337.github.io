@@ -44,6 +44,7 @@ All facts below come from the site content and the listed public repositories. N
 - [About](${SITE}/#about)
 - [Technology stack](${SITE}/#stack)
 - [Projects](${SITE}/#projects)
+- [Projects catalog](${SITE}/projects/) · [Каталог](${SITE}/ru/projects/)
 - [Contact](${SITE}/#contact)
 - [Resume PDF](${SITE}/resume/Egor_Trefilov_Resume.pdf)
 

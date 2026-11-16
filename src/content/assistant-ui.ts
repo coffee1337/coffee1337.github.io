@@ -72,6 +72,7 @@ export interface AssistantUi {
   clear: string;
   thinking: string;
   chips: string[];
+  projectQuestions: { built: string; problem: string; stack: string };
   tryAsking: string;
   dialogLabel: string;
   feedLabel: string;
@@ -101,6 +102,11 @@ const en: AssistantUi = {
     "Are you open to an internship?",
     "How do I contact you?",
   ],
+  projectQuestions: {
+    built: "How is {name} built?",
+    problem: "What problem does {name} solve?",
+    stack: "What stack does {name} use?",
+  },
   tryAsking: "Try asking",
   dialogLabel: "AI assistant chat",
   feedLabel: "Conversation",
@@ -184,6 +190,11 @@ const ru: AssistantUi = {
     "Ты открыт к стажировке?",
     "Как с тобой связаться?",
   ],
+  projectQuestions: {
+    built: "Как устроен {name}?",
+    problem: "Какую задачу решает {name}?",
+    stack: "Какой стек у {name}?",
+  },
   tryAsking: "Попробуйте спросить",
   dialogLabel: "Чат с AI-ассистентом",
   feedLabel: "Диалог",

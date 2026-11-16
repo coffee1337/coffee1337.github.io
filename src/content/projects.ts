@@ -51,7 +51,10 @@ export const projectMeta = [
   },
 ];
 
-export type ProjectCopy = Pick<ProjectContent, "name" | "statement" | "purpose" | "built" | "highlights" | "status">;
+export type ProjectCopy = Pick<
+  ProjectContent,
+  "name" | "statement" | "purpose" | "built" | "highlights" | "status" | "architecture" | "decisions" | "demoUrl" | "docsUrl"
+>;
 
 export function mergeProjects(copy: ProjectCopy[]): ProjectContent[] {
   return projectMeta.map((meta, i) => ({

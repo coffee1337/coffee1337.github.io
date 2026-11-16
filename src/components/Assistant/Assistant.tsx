@@ -125,7 +125,8 @@ function Markdown({ text, onNavigate }: { text: string; onNavigate: () => void }
 
 /** AI-ассистент: локальный режим работает всегда, LLM через Worker — если задан VITE_CHAT_API_URL. */
 export function Assistant() {
-  const { lang, loaderDone } = useSite();
+  const site = useSite();
+  const { lang, loaderDone } = site;
   const ui = assistantUi[lang];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(restore);
@@ -418,6 +419,20 @@ export function Assistant() {
   const last = messages[messages.length - 1];
   const thinking = busy && !!last && last.role === "bot" && !last.text;
 
+  // На странице кейса сначала предлагаем вопросы про открытый проект.
+  const project =
+    site.route.kind === "project" && site.route.projectId
+      ? site.dict.projects.items.find((item) => item.id === site.route.projectId)
+      : undefined;
+  const starterChips = project
+    ? [
+        ui.projectQuestions.built.replace("{name}", project.name),
+        ui.projectQuestions.problem.replace("{name}", project.name),
+        ui.projectQuestions.stack.replace("{name}", project.name),
+        ...ui.chips.slice(0, 2),
+      ]
+    : ui.chips;
+
   return (
     <>
       {loaderDone && (
@@ -494,7 +509,7 @@ export function Assistant() {
                 <div>
                   <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-[var(--ink-faint)]">{ui.tryAsking}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {ui.chips.map((chip) => (
+                    {starterChips.map((chip) => (
                       <button
                         key={chip}
                         type="button"

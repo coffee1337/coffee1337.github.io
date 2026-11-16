@@ -1,10 +1,11 @@
 // Prerenders the built SPA into static HTML files for every route, then emits
 // sitemap.xml and 404.html. Runs after `vite build` and `vite build --ssr`.
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
-import { buildRoutes, renderRoute, routeJsonLd, routeMeta } from "../dist-ssr/entry.js";
+import { buildRoutes, renderRoute, routeJsonLd, routeMeta, routeOgAlt } from "../dist-ssr/entry.js";
 
 const SITE = "https://coffee1337.github.io";
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -48,6 +49,14 @@ function renderPage(route) {
   const { title, description } = routeMeta(route);
   const url = SITE + route.path;
   const locale = route.lang === "ru" ? "ru_RU" : "en_US";
+  const ogFile =
+    route.kind === "project" && route.projectId && existsSync(join(distDir, "og", `${route.projectId}.png`))
+      ? `/og/${route.projectId}.png`
+      : route.kind === "catalog" && existsSync(join(distDir, "og", "projects.png"))
+        ? "/og/projects.png"
+        : "/og.png";
+  const ogImage = `${SITE}${ogFile}`;
+  const ogAlt = routeOgAlt(route);
   const enPath = mirror(route.path, "en");
   const ruPath = mirror(route.path, "ru");
 
@@ -73,11 +82,18 @@ function renderPage(route) {
     `$1${locale === "ru_RU" ? "en_US" : "ru_RU"}$2`,
     "og:locale:alternate",
   );
+  html = patchOnce(
+    html,
+    /<meta property="og:image" content="[^"]*" \/>/,
+    `<meta property="og:image" content="${ogImage}" />\n    <meta property="og:image:alt" content="${esc(ogAlt)}" />`,
+    "og:image",
+  );
   html = patchOnce(html, /(<meta[^>]*property="og:title"[^>]*content=")[^"]*(")/, `$1${esc(title)}$2`, "og:title");
   html = patchOnce(html, /(<meta[^>]*property="og:description"[^>]*content=")[^"]*(")/, `$1${esc(description)}$2`, "og:description");
   html = patchOnce(html, /(<meta[^>]*property="og:url"[^>]*content=")[^"]*(")/, `$1${url}$2`, "og:url");
   html = patchOnce(html, /(<meta[^>]*name="twitter:title"[^>]*content=")[^"]*(")/, `$1${esc(title)}$2`, "twitter:title");
   html = patchOnce(html, /(<meta[^>]*name="twitter:description"[^>]*content=")[^"]*(")/, `$1${esc(description)}$2`, "twitter:description");
+  html = patchOnce(html, /(<meta[^>]*name="twitter:image"[^>]*content=")[^"]*(")/, `$1${ogImage}$2`, "twitter:image");
 
   // На подстраницах критический оверлей не нужен: контент должен быть виден сразу.
   if (route.kind !== "home") {
@@ -135,8 +151,6 @@ function gitDate(paths) {
     return today;
   }
 }
-const contentDate = gitDate(["src/content", "index.html"]);
-
 const urls = routes
   .filter((route) => route.kind !== "notfound")
   .map((route) => {
@@ -147,7 +161,7 @@ const urls = routes
     <xhtml:link rel="alternate" hreflang="en" href="${SITE}${en}"/>
     <xhtml:link rel="alternate" hreflang="ru" href="${SITE}${ru}"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${en}"/>
-    <lastmod>${contentDate}</lastmod>
+    <lastmod>${gitDate(route.sources ?? ["src/content", "index.html"])}</lastmod>
   </url>`;
   })
   .join("\n");

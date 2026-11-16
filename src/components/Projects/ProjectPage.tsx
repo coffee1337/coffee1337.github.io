@@ -4,8 +4,10 @@ import { useReveal } from "../../hooks/useMotion";
 import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
+import { Assistant } from "../Assistant/Assistant";
 import { NotFound } from "../NotFound";
 import { ProjectVisual } from "./ProjectVisual";
+import { formatRepoDate, repoMeta } from "../../lib/repoMeta";
 
 export function ProjectPage({ id }: { id?: string }) {
   const { dict, lang, pathBase, loaderDone } = useSite();
@@ -18,6 +20,8 @@ export function ProjectPage({ id }: { id?: string }) {
   const project = index >= 0 ? items[index] : undefined;
   const copy = dict.projects;
   const t = dict.projectPage;
+  const meta = id ? repoMeta(id) : undefined;
+  const updated = formatRepoDate(meta?.pushedAt, lang);
 
   useEffect(() => {
     if (!project) return;
@@ -34,6 +38,8 @@ export function ProjectPage({ id }: { id?: string }) {
       ['meta[property="og:description"]', "content", description],
       ['meta[name="twitter:title"]', "content", title],
       ['meta[name="twitter:description"]', "content", description],
+      ['meta[property="og:image"]', "content", `${window.location.origin}/og/${project.id}.png`],
+      ['meta[name="twitter:image"]', "content", `${window.location.origin}/og/${project.id}.png`],
     ];
     for (const [selector, attr, value] of patches) {
       const el = document.querySelector(selector);
@@ -71,6 +77,15 @@ export function ProjectPage({ id }: { id?: string }) {
               {project.statement}
             </p>
 
+            {(updated || meta?.language || meta?.license || meta?.release) && (
+              <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--ink-faint)]">
+                {updated && <span>{t.updated} {updated}</span>}
+                {meta?.language && <><span aria-hidden>·</span><span>{meta.language}</span></>}
+                {meta?.license && <><span aria-hidden>·</span><span>{meta.license}</span></>}
+                {meta?.release && <><span aria-hidden>·</span><span>{meta.release}</span></>}
+              </p>
+            )}
+
             <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
                 <div className="space-y-5 text-[var(--ink-dim)]">
@@ -101,11 +116,50 @@ export function ProjectPage({ id }: { id?: string }) {
               </div>
             </div>
 
+            {(project.architecture?.length || project.decisions?.length) && (
+              <div className="mt-16 grid gap-10 border-t border-[var(--line)] pt-10 md:grid-cols-2">
+                {project.architecture?.length ? (
+                  <div>
+                    <h2 className="kicker">{t.architecture}</h2>
+                    <ul className="mt-4 grid gap-3">
+                      {project.architecture.map((item) => (
+                        <li key={item} className="border-t border-[var(--line)] pt-3 text-sm leading-relaxed text-[var(--ink-dim)]">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {project.decisions?.length ? (
+                  <div>
+                    <h2 className="kicker">{t.decisions}</h2>
+                    <ul className="mt-4 grid gap-3">
+                      {project.decisions.map((item) => (
+                        <li key={item} className="border-t border-[var(--line)] pt-3 text-sm leading-relaxed text-[var(--ink-dim)]">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            )}
+
             <div className="mt-16 flex flex-wrap gap-3">
               <a className="btn btn-primary" href={project.github} target="_blank" rel="noopener noreferrer">
                 {copy.github}
               </a>
-              <a className="btn btn-ghost" href={`${pathBase}/#projects`}>{t.back}</a>
+              {project.demoUrl && (
+                <a className="btn btn-ghost" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                  {t.demo} ↗
+                </a>
+              )}
+              {project.docsUrl && (
+                <a className="btn btn-ghost" href={project.docsUrl} target="_blank" rel="noopener noreferrer">
+                  {t.docs} ↗
+                </a>
+              )}
+              <a className="btn btn-ghost" href={`${pathBase}/projects/`}>{t.back}</a>
             </div>
           </div>
         </section>
@@ -120,6 +174,7 @@ export function ProjectPage({ id }: { id?: string }) {
         </section>
       </main>
       <Footer />
+      <Assistant />
     </>
   );
 }

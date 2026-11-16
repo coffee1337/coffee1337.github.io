@@ -10,8 +10,12 @@ export interface ProjectContent {
   purpose: string;
   built: string;
   highlights: string[];
+  architecture?: string[];
+  decisions?: string[];
   stack: string[];
   github: string;
+  demoUrl?: string;
+  docsUrl?: string;
   visual: "mentor" | "campus" | "ledger" | "search" | "neighbors" | "analytics";
   image?: string;
 }
@@ -22,6 +26,10 @@ export interface Sections {
     label: string;
     title: string;
     cards: { id: "hire" | "freelance" | "code"; title: string; body: string; action: string }[];
+    tasksTitle: string;
+    tasks: string[];
+    processTitle: string;
+    process: string[];
   };
   educationCard: {
     aria: string;
@@ -246,6 +254,28 @@ export interface Dictionary {
     open: string;
     back: string;
     next: string;
+    architecture: string;
+    decisions: string;
+    demo: string;
+    docs: string;
+    updated: string;
+    language: string;
+    license: string;
+    release: string;
+    screenshot: string;
+    diagram: string;
+  };
+  catalog: {
+    index: string;
+    label: string;
+    title: string;
+    lead: string;
+    back: string;
+    all: string;
+    open: string;
+    github: string;
+    empty: string;
+    stackLabel: string;
   };
   stack: {
     index: string;

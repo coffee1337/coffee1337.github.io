@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { NotFound } from "./components/NotFound";
 import { ProjectPage } from "./components/Projects/ProjectPage";
+import { ProjectsCatalog } from "./components/Projects/ProjectsCatalog";
 import { SiteProvider } from "./context/SiteProvider";
 import type { Lang } from "./content";
 import { initAnalytics } from "./analytics";
@@ -15,7 +16,7 @@ document.documentElement.classList.add("js");
 installScrollTriggerRefresh();
 
 interface ClientRoute {
-  kind: "home" | "project" | "notfound";
+  kind: "home" | "project" | "catalog" | "notfound";
   lang: Lang;
   projectId?: string;
 }
@@ -25,8 +26,8 @@ function parseRoute(): ClientRoute {
   const ru = path === "/ru" || path.startsWith("/ru/");
   const lang: Lang = ru ? "ru" : "en";
   const rest = ru ? path.slice(3) || "/" : path;
-  // /projects/index.html не пререндерится: прямой HTTP-запрос отдаёт 404, клиент не должен думать иначе.
   if (rest === "/") return { kind: "home", lang };
+  if (rest === "/projects") return { kind: "catalog", lang };
   const match = rest.match(/^\/projects\/([a-z0-9-]+)$/i);
   if (match) return { kind: "project", lang, projectId: match[1] };
   return { kind: "notfound", lang };
@@ -48,6 +49,8 @@ function Root() {
             <App />
           ) : route.kind === "project" ? (
             <ProjectPage id={route.projectId} />
+          ) : route.kind === "catalog" ? (
+            <ProjectsCatalog />
           ) : (
             <NotFound />
           )}

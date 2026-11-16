@@ -52,6 +52,31 @@ export function Entry() {
             </a>
           ))}
         </div>
+
+        <div className="mt-10 grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
+          <div data-reveal>
+            <p className="kicker">{entry.tasksTitle}</p>
+            <ul className="mt-3 grid gap-2">
+              {entry.tasks.map((task) => (
+                <li key={task} className="flex gap-2 text-sm leading-relaxed text-[var(--ink-dim)]">
+                  <span aria-hidden className="text-[var(--accent)]">·</span>
+                  {task}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div data-reveal>
+            <p className="kicker">{entry.processTitle}</p>
+            <ol className="mt-3 flex flex-wrap items-center gap-2">
+              {entry.process.map((step, i) => (
+                <li key={step} className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--ink-dim)]">
+                  {i > 0 && <span aria-hidden className="text-[var(--accent)]">→</span>}
+                  <span className="border border-[var(--line)] px-2 py-1">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
       </div>
     </section>
   );

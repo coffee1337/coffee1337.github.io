@@ -28,6 +28,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Tests (assistant + worker)
+        run: |
+          npm run test:assistant
+          npm run test:worker
       - name: Build site
         run: npm run build
         env:

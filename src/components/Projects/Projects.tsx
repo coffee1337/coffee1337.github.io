@@ -7,6 +7,7 @@ import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { Explorer } from "./Explorer";
 import { ProjectVisual } from "./ProjectVisual";
 import { sameTech } from "../../lib/tech";
+import { formatRepoDate, repoMeta } from "../../lib/repoMeta";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
@@ -20,7 +21,7 @@ const matches = (stack: string[], filter: string | null): boolean => {
 };
 
 export function Projects() {
-  const { dict, pathBase } = useSite();
+  const { dict, pathBase, lang } = useSite();
   const { toast } = useToast();
   const ref = useReveal<HTMLElement>();
   const [filter, setFilter] = useState<string | null>(null);
@@ -181,6 +182,19 @@ export function Projects() {
                     </li>
                   ))}
                 </ul>
+
+                {(() => {
+                  const meta = repoMeta(active.id);
+                  const updated = formatRepoDate(meta?.pushedAt, lang);
+                  if (!updated && !meta?.language) return null;
+                  return (
+                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--ink-faint)]">
+                      {updated && <>{dict.projectPage.updated} {updated}</>}
+                      {updated && meta?.language ? " · " : ""}
+                      {meta?.language}
+                    </p>
+                  );
+                })()}
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   <a

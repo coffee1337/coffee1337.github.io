@@ -65,6 +65,7 @@ export function ContactForm() {
       email: String(data.get("email") || "").trim(),
       topic,
       message: String(data.get("message") || "").trim(),
+      company: honeypot,
       subject,
     };
 

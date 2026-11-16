@@ -27,8 +27,18 @@ export default {
     const allowed = allowedOrigins(env);
     const cors = corsHeaders(origin, allowed);
 
+    const { pathname } = new URL(request.url);
+
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: { ...cors, "Access-Control-Max-Age": "86400" } });
+    }
+    if (request.method === "GET" && pathname === "/health") {
+      return json({ ok: true, service: "coffee1337-chat" }, 200, cors);
+    }
+    if (pathname === "/contact" || pathname === "/contact/") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, cors);
+      if (origin && !allowed.includes(origin)) return json({ error: "forbidden_origin" }, 403, cors);
+      return handleContact(request, env, cors);
     }
     if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, cors);
     if (origin && !allowed.includes(origin)) return json({ error: "forbidden_origin" }, 403, cors);
@@ -165,12 +175,73 @@ const STOPWORDS = new Set([
 /** Короткие технические токены, которые нельзя отбрасывать по длине. */
 const SHORT_TERMS = new Set(["ai", "ии", "ml", "c#", "ci", "db", "go", "js", "ts", "ui"]);
 
-function terms(text) {
+/**
+ * RU/EN синонимы и технические соответствия. Группы задают эквивалентные основы:
+ * «бот» находит «telegram», «бд» — «postgresql», «нейросеть» — «pytorch» и т.п.
+ */
+const SYNONYM_GROUPS = [
+  ["python", "питон", "пайтон"],
+  ["fastapi", "фастапи"],
+  ["postgres", "postgresql", "постгрес"],
+  ["database", "db", "база", "бд", "sql", "sqlite"],
+  ["telegram", "телеграм", "tg", "bot", "бот"],
+  ["llm", "gpt", "языковая", "нейросет", "neural", "ml", "pytorch", "ии", "ai", "модель"],
+  ["rag", "retrieval", "эмбеддинг", "embedding", "вектор"],
+  ["asyncio", "асинхрон", "async"],
+  ["parser", "парсер", "scraper", "скрапер", "автоматизац", "automation"],
+  ["docker", "докер", "контейнер"],
+  ["flutter", "флаттер", "dart"],
+  ["backend", "бэкенд", "бекенд", "server", "сервер"],
+  ["frontend", "фронтенд", "next", "nextjs", "react"],
+  ["analytics", "аналитик", "метрик"],
+  ["astar", "a-star", "астар", "эвристик", "heuristic"],
+  ["knn", "k-nn", "кнн", "neighbors", "сосед"],
+  ["project", "проект", "кейс", "case"],
+  ["resume", "резюме", "cv"],
+  ["contact", "контакт", "связ", "почт"],
+];
+
+/** Лёгкая основа: срезаем частые окончания, чтобы «проектах» ≈ «проект», «built» ≈ «build». */
+function stem(word) {
+  const clean = String(word)
+    .toLowerCase()
+    .replace(/^[^\p{L}\p{N}#+.]+|[^\p{L}\p{N}#+.]+$/gu, "");
+  if (clean.length <= 3) return clean;
+  if (/[\u0400-\u04FF]/u.test(clean)) {
+    const cut = clean.replace(
+      /(ами|ями|ого|ему|ыми|ими|ая|ое|ые|ий|ый|ой|ам|ям|ах|ях|ов|ев|ей|ую|юю|ом|ем|а|я|ы|и|е|у|о|ь)$/u,
+      "",
+    );
+    return cut.length >= 4 ? cut : clean;
+  }
+  const cut = clean.replace(/(ing|ed|es|s|ly|er)$/u, "");
+  return cut.length >= 4 ? cut : clean;
+}
+
+const ALIAS = new Map();
+for (const group of SYNONYM_GROUPS) {
+  const stems = group.map(stem);
+  for (const alias of group) {
+    const key = stem(alias);
+    if (!ALIAS.has(key)) ALIAS.set(key, stems);
+  }
+}
+
+function tokenize(text) {
   return String(text)
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}+#.\-\s]/gu, " ")
-    .split(/\s+/)
-    .filter((word) => (word.length >= 3 || SHORT_TERMS.has(word)) && !STOPWORDS.has(word));
+    .split(/[^\p{L}\p{N}#+]+/u)
+    .filter(Boolean);
+}
+
+function terms(text) {
+  return tokenize(text).filter((word) => (word.length >= 3 || SHORT_TERMS.has(word)) && !STOPWORDS.has(word));
+}
+
+/** Все основы синонимов для термина запроса. */
+function termStems(term) {
+  const key = stem(term);
+  return ALIAS.get(key) ?? [key];
 }
 
 /** Контекст собирается на сервере: скоринг по вопросу + профильный чанк всегда. */
@@ -182,28 +253,91 @@ async function selectContext(question, lang, env) {
   for (const doc of docs) {
     const docLang = doc.lang === "ru" || doc.lang === "en" ? doc.lang : "both";
     const sameLang = docLang === "both" || docLang === lang;
-    const title = String(doc.title || "").toLowerCase();
-    const text = String(doc.text || "").toLowerCase();
+    const titleTokens = tokenize(doc.title || "").map(stem);
+    const textTokens = tokenize(doc.text || "").map(stem);
+
     let score = 0;
     for (const term of query) {
-      if (title.includes(term)) score += 3;
-      const hits = text.split(term).length - 1;
-      if (hits) score += Math.min(hits, 4);
+      const stems = termStems(term);
+      if (titleTokens.some((token) => stems.some((item) => token.startsWith(item)))) score += 3;
+      let hits = 0;
+      for (const token of textTokens) {
+        if (stems.some((item) => token.startsWith(item))) {
+          hits += 1;
+          if (hits >= 4) break;
+        }
+      }
+      score += hits;
     }
+
     // README проектов бывают только на языке репозитория — их не отбрасываем,
     // но чанки языка вопроса получают приоритет.
     if (score > 0 && sameLang) score += 2;
     scored.push({ doc, score });
   }
-  const pool = scored.length ? scored : [];
-  pool.sort((a, b) => b.score - a.score);
-  const picked = pool.filter((item) => item.score > 0).slice(0, MAX_CHUNKS - 1).map((item) => item.doc);
+  scored.sort((a, b) => b.score - a.score);
+  const picked = scored.filter((item) => item.score > 0).slice(0, MAX_CHUNKS - 1).map((item) => item.doc);
   const profile = docs.find((doc) => doc.source === `content-${lang}` && /^(Profile|Профиль)$/.test(String(doc.title || "")));
   if (profile) picked.unshift(profile);
   return picked.slice(0, MAX_CHUNKS).map((doc) => ({
     title: String(doc.title || "").slice(0, 140),
     text: String(doc.text || "").slice(0, 1400),
   }));
+}
+
+const CONTACT_TOPICS = new Set(["hire", "project", "other"]);
+
+/** POST /contact: заявка с сайта → уведомление владельцу в Telegram. */
+async function handleContact(request, env, cors) {
+  if (await rateLimited(request, env, "contact", Number(env.CONTACT_RATE_LIMIT || 5))) {
+    return json({ error: "rate_limited" }, 429, cors);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "bad_json" }, 400, cors);
+  }
+
+  // honeypot: боты заполняют скрытое поле — отвечаем как будто всё хорошо
+  if (String(body?.company || "").trim()) return json({ ok: true }, 200, cors);
+
+  const name = String(body?.name || "").trim().slice(0, 80);
+  const email = String(body?.email || "").trim().slice(0, 160);
+  const message = String(body?.message || "").trim().slice(0, 4000);
+  const topic = CONTACT_TOPICS.has(body?.topic) ? body.topic : "other";
+
+  const fields = [];
+  if (name.length < 2) fields.push("name");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) fields.push("email");
+  if (message.length < 10) fields.push("message");
+  if (fields.length) return json({ error: "invalid_fields", fields }, 400, cors);
+
+  if (!env.TG_BOT_TOKEN || !env.TG_CHAT_ID) return json({ error: "not_configured" }, 503, cors);
+
+  const text = [
+    "Portfolio contact form",
+    `Topic: ${topic}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    "",
+    message,
+  ].join("\n");
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ chat_id: env.TG_CHAT_ID, text, disable_web_page_preview: true }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return json({ error: "telegram_failed" }, 502, cors);
+  } catch {
+    return json({ error: "telegram_unreachable" }, 502, cors);
+  }
+
+  return json({ ok: true }, 200, cors);
 }
 
 function normaliseHistory(value) {
@@ -217,11 +351,11 @@ function normaliseHistory(value) {
     .filter((turn) => turn.content.trim().length > 0);
 }
 
-async function rateLimited(request, env) {
+async function rateLimited(request, env, scope = "chat", limitOverride) {
   if (!env.RATE_KV) return false;
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const limit = Number(env.RATE_LIMIT || 20);
-  const bucket = `rl:${ip}:${Math.floor(Date.now() / 3_600_000)}`;
+  const limit = limitOverride ?? Number(env.RATE_LIMIT || 20);
+  const bucket = `rl:${scope}:${ip}:${Math.floor(Date.now() / 3_600_000)}`;
   try {
     const used = Number((await env.RATE_KV.get(bucket)) || 0);
     if (used >= limit) return true;

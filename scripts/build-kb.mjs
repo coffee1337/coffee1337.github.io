@@ -235,6 +235,10 @@ export async function contentDocs() {
           `${dict.projects.purpose}: ${project.purpose}`,
           `${dict.projects.built}: ${project.built}`,
           `${dict.projects.highlights}: ${project.highlights.join("; ")}.`,
+          project.architecture?.length
+            ? `${dict.projectPage.architecture}: ${project.architecture.join(" ")}`
+            : "",
+          project.decisions?.length ? `${dict.projectPage.decisions}: ${project.decisions.join(" ")}` : "",
           `${dict.projects.technology}: ${project.stack.join(", ")}.`,
           project.status ? `${dict.projects.active}: ${project.status}.` : "",
           `${dict.projects.github}: ${project.github}`,

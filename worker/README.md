@@ -111,6 +111,33 @@
 ссылки только из разрешённого списка (разделы сайта, страницы проектов, GitHub, Telegram,
 email, резюме).
 
+## Контактная форма → Telegram
+
+`POST /contact` принимает заявку с сайта и пересылает её владельцу в Telegram Bot API.
+Включается только при заданных секретах; без них отвечает `503 not_configured` и форма
+продолжает работать через `mailto:`.
+
+```bash
+wrangler secret put TG_BOT_TOKEN   # токен бота от @BotFather
+wrangler secret put TG_CHAT_ID     # числовой chat id владельца
+```
+
+Тело запроса: `{ "name", "email", "topic": "hire|project|other", "message", "company" }`.
+`company` — honeypot: если заполнено, Worker отвечает `200 { ok: true }` и ничего не отправляет.
+Лимиты: 5 заявок в час на IP (`CONTACT_RATE_LIMIT`), длина имени 2–80, сообщения 10–4000,
+строгая проверка `Origin` по `ALLOWED_ORIGINS`. Ответы: `200 ok`, `400 invalid_fields`,
+`403 forbidden_origin`, `429 rate_limited`, `502 telegram_failed|telegram_unreachable`,
+`503 not_configured`.
+
+Подключение на сайте: GitHub → Settings → Variables → `VITE_CONTACT_ENDPOINT` =
+`https://<worker>.workers.dev/contact` (или `VITE_CONTACT_PROVIDER` для явного выбора).
+Приоритет: `VITE_WEB3FORMS_KEY` → `VITE_CONTACT_ENDPOINT` → `mailto:`.
+
+## Health-check
+
+`GET /health` → `{ "ok": true, "service": "coffee1337-chat" }`, без секретов и без CORS-ограничений
+для мониторинга.
+
 ## Если провайдер не поддерживает stream
 
 Worker проверяет `content-type` ответа: если это не `text/event-stream`, он сам оборачивает

@@ -2,5 +2,45 @@
   "login": "coffee1337",
   "commitsLastYear": 307,
   "publicRepos": 10,
-  "fetchedAt": "2026-11-15T20:56:10.395Z"
+  "repos": {
+    "ai-python-mentor": {
+      "pushedAt": "2026-11-12T15:55:29Z",
+      "language": "Python",
+      "stars": 0,
+      "license": "MIT",
+      "release": "v0.1.0"
+    },
+    "ngie": {
+      "pushedAt": "2026-10-07T13:43:13Z",
+      "language": "Dart",
+      "stars": 1,
+      "license": null
+    },
+    "transaction-monitor": {
+      "pushedAt": "2026-10-07T14:21:41Z",
+      "language": "C#",
+      "stars": 0,
+      "license": "MIT",
+      "release": "v0.1-alpha"
+    },
+    "neural-astar": {
+      "pushedAt": "2026-10-07T14:22:53Z",
+      "language": "Python",
+      "stars": 0,
+      "license": null
+    },
+    "knn": {
+      "pushedAt": "2026-10-07T13:23:24Z",
+      "language": "C++",
+      "stars": 1,
+      "license": null
+    },
+    "portfolio-analytics": {
+      "pushedAt": "2026-10-20T05:18:38Z",
+      "language": "Python",
+      "stars": 0,
+      "license": null
+    }
+  },
+  "fetchedAt": "2026-11-16T00:46:26.810Z"
 }

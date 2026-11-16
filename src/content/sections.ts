@@ -29,6 +29,15 @@ const en: Sections = {
         action: "Projects + GitHub",
       },
     ],
+    tasksTitle: "What I take on",
+    tasks: [
+      "FastAPI backends: APIs, PostgreSQL, migrations, background jobs",
+      "Telegram bots connected to a database and external APIs",
+      "RAG / LLM assistants over your documents",
+      "Parsers and automation, packaged with Docker",
+    ],
+    processTitle: "How it goes",
+    process: ["Brief and constraints", "Prototype / MVP", "Docker and documentation"],
   },
   educationCard: {
     aria: "Education",
@@ -141,6 +150,15 @@ const ru: Sections = {
         action: "Проекты и GitHub",
       },
     ],
+    tasksTitle: "Что беру в работу",
+    tasks: [
+      "FastAPI-бэкенды: API, PostgreSQL, миграции, фоновые задачи",
+      "Telegram-боты с базой данных и интеграциями",
+      "RAG/LLM-ассистенты по вашим документам",
+      "Парсеры и автоматизация, упакованные в Docker",
+    ],
+    processTitle: "Как идёт работа",
+    process: ["Задача и ограничения", "Прототип / MVP", "Docker и документация"],
   },
   educationCard: {
     aria: "Образование",
