@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactN
 import { flushSync } from "react-dom";
 import { dictionaries, type Lang } from "../content";
 import { SiteContext, type RouteInfo, type Theme } from "./site";
-import { trackEvent } from "../analytics";
+import { markLoaderDone, trackEvent } from "../analytics";
 
 const THEME_KEY = "et-theme";
 const hasWindow = typeof window !== "undefined";
@@ -74,6 +74,8 @@ export function SiteProvider({
     if (!loaderDone) return;
     document.documentElement.classList.add("boot-done");
     document.getElementById("boot")?.remove();
+    // Сплэш закончился (или его нет): аналитика может наблюдать секции.
+    markLoaderDone();
   }, [loaderDone]);
 
   const pathBase = lang === "ru" ? "/ru" : "";
@@ -113,7 +115,7 @@ export function SiteProvider({
       target = clean.replace(/^\/ru(?=\/|$)/, "") || "/";
     }
     if (target !== "/" && !target.endsWith("/")) target += "/";
-    if (to !== lang) trackEvent("lang_switch", { to });
+    trackEvent("lang_switch", { from: lang, to });
     window.location.assign(target);
   };
 
@@ -136,6 +138,7 @@ export function SiteProvider({
   const toggleTheme = useCallback(
     (origin?: { x: number; y: number }) => {
       const next: Theme = theme === "dark" ? "light" : "dark";
+      trackEvent("theme_switch", { to: next });
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce || typeof document.startViewTransition !== "function") {
         commitTheme(next);

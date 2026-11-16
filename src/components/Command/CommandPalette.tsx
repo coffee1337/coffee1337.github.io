@@ -7,6 +7,7 @@ import { useToast } from "../Toast/ToastProvider";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useScrollLock } from "../../hooks/useScrollLock";
+import { trackEvent } from "../../analytics";
 
 type Props = {
   open: boolean;
@@ -26,6 +27,7 @@ export function CommandPalette({ open, onClose }: Props) {
 
   useEffect(() => {
     if (!open) return;
+    trackEvent("cmdk", { action: "open" });
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -90,7 +92,7 @@ export function CommandPalette({ open, onClose }: Props) {
 
               <Group heading={p.nav}>
                 {SECTION_IDS.map((id) => (
-                  <Item key={id} value={`${id} ${dict.nav[id]} nav`} onSelect={() => jump(id)}>
+                  <Item key={id} id={`nav-${id}`} group="nav" value={`${id} ${dict.nav[id]} nav`} onSelect={() => jump(id)}>
                     {dict.nav[id]}
                   </Item>
                 ))}
@@ -100,6 +102,8 @@ export function CommandPalette({ open, onClose }: Props) {
                 {dict.projects.items.map((project) => (
                   <Item
                     key={project.id}
+                    id={`project-${project.id}`}
+                    group="projects"
                     value={`${project.id} ${project.name} project проект`}
                     onSelect={() => {
                       window.location.href = `${pathBase}/projects/${project.id}/`;
@@ -111,22 +115,24 @@ export function CommandPalette({ open, onClose }: Props) {
               </Group>
 
               <Group heading={p.actions}>
-                <Item value={`email copy копировать почта ${links.email}`} onSelect={() => copy(links.email, links.email)}>
+                <Item id="copy-email" group="actions" value={`email copy копировать почта ${links.email}`} onSelect={() => copy(links.email, links.email)}>
                   {p.copyEmail}
                 </Item>
-                <Item value="resume cv резюме скачать" onSelect={() => external(links.resumePdf)}>
+                <Item id="download-resume" group="actions" value="resume cv резюме скачать" onSelect={() => external(links.resumePdf)}>
                   {p.downloadResume}
                 </Item>
-                <Item value="github код code" onSelect={() => external(links.github)}>
+                <Item id="open-github" group="actions" value="github код code" onSelect={() => external(links.github)}>
                   GitHub
                 </Item>
-                <Item value="linkedin работа work" onSelect={() => external(links.linkedin)}>
+                <Item id="open-linkedin" group="actions" value="linkedin работа work" onSelect={() => external(links.linkedin)}>
                   LinkedIn
                 </Item>
-                <Item value="telegram tg связаться" onSelect={() => external(links.telegram)}>
+                <Item id="open-telegram" group="actions" value="telegram tg связаться" onSelect={() => external(links.telegram)}>
                   Telegram {links.telegramHandle}
                 </Item>
                 <Item
+                  id="ask-ai"
+                  group="actions"
                   value="ai ask assistant спросить ассистент чат"
                   onSelect={() => {
                     window.dispatchEvent(new CustomEvent("open-ai-chat"));
@@ -136,6 +142,8 @@ export function CommandPalette({ open, onClose }: Props) {
                   {p.askAi}
                 </Item>
                 <Item
+                  id="write-email"
+                  group="actions"
                   value="write contact написать письмо"
                   onSelect={() => {
                     window.location.href = links.mailto;
@@ -148,6 +156,8 @@ export function CommandPalette({ open, onClose }: Props) {
 
               <Group heading={p.settings}>
                 <Item
+                  id="toggle-theme"
+                  group="settings"
                   value="theme dark light тема тёмная светлая"
                   onSelect={() => {
                     toggleTheme();
@@ -157,6 +167,8 @@ export function CommandPalette({ open, onClose }: Props) {
                   {p.toggleTheme}
                 </Item>
                 <Item
+                  id="switch-lang"
+                  group="settings"
                   value={`language lang язык ${lang === "ru" ? "en english" : "ru русский"}`}
                   onSelect={() => {
                     switchLang(lang === "ru" ? "en" : "ru");
@@ -189,11 +201,26 @@ function Group({ heading, children }: { heading: string; children: React.ReactNo
   );
 }
 
-function Item({ value, onSelect, children }: { value: string; onSelect: () => void; children: React.ReactNode }) {
+function Item({
+  value,
+  onSelect,
+  id,
+  group,
+  children,
+}: {
+  value: string;
+  onSelect: () => void;
+  id: string;
+  group: "nav" | "projects" | "actions" | "settings";
+  children: React.ReactNode;
+}) {
   return (
     <Command.Item
       value={value}
-      onSelect={onSelect}
+      onSelect={() => {
+        trackEvent("cmdk", { action: "select", command: id, group });
+        onSelect();
+      }}
       className="cursor-pointer px-3 py-2 font-body text-sm normal-case tracking-normal text-[var(--ink)] data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-[var(--bg)]"
     >
       {children}

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useReveal } from "../../hooks/useMotion";
+import { trackEvent } from "../../analytics";
 
 export function Resume() {
   const { dict } = useSite();
@@ -24,8 +25,25 @@ export function Resume() {
             <p className="mt-2 text-[var(--ink-dim)]">{r.role}</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a className="btn btn-primary" href={links.resumePdf} download>{r.download}</a>
-            <a className="btn btn-ghost" href={links.resumeRepo} target="_blank" rel="noopener noreferrer">{r.view}</a>
+            <a
+              className="btn btn-primary"
+              href={links.resumePdf}
+              download
+              onClick={() => trackEvent("resume", { action: "download_pdf", section: "resume" })}
+              data-track="resume_pdf"
+            >
+              {r.download}
+            </a>
+            <a
+              className="btn btn-ghost"
+              href={links.resumeRepo}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("resume", { action: "view_repo", section: "resume" })}
+              data-track="resume_repo"
+            >
+              {r.view}
+            </a>
           </div>
         </div>
 

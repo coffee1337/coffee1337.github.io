@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSite } from "../../context/site";
 import { links } from "../../content";
 import { CopyButton } from "../CopyButton";
+import { trackEvent } from "../../analytics";
 
 type Topic = "hire" | "project" | "other";
 type Field = "name" | "email" | "message";
@@ -74,6 +75,7 @@ export function ContactForm() {
       const mailSubject = `[Portfolio] ${f.topics[topic]} — ${payload.name}`;
       const mailBody = `${payload.message}\n\n---\nFrom: ${payload.name} (${payload.email})`;
       window.location.href = `${links.mailto}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      trackEvent("contact_submit", { topic, status: "mailto", provider: PROVIDER });
       setState("mailto");
       return;
     }
@@ -103,8 +105,10 @@ export function ContactForm() {
         throw new Error("not_configured");
       }
       setState("sent");
+      trackEvent("contact_submit", { topic, status: "sent", provider: PROVIDER });
       form.reset();
     } catch {
+      trackEvent("contact_submit", { topic, status: "error", provider: PROVIDER });
       setState("error");
     }
   };
@@ -216,6 +220,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={state === "sending"}
+          data-track="contact_submit"
           className="mt-1 rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-[11px] uppercase text-[var(--bg)] disabled:opacity-60"
         >
           {state === "sending" ? f.sending : f.send}

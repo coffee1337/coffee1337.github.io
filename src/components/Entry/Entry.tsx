@@ -2,6 +2,7 @@ import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useReveal } from "../../hooks/useMotion";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
+import { trackEvent } from "../../analytics";
 
 const TARGETS: Record<string, string> = {
   hire: links.resumePdf,
@@ -16,6 +17,11 @@ export function Entry() {
 
   /** «Hire» ведёт прямо в PDF, «freelance» — обычный якорь + подсказка формы. */
   const onCard = (id: string) => {
+    trackEvent("entry_cta", { card: id });
+    if (id === "hire") {
+      // Эта карточка — скачивание резюме, отдельный семантический срез.
+      trackEvent("resume", { action: "download_pdf", section: "entry" });
+    }
     if (id === "freelance") {
       window.dispatchEvent(new CustomEvent("contact-topic", { detail: "project" }));
     }
@@ -39,6 +45,7 @@ export function Entry() {
               target={card.id === "hire" ? "_blank" : undefined}
               rel={card.id === "hire" ? "noopener noreferrer" : undefined}
               onClick={() => onCard(card.id)}
+              data-track={`entry_${card.id}`}
               data-reveal
               className="group relative flex min-h-[190px] flex-col justify-between border border-[var(--line)] bg-[var(--bg-2)] p-5 transition-colors hover:border-[var(--accent)]"
             >

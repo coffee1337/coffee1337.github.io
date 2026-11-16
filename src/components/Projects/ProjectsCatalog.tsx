@@ -7,6 +7,7 @@ import { formatRepoDate, repoMeta } from "../../lib/repoMeta";
 import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
 import { Assistant } from "../Assistant/Assistant";
+import { trackEvent } from "../../analytics";
 
 /**
  * Каталог всех проектов: тот же контент, что на главной, но без 3D и скролла —
@@ -56,8 +57,12 @@ export function ProjectsCatalog() {
             <div className="mt-10 flex flex-wrap items-center gap-2" role="group" aria-label={t.stackLabel} data-reveal>
               <button
                 type="button"
-                onClick={() => setFilter(null)}
+                onClick={() => {
+                  trackEvent("project_filter", { filter: "All", page: "catalog" });
+                  setFilter(null);
+                }}
                 aria-pressed={filter === null}
+                data-track="filter_All"
                 className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] ${
                   filter === null
                     ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]"
@@ -70,8 +75,12 @@ export function ProjectsCatalog() {
                 <button
                   key={tech}
                   type="button"
-                  onClick={() => setFilter(tech)}
+                  onClick={() => {
+                    trackEvent("project_filter", { filter: tech, page: "catalog" });
+                    setFilter(tech);
+                  }}
                   aria-pressed={filter === tech}
+                  data-track={`filter_${tech}`}
                   className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] ${
                     filter === tech
                       ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]"

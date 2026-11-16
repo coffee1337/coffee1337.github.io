@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSite } from "../../context/site";
 import { useScrollLock } from "../../hooks/useScrollLock";
 import { BRAND, createLoaderScene } from "../../loader/scene";
+import { markLoaderDone, trackEvent } from "../../analytics";
 
 const VISIT_KEY = "et-seen";
 
@@ -45,6 +46,8 @@ export function Loader({ onDone }: { onDone: () => void }) {
   const [duration] = useState(() =>
     reduced ? REDUCED_MS : seenThisSession() ? SHORT_MS : FULL_MS,
   );
+  /** Для elapsed_ms в событии loader — фиксируется на монтировании. */
+  const [mountedAt] = useState(() => performance.now());
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -61,6 +64,12 @@ export function Loader({ onDone }: { onDone: () => void }) {
   const finish = useCallback((instant: boolean) => {
     if (finishedRef.current) return;
     finishedRef.current = true;
+    // instant = клик/клавиша/Skip; иначе сюжет дошёл до конца сам.
+    trackEvent("loader", {
+      action: instant ? "skip" : "complete",
+      elapsed_ms: Math.round(performance.now() - mountedAt),
+    });
+    markLoaderDone();
     setLeaving(true);
     try {
       sessionStorage.setItem(VISIT_KEY, "1");
@@ -68,7 +77,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
       /* private mode */
     }
     window.setTimeout(() => onDoneRef.current(), instant ? 120 : 0);
-  }, []);
+  }, [mountedAt]);
 
   const lines = dict.loader.lines;
   const tokens = dict.loader.tokens;

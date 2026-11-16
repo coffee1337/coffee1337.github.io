@@ -136,6 +136,7 @@ export function Explorer({ projects, activeId, onSelect, dimmed }: Props) {
                       role="treeitem"
                       aria-selected={active}
                       data-file={project.id}
+                      data-track="project_item"
                       onClick={() => onSelect(project.id)}
                       className={`relative flex w-full items-center gap-2 py-1 pl-8 pr-3 text-left font-mono text-[12px] transition-opacity ${
                         active ? "text-[var(--ink)]" : "text-[var(--ink-dim)] hover:text-[var(--ink)]"

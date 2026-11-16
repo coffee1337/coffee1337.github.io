@@ -124,6 +124,7 @@ export function Header() {
             className="hidden rounded-full px-1 py-1 lg:block"
             onClick={() => setPaletteOpen(true)}
             aria-label={dict.a11y.openPalette}
+            data-track="cmdk_open"
           >
             <KbdShortcut />
           </button>
@@ -139,6 +140,7 @@ export function Header() {
                 type="button"
                 onClick={() => switchLang(code)}
                 aria-pressed={lang === code}
+                data-track="lang"
                 className="relative rounded-full px-2 py-1 font-mono text-[10px]"
               >
                 {lang === code && (
@@ -158,6 +160,7 @@ export function Header() {
             className="theme-btn"
             onClick={(event) => toggleTheme({ x: event.clientX, y: event.clientY })}
             aria-label={theme === "dark" ? dict.a11y.themeToLight : dict.a11y.themeToDark}
+            data-track="theme"
           >
             {theme === "dark" ? "☼" : "☾"}
           </button>
@@ -216,6 +219,7 @@ export function Header() {
                     type="button"
                     onClick={() => switchLang(code)}
                     aria-pressed={lang === code}
+                    data-track="lang"
                     className={`rounded-full px-3 py-1.5 font-mono text-[11px] uppercase transition-colors ${
                       lang === code
                         ? "bg-[var(--accent)] text-[var(--bg)]"
@@ -234,6 +238,7 @@ export function Header() {
                   setPaletteOpen(true);
                 }}
                 aria-label={dict.a11y.openPalette}
+                data-track="cmdk_open"
                 className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] px-3 py-1.5 font-mono text-[11px] uppercase text-[var(--ink-dim)] transition-colors hover:border-[var(--accent)] hover:text-[var(--ink)]"
               >
                 <span aria-hidden>⌕</span>

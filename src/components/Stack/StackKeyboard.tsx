@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { useSite } from "../../context/site";
 import { canon, projectsWithRelated, projectsWithTech } from "../../lib/tech";
 import type { KeyboardHandle, KeyboardRow } from "../../three/keyboard";
+import { trackEvent } from "../../analytics";
 
 /** Акцентные колпачки: технологии, на которых держатся проекты. */
 const ACCENT = new Set([
@@ -77,6 +78,7 @@ export function StackKeyboard() {
 
   /** Клик/выбор клавиши: только выделение и панель, без скролла страницы. */
   const select = (label: string) => {
+    trackEvent("stack_key", { tech: label, mode: webgl ? "3d" : "2d" });
     setActive(label);
     handleRef.current?.setSelected(label);
   };
@@ -244,6 +246,7 @@ export function StackKeyboard() {
                         type="button"
                         onClick={() => select(key.label)}
                         aria-pressed={active === key.label}
+                        data-track="stack_key"
                         className={`rounded-sm border px-2.5 py-1.5 font-mono text-[11px] transition-transform active:translate-y-0.5 ${
                           key.accent
                             ? "border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_16%,var(--bg-2))] text-[var(--ink)]"

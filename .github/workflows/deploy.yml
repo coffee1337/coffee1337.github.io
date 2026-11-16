@@ -39,6 +39,8 @@ jobs:
           VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
           VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
           VITE_CONTACT_ENDPOINT: ${{ vars.VITE_CONTACT_ENDPOINT }}
+          VITE_ANALYTICS_URL: ${{ vars.VITE_ANALYTICS_URL || secrets.VITE_ANALYTICS_URL }}
+          VITE_ANALYTICS_KEY: ${{ vars.VITE_ANALYTICS_KEY || secrets.VITE_ANALYTICS_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

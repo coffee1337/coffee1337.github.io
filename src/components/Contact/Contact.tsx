@@ -7,6 +7,7 @@ import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { NeuralMark } from "../Brand/NeuralMark";
 import { GitHub, LinkedIn, Mail, Resume, Telegram } from "../Icons";
 import { ContactForm } from "./ContactForm";
+import { trackEvent } from "../../analytics";
 
 export function Contact() {
   const { dict } = useSite();
@@ -27,17 +28,17 @@ export function Contact() {
           {c.status}
         </p>
         <div data-reveal className="mt-8 flex flex-wrap gap-3">
-          <a ref={cta} className="btn btn-primary" href={links.mailto}>{c.cta}</a>
-          <a className="btn btn-ghost" href={links.github} target="_blank" rel="noopener noreferrer">{c.github}</a>
+          <a ref={cta} className="btn btn-primary" href={links.mailto} onClick={() => trackEvent("social_click", { network: "mailto", section: "contact" })} data-track="social_mailto_contact">{c.cta}</a>
+          <a className="btn btn-ghost" href={links.github} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "github", section: "contact" })} data-track="social_github_contact">{c.github}</a>
         </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div data-reveal><ContactForm /></div>
           <ul className="border-t border-[var(--line)]">
-          <Row icon={<Mail className="h-4 w-4" />} label={c.email} value={links.email} href={links.mailto} copyValue={links.email} copyLabel={c.copyEmail} copiedLabel={c.copied} />
-          <Row icon={<GitHub className="h-4 w-4" />} label="GitHub" value="coffee1337" href={links.github} external />
-          <Row icon={<LinkedIn className="h-4 w-4" />} label={c.linkedin} value="in/coffee1337" href={links.linkedin} external />
-          <Row icon={<Telegram className="h-4 w-4" />} label={c.telegram} value={links.telegramHandle} href={links.telegram} external copyValue={links.telegramHandle} copyLabel={c.copyTelegram} copiedLabel={c.copied} />
-            <Row icon={<Resume className="h-4 w-4" />} label={c.resume} value="resume" href={links.resumeRepo} external />
+          <Row icon={<Mail className="h-4 w-4" />} label={c.email} value={links.email} href={links.mailto} network="mailto" copyValue={links.email} copyLabel={c.copyEmail} copiedLabel={c.copied} />
+          <Row icon={<GitHub className="h-4 w-4" />} label="GitHub" value="coffee1337" href={links.github} external network="github" />
+          <Row icon={<LinkedIn className="h-4 w-4" />} label={c.linkedin} value="in/coffee1337" href={links.linkedin} external network="linkedin" />
+          <Row icon={<Telegram className="h-4 w-4" />} label={c.telegram} value={links.telegramHandle} href={links.telegram} external network="telegram" copyValue={links.telegramHandle} copyLabel={c.copyTelegram} copiedLabel={c.copied} />
+            <Row icon={<Resume className="h-4 w-4" />} label={c.resume} value="resume" href={links.resumeRepo} external resumeRepo />
           </ul>
         </div>
       </div>
@@ -51,6 +52,8 @@ function Row({
   value,
   href,
   external = false,
+  network,
+  resumeRepo = false,
   copyValue,
   copyLabel,
   copiedLabel,
@@ -60,13 +63,28 @@ function Row({
   value: string;
   href: string;
   external?: boolean;
+  network?: "mailto" | "github" | "linkedin" | "telegram";
+  resumeRepo?: boolean;
   copyValue?: string;
   copyLabel?: string;
   copiedLabel?: string;
 }) {
+  const onFollow = () => {
+    if (network) {
+      trackEvent("social_click", { network, section: "contact" });
+      return;
+    }
+    if (resumeRepo) trackEvent("resume", { action: "view_repo", section: "contact" });
+  };
   return (
     <li data-reveal className="contact-line">
-      <a href={href} className="contact-row group" {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+      <a
+        href={href}
+        className="contact-row group"
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        onClick={onFollow}
+        data-track={network ? `social_${network}` : resumeRepo ? "resume_repo_contact" : undefined}
+      >
         <span className="inline-flex items-center gap-2.5">
           <span className="inline-flex shrink-0 text-[var(--ink-faint)] transition-colors duration-300 group-hover:text-[var(--accent)]">{icon}</span>
           <span className="kicker">{label}</span>

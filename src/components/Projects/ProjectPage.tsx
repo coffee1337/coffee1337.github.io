@@ -8,6 +8,7 @@ import { Assistant } from "../Assistant/Assistant";
 import { NotFound } from "../NotFound";
 import { ProjectVisual } from "./ProjectVisual";
 import { formatRepoDate, repoMeta } from "../../lib/repoMeta";
+import { trackEvent } from "../../analytics";
 
 export function ProjectPage({ id }: { id?: string }) {
   const { dict, lang, pathBase, loaderDone } = useSite();
@@ -146,16 +147,37 @@ export function ProjectPage({ id }: { id?: string }) {
             )}
 
             <div className="mt-16 flex flex-wrap gap-3">
-              <a className="btn btn-primary" href={project.github} target="_blank" rel="noopener noreferrer">
+              <a
+                className="btn btn-primary"
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
+                data-track="project_github"
+              >
                 {copy.github}
               </a>
               {project.demoUrl && (
-                <a className="btn btn-ghost" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="btn btn-ghost"
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "demo" })}
+                  data-track="project_demo"
+                >
                   {t.demo} ↗
                 </a>
               )}
               {project.docsUrl && (
-                <a className="btn btn-ghost" href={project.docsUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="btn btn-ghost"
+                  href={project.docsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "docs" })}
+                  data-track="project_docs"
+                >
                   {t.docs} ↗
                 </a>
               )}
@@ -166,7 +188,14 @@ export function ProjectPage({ id }: { id?: string }) {
 
         <section ref={nextRef} className="relative z-[2] border-t border-[var(--line)] py-12">
           <div className="site-wrap">
-            <a data-reveal className="link-arrow" href={`${pathBase}/projects/${next.id}/`}>
+            {/* Единственный выбор проекта на странице кейса — переход «next»: это чип-навигация. */}
+            <a
+              data-reveal
+              className="link-arrow"
+              href={`${pathBase}/projects/${next.id}/`}
+              onClick={() => trackEvent("project_select", { project: next.id, via: "pill" })}
+              data-track="project_next"
+            >
               {t.next} — {next.name}
               <span className="arr" aria-hidden>→</span>
             </a>

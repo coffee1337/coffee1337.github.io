@@ -4,6 +4,7 @@ import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
 import { KbdShortcut } from "../Kbd/KbdShortcut";
 import { ArrowUpRight, Copy, GitHub, LinkedIn, Llms, Mail, PixelCup, Resume, Telegram } from "../Icons";
+import { trackEvent } from "../../analytics";
 import "./footer.css";
 
 /** No layout effect during prerender: fall back to useEffect to keep the SSR log clean. */
@@ -66,6 +67,7 @@ export function Footer() {
     try {
       await navigator.clipboard.writeText(links.email);
       toast(`✓ ${dict.contact.copied}: ${links.email}`);
+      trackEvent("contact_copy", { channel: "email", value: links.email });
     } catch {
       /* clipboard unavailable (http, denied permission) — fail silently */
     }
@@ -85,14 +87,14 @@ export function Footer() {
           <div className="grid gap-10 border-b border-[var(--line)] pb-12 md:grid-cols-3">
             <div><p className="font-mono text-xl"><span className="text-[var(--accent)]">●</span> coffee1337</p><p className="mt-4 max-w-xs text-sm text-[var(--ink-dim)]">{dict.footer.role}</p><span className="mt-5 inline-flex rounded-full border border-[var(--ok)] px-3 py-1 font-mono text-[10px] uppercase text-[var(--ok)]">{dict.footer.status}</span></div>
             <nav className="footer-links" aria-label={dict.footer.linksAria}>
-              <a className="footer-link" href={links.github} target="_blank" rel="noopener noreferrer"><GitHub className="footer-link__icon" /><span>GitHub</span><ArrowUpRight className="footer-link__arrow" /></a>
-              <a className="footer-link" href={links.linkedin} target="_blank" rel="noopener noreferrer"><LinkedIn className="footer-link__icon" /><span>{dict.contact.linkedin}</span><ArrowUpRight className="footer-link__arrow" /></a>
-              <a className="footer-link" href={links.telegram} target="_blank" rel="noopener noreferrer"><Telegram className="footer-link__icon" /><span>{dict.contact.telegram}</span><ArrowUpRight className="footer-link__arrow" /></a>
-              <button type="button" className="footer-link" onClick={() => void copyEmail()}><Mail className="footer-link__icon" /><span>{dict.contact.email}</span><Copy className="footer-link__arrow" /></button>
-              <a className="footer-link" href={links.resumePdf}><Resume className="footer-link__icon" /><span>{dict.footer.resume}</span><ArrowUpRight className="footer-link__arrow" /></a>
+              <a className="footer-link" href={links.github} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "github", section: "footer" })} data-track="social_github"><GitHub className="footer-link__icon" /><span>GitHub</span><ArrowUpRight className="footer-link__arrow" /></a>
+              <a className="footer-link" href={links.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "linkedin", section: "footer" })} data-track="social_linkedin"><LinkedIn className="footer-link__icon" /><span>{dict.contact.linkedin}</span><ArrowUpRight className="footer-link__arrow" /></a>
+              <a className="footer-link" href={links.telegram} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "telegram", section: "footer" })} data-track="social_telegram"><Telegram className="footer-link__icon" /><span>{dict.contact.telegram}</span><ArrowUpRight className="footer-link__arrow" /></a>
+              <button type="button" className="footer-link" onClick={() => void copyEmail()} data-track="contact_copy_email"><Mail className="footer-link__icon" /><span>{dict.contact.email}</span><Copy className="footer-link__arrow" /></button>
+              <a className="footer-link" href={links.resumePdf} onClick={() => trackEvent("resume", { action: "download_pdf", section: "footer" })} data-track="resume_pdf_footer"><Resume className="footer-link__icon" /><span>{dict.footer.resume}</span><ArrowUpRight className="footer-link__arrow" /></a>
               <a className="footer-link" href="/llms.txt"><Llms className="footer-link__icon" /><span>llms.txt</span><ArrowUpRight className="footer-link__arrow" /></a>
             </nav>
-            <div className="flex flex-col items-start gap-4 text-sm"><p className="text-[var(--ink-dim)]">{dict.footer.location}</p><time className="font-mono tabular-nums text-2xl" dateTime={new Date().toISOString()} suppressHydrationWarning>{time}</time><a href={links.mailto} className="rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-xs text-[var(--bg)]">{dict.footer.sayHello} ↗</a></div>
+            <div className="flex flex-col items-start gap-4 text-sm"><p className="text-[var(--ink-dim)]">{dict.footer.location}</p><time className="font-mono tabular-nums text-2xl" dateTime={new Date().toISOString()} suppressHydrationWarning>{time}</time><a href={links.mailto} className="rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-xs text-[var(--bg)]" onClick={() => trackEvent("social_click", { network: "mailto", section: "footer" })} data-track="social_mailto">{dict.footer.sayHello} ↗</a></div>
           </div>
           <div className="flex flex-col gap-2 pt-5 font-mono text-[11px] text-[var(--ink-faint)] md:flex-row md:items-center md:justify-between">
             <span>© {year} {dict.footer.rights} (coffee1337)</span>

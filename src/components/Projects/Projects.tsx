@@ -8,6 +8,7 @@ import { Explorer } from "./Explorer";
 import { ProjectVisual } from "./ProjectVisual";
 import { sameTech } from "../../lib/tech";
 import { formatRepoDate, repoMeta } from "../../lib/repoMeta";
+import { trackEvent } from "../../analytics";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
@@ -39,11 +40,17 @@ export function Projects() {
    * Хэш пишется только по явному действию пользователя (клик по проекту).
    * На монтировании URL остаётся чистым, а входящий #about/#top не затирается.
    */
-  const selectProject = (id: string) => {
+  const selectProject = (id: string, via: "explorer" | "pill") => {
+    trackEvent("project_select", { project: id, via });
     setActiveId(id);
     const target = `#projects/${id}`;
     if (window.location.hash !== target) history.replaceState(null, "", target);
     setDetailsOpen(false);
+  };
+
+  const changeFilter = (value: string | null) => {
+    trackEvent("project_filter", { filter: value ?? "All", page: "home" });
+    setFilter(value);
   };
 
   useEffect(() => {
@@ -51,7 +58,10 @@ export function Projects() {
       const tech = String((event as CustomEvent<string>).detail || "").trim();
       if (!tech) return;
       const preset = FILTERS.find((item) => item.toLowerCase() === tech.toLowerCase());
-      setFilter(preset && preset !== "All" ? preset : tech);
+      const next = preset && preset !== "All" ? preset : tech;
+      // Фильтр пришёл из панели стека — это тот же выбор технологии.
+      trackEvent("project_filter", { filter: next, page: "home" });
+      setFilter(next);
     };
     window.addEventListener("stack-filter", onFilter);
     return () => window.removeEventListener("stack-filter", onFilter);
@@ -105,8 +115,9 @@ export function Projects() {
               <button
                 key={item}
                 type="button"
-                onClick={() => setFilter(value)}
+                onClick={() => changeFilter(value)}
                 aria-pressed={pressed}
+                data-track={`filter_${item}`}
                 className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors ${
                   pressed
                     ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]"
@@ -120,8 +131,9 @@ export function Projects() {
           {customFilter && (
             <button
               type="button"
-              onClick={() => setFilter(null)}
+              onClick={() => changeFilter(null)}
               aria-label={dict.sections.projectsUi.clearFilter}
+              data-track="filter_clear"
               className="inline-flex items-center gap-2 rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--bg)]"
             >
               {customFilter}
@@ -132,7 +144,7 @@ export function Projects() {
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
           <div className="hidden lg:block">
-            <Explorer projects={projects} activeId={active.id} onSelect={selectProject} dimmed={dimmed} />
+            <Explorer projects={projects} activeId={active.id} onSelect={(id) => selectProject(id, "explorer")} dimmed={dimmed} />
           </div>
 
           <div className="lg:hidden -mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-2">
@@ -141,7 +153,8 @@ export function Projects() {
               <button
                 key={project.id}
                 type="button"
-                onClick={() => selectProject(project.id)}
+                onClick={() => selectProject(project.id, "pill")}
+                data-track="project_pill"
                 className={`whitespace-nowrap rounded-full border px-3 py-1 font-mono text-[11px] ${
                   project.id === active.id ? "border-[var(--accent)] text-[var(--accent)]" : "border-[var(--line)] text-[var(--ink-dim)]"
                 }`}
@@ -201,21 +214,30 @@ export function Projects() {
                     href={active.github}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent("project_action", { project: active.id, action: "github" })}
+                    data-track="project_github"
                     className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
                   >
                     {dict.sections.projectsUi.repo} ↗
                   </a>
                   <a
                     href={`${pathBase}/projects/${active.id}/`}
+                    onClick={() => trackEvent("project_action", { project: active.id, action: "case_study" })}
+                    data-track="project_case"
                     className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
                   >
                     {dict.sections.projectsUi.caseStudy} →
                   </a>
                   <button
                     type="button"
-                    onClick={() => setDetailsOpen((open) => !open)}
+                    onClick={() => {
+                      const nextOpen = !detailsOpen;
+                      trackEvent("project_details", { project: active.id, open: nextOpen });
+                      setDetailsOpen(nextOpen);
+                    }}
                     aria-expanded={detailsOpen}
                     aria-controls="project-details"
+                    data-track="project_details"
                     className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
                   >
                     {dict.sections.projectsUi.details} {detailsOpen ? "−" : "+"}
@@ -227,7 +249,11 @@ export function Projects() {
                   <code className="truncate text-[var(--ink-dim)]">{cloneCommand}</code>
                   <button
                     type="button"
-                    onClick={() => copy(cloneCommand)}
+                    onClick={() => {
+                      copy(cloneCommand);
+                      trackEvent("project_action", { project: active.id, action: "clone_copy" });
+                    }}
+                    data-track="project_clone"
                     className="ml-auto shrink-0 text-[var(--ink-faint)] hover:text-[var(--ink)]"
                     aria-label={dict.sections.projectsUi.copy}
                   >

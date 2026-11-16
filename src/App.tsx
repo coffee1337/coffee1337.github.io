@@ -14,6 +14,7 @@ import { Resume } from "./components/Resume/Resume";
 import { Footer } from "./components/Footer/Footer";
 import { ScrollProgress } from "./components/Progress/ScrollProgress";
 import { Assistant } from "./components/Assistant/Assistant";
+import { markLoaderDone } from "./analytics";
 
 function Shell() {
   const { loaderDone, setLoaderDone, dict } = useSite();
@@ -36,6 +37,8 @@ function Shell() {
         <Loader
           onDone={() => {
             setLoaderDone(true);
+            // Секционные IntersectionObserver'ы стартуют только после сплэша.
+            markLoaderDone();
             const hash = window.location.hash.replace("#", "");
             window.setTimeout(() => {
               setBooting(false);

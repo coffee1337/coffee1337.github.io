@@ -10,6 +10,7 @@ import { parseMarkdown, type InlineNode } from "../../lib/assistant/markdown";
 import { makeSearcher, type MiniSearchLike } from "../../lib/assistant/search";
 import { createSseParser, parseDelta } from "../../lib/assistant/sse";
 import type { Answer, Chunk, Searcher } from "../../lib/assistant/types";
+import { trackEvent } from "../../analytics";
 
 const API_URL = (import.meta.env.VITE_CHAT_API_URL as string | undefined)?.trim();
 const REQUEST_TIMEOUT = 15_000;
@@ -148,7 +149,10 @@ export function Assistant() {
   useFocusTrap(panelRef, open);
 
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    const onOpen = () => {
+      setOpen(true);
+      trackEvent("assistant", { action: "open" });
+    };
     window.addEventListener("open-ai-chat", onOpen);
     return () => window.removeEventListener("open-ai-chat", onOpen);
   }, []);
@@ -323,9 +327,11 @@ export function Assistant() {
     }
   };
 
-  const ask = async (question: string) => {
+  const ask = async (question: string, via: "input" | "chip") => {
     const text = question.trim();
     if (!text || busyRef.current) return;
+
+    trackEvent("assistant", { action: "ask", query: text.slice(0, 120), via, lang });
 
     busyRef.current = true;
     setBusy(true);
@@ -438,10 +444,18 @@ export function Assistant() {
       {loaderDone && (
       <button
         type="button"
-        onClick={() => setOpen((state) => !state)}
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+            return;
+          }
+          setOpen(true);
+          trackEvent("assistant", { action: "open" });
+        }}
         aria-label={open ? ui.close : ui.open}
         aria-expanded={open}
         aria-controls="ai-assistant-panel"
+        data-track="assistant_fab"
         className="assistant-fab fixed bottom-5 right-5 z-[80] grid h-14 w-14 place-items-center rounded-full border border-[var(--line)] bg-[var(--bg-2)] shadow-lg transition-transform hover:scale-105"
       >
         <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
@@ -513,7 +527,8 @@ export function Assistant() {
                       <button
                         key={chip}
                         type="button"
-                        onClick={() => void ask(chip)}
+                        onClick={() => void ask(chip, "chip")}
+                        data-track="assistant_chip"
                         className="border border-[var(--line)] px-2.5 py-1 text-left font-mono text-[11px] text-[var(--ink-dim)] transition-colors hover:border-[var(--accent)] hover:text-[var(--ink)]"
                       >
                         {chip}
@@ -568,7 +583,11 @@ export function Assistant() {
                           <a
                             key={`${message.id}-${sourceIndex}-${source.title}`}
                             href={source.href}
-                            onClick={() => setOpen(false)}
+                            onClick={() => {
+                              trackEvent("assistant", { action: "source_click", href: source.href ?? "" });
+                              setOpen(false);
+                            }}
+                            data-track="assistant_source"
                             className="border border-[var(--line)] px-2 py-0.5 font-mono text-[9px] text-[var(--ink-faint)] transition-colors hover:border-[var(--accent)] hover:text-[var(--ink)]"
                           >
                             {source.title}
@@ -590,7 +609,8 @@ export function Assistant() {
                           <button
                             key={`${message.id}-${chip}`}
                             type="button"
-                            onClick={() => void ask(chip)}
+                            onClick={() => void ask(chip, "chip")}
+                            data-track="assistant_chip"
                             className="border border-[var(--line)] px-2.5 py-1 text-left font-mono text-[11px] text-[var(--ink-dim)] transition-colors hover:border-[var(--accent)] hover:text-[var(--ink)]"
                           >
                             {chip}
@@ -613,7 +633,7 @@ export function Assistant() {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
-                void ask(value);
+                void ask(value, "input");
               }}
               className="flex items-center gap-2 border-t border-[var(--line)] p-3"
             >
@@ -638,6 +658,7 @@ export function Assistant() {
                 <button
                   type="submit"
                   disabled={value.trim().length === 0}
+                  data-track="assistant_send"
                   className="bg-[var(--accent)] px-3 py-1 font-mono text-[10px] uppercase text-[var(--bg)] transition-opacity disabled:opacity-40"
                 >
                   {ui.send}
