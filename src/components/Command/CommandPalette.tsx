@@ -106,6 +106,7 @@ export function CommandPalette({ open, onClose }: Props) {
                     group="projects"
                     value={`${project.id} ${project.name} project проект`}
                     onSelect={() => {
+                      trackEvent("project_select", { project: project.id, via: "cmdk" });
                       window.location.href = `${pathBase}/projects/${project.id}/`;
                     }}
                   >
@@ -115,19 +116,59 @@ export function CommandPalette({ open, onClose }: Props) {
               </Group>
 
               <Group heading={p.actions}>
-                <Item id="copy-email" group="actions" value={`email copy копировать почта ${links.email}`} onSelect={() => copy(links.email, links.email)}>
+                <Item
+                  id="copy-email"
+                  group="actions"
+                  value={`email copy копировать почта ${links.email}`}
+                  onSelect={() => {
+                    trackEvent("contact_copy", { channel: "email", section: "cmdk" });
+                    copy(links.email, links.email);
+                  }}
+                >
                   {p.copyEmail}
                 </Item>
-                <Item id="download-resume" group="actions" value="resume cv резюме скачать" onSelect={() => external(links.resumePdf)}>
+                <Item
+                  id="download-resume"
+                  group="actions"
+                  value="resume cv резюме скачать"
+                  onSelect={() => {
+                    trackEvent("resume", { action: "download_pdf", section: "cmdk" });
+                    external(links.resumePdf);
+                  }}
+                >
                   {p.downloadResume}
                 </Item>
-                <Item id="open-github" group="actions" value="github код code" onSelect={() => external(links.github)}>
+                <Item
+                  id="open-github"
+                  group="actions"
+                  value="github код code"
+                  onSelect={() => {
+                    trackEvent("social_click", { network: "github", section: "cmdk" });
+                    external(links.github);
+                  }}
+                >
                   GitHub
                 </Item>
-                <Item id="open-linkedin" group="actions" value="linkedin работа work" onSelect={() => external(links.linkedin)}>
+                <Item
+                  id="open-linkedin"
+                  group="actions"
+                  value="linkedin работа work"
+                  onSelect={() => {
+                    trackEvent("social_click", { network: "linkedin", section: "cmdk" });
+                    external(links.linkedin);
+                  }}
+                >
                   LinkedIn
                 </Item>
-                <Item id="open-telegram" group="actions" value="telegram tg связаться" onSelect={() => external(links.telegram)}>
+                <Item
+                  id="open-telegram"
+                  group="actions"
+                  value="telegram tg связаться"
+                  onSelect={() => {
+                    trackEvent("social_click", { network: "telegram", section: "cmdk" });
+                    external(links.telegram);
+                  }}
+                >
                   Telegram {links.telegramHandle}
                 </Item>
                 <Item
@@ -146,6 +187,7 @@ export function CommandPalette({ open, onClose }: Props) {
                   group="actions"
                   value="write contact написать письмо"
                   onSelect={() => {
+                    trackEvent("social_click", { network: "mailto", section: "cmdk" });
                     window.location.href = links.mailto;
                     onClose();
                   }}

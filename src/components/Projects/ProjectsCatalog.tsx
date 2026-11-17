@@ -130,6 +130,8 @@ export function ProjectsCatalog() {
                       <div className="mt-5 flex flex-wrap gap-2">
                         <a
                           href={`${pathBase}/projects/${project.id}/`}
+                          onClick={() => trackEvent("project_action", { project: project.id, action: "case_study" })}
+                          data-track="catalog_case"
                           className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
                         >
                           {t.open} →
@@ -138,6 +140,8 @@ export function ProjectsCatalog() {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
+                          data-track="catalog_github"
                           className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
                         >
                           {t.github} ↗

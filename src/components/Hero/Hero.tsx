@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { links } from "../../content";
 import { useSite } from "../../context/site";
 import { useMagnetic } from "../../hooks/useMotion";
+import { trackEvent } from "../../analytics";
 import { CopyButton } from "../CopyButton";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import github from "../../generated/github.json";
@@ -112,29 +113,71 @@ export function Hero() {
           <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-dim)]">
             <CopyButton value={links.email} label={dict.hero.linkEmail} copiedLabel={dict.contact.copied} className="hero-copy" />
             <span aria-hidden>·</span>
-            <a href={links.telegram} target="_blank" rel="noopener noreferrer">{dict.hero.linkTelegram}</a>
+            <a
+              href={links.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("social_click", { network: "telegram", section: "hero" })}
+              data-track="hero_social_telegram"
+            >
+              {dict.hero.linkTelegram}
+            </a>
             <span aria-hidden>·</span>
-            <a href={links.github} target="_blank" rel="noopener noreferrer">{dict.hero.linkGithub}</a>
+            <a
+              href={links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("social_click", { network: "github", section: "hero" })}
+              data-track="hero_social_github"
+            >
+              {dict.hero.linkGithub}
+            </a>
             <span aria-hidden>·</span>
-            <a href={links.linkedin} target="_blank" rel="noopener noreferrer">{dict.hero.linkLinkedin}</a>
+            <a
+              href={links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("social_click", { network: "linkedin", section: "hero" })}
+              data-track="hero_social_linkedin"
+            >
+              {dict.hero.linkLinkedin}
+            </a>
             <span aria-hidden>·</span>
-            <a href={links.resumePdf} target="_blank" rel="noopener noreferrer">{dict.hero.linkResume}</a>
+            <a
+              href={links.resumePdf}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("resume", { action: "download_pdf", section: "hero" })}
+              data-track="resume_hero"
+            >
+              {dict.hero.linkResume}
+            </a>
           </p>
           <div className="hero-metrics mt-10 grid grid-cols-2 gap-px bg-[var(--line)] sm:grid-cols-4">
-            {metrics.map((metric) => (
-              <a
-                key={metric.label}
-                href={metric.href}
-                className="bg-[var(--bg)] px-4 py-5 transition-colors hover:bg-[var(--bg-2)]"
-              >
-                <p className="display text-[clamp(1.8rem,4vw,2.6rem)] leading-none">
-                  <CountUp value={metric.value} />
-                </p>
-                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-faint)]">
-                  {metric.label}
-                </p>
-              </a>
-            ))}
+            {metrics.map((metric) => {
+              // Only the GitHub-backed tiles are outbound links; the others are anchors.
+              const toGithub = metric.href === links.github;
+              return (
+                <a
+                  key={metric.label}
+                  href={metric.href}
+                  onClick={
+                    toGithub
+                      ? () => trackEvent("social_click", { network: "github", section: "hero_metrics" })
+                      : undefined
+                  }
+                  data-track={toGithub ? "hero_metric_github" : undefined}
+                  className="bg-[var(--bg)] px-4 py-5 transition-colors hover:bg-[var(--bg-2)]"
+                >
+                  <p className="display text-[clamp(1.8rem,4vw,2.6rem)] leading-none">
+                    <CountUp value={metric.value} />
+                  </p>
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-faint)]">
+                    {metric.label}
+                  </p>
+                </a>
+              );
+            })}
           </div>
         </div>
         <div aria-hidden className="hidden lg:block" />

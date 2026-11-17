@@ -2,12 +2,14 @@
 // VITE_ANALYTICS_KEY are set at build time; respects Do Not Track.
 // Sends: pageview, click (with element/text/section), ui (button presses),
 // section (scroll-through), scroll (depth 25/50/75/100), ping (30s heartbeat),
-// exit (active_sec + max_scroll) plus semantic events emitted by components
-// (loader, entry_cta, stack_key, project_*, resume, contact_*, social_click,
-// assistant, cmdk, theme_switch, lang_switch).
+// exit (active_sec + max_scroll + reason: hidden|pagehide) plus semantic events
+// emitted by components (loader, entry_cta, stack_key, project_*, resume,
+// contact_*, social_click, assistant, cmdk, theme_switch, lang_switch).
 // Each payload carries a 30-minute sliding session id, an anonymous 16-char
 // visitor id, device metadata and the "me" flag (opt-in via ?me=1) so the owner
-// can be told apart in the dashboard.
+// can be told apart in the dashboard. `lang` is the browser language, while
+// `props.site_lang` / `props.theme` describe the version of the site that was
+// actually shown.
 const ENDPOINT = import.meta.env.VITE_ANALYTICS_URL as string | undefined;
 const SITE_KEY = import.meta.env.VITE_ANALYTICS_KEY as string | undefined;
 
@@ -242,6 +244,25 @@ function cleanProps(input?: EventProps): PayloadProps {
   return out;
 }
 
+/** Browser language: what the visitor speaks, not the version of the site. */
+function browserLang(): string {
+  if (!hasWindow) return "";
+  return (navigator.language || document.documentElement.lang || "").slice(0, 16);
+}
+
+/**
+ * Which build of the site was shown: `/ru` prefix or the prerendered <html lang>
+ * for RU pages, plus the active theme. Component props win over these defaults.
+ */
+function siteProps(): PayloadProps {
+  const html = document.documentElement;
+  const lang = html.lang || (window.location.pathname.startsWith("/ru") ? "ru" : "en");
+  return {
+    site_lang: (lang || "en").slice(0, 8),
+    theme: html.dataset.theme === "light" ? "light" : "dark",
+  };
+}
+
 function buildPayload(name: string, props?: EventProps): Payload {
   const { id: session, utm } = getSession();
   const pageview = name === "pageview";
@@ -256,12 +277,12 @@ function buildPayload(name: string, props?: EventProps): Payload {
     session,
     visitor: getVisitor(),
     me: isMe(),
-    lang: document.documentElement.lang || navigator.language,
+    lang: browserLang(),
     screen: `${window.screen.width}x${window.screen.height}`,
     viewport: `${window.innerWidth}x${window.innerHeight}`,
     tz: timeZone(),
     client_ts: Date.now(),
-    props: { ...utm, active_sec: getActiveSec(), ...cleanProps(props) },
+    props: { ...utm, active_sec: getActiveSec(), ...siteProps(), ...cleanProps(props) },
   };
 }
 
@@ -380,15 +401,28 @@ export function trackEvent(name: string, props?: EventProps): void {
 
 /* -------------------------------------------------------- exit beacon --- */
 
-let exitSent = false;
+/** Set while the tab is in the background: reset when the page is visible again. */
+let hiddenExitSent = false;
+/** One-shot per page load (and per bfcache restore): the final beacon. */
+let pagehideSent = false;
 
-/** visibilitychange->hidden and pagehide: one exit event per visible period. */
-function sendExit(): void {
-  if (!enabled || exitSent) return;
+/**
+ * visibilitychange->hidden (Alt+Tab, another tab) sends an exit with
+ * reason="hidden"; pagehide (close, reload, navigation away) always sends a
+ * final exit with reason="pagehide", even when a hidden exit was already sent.
+ * Both bypass the queue: sendBeacon survives the page being torn down.
+ */
+function sendExit(reason: "hidden" | "pagehide"): void {
+  if (!enabled) return;
+  // A real leave fires pagehide before visibilitychange->hidden: the final
+  // beacon already carries the state, a second exit would double-count.
+  if (reason === "hidden" && pagehideSent) return;
+  if (reason === "hidden" ? hiddenExitSent : pagehideSent) return;
+  if (reason === "hidden") hiddenExitSent = true;
+  else pagehideSent = true;
   tickActive();
-  exitSent = true;
   maxScroll = Math.max(maxScroll, readScrollDepth());
-  const payload = buildPayload("exit", { active_sec: getActiveSec(), max_scroll: maxScroll });
+  const payload = buildPayload("exit", { active_sec: getActiveSec(), max_scroll: maxScroll, reason });
   const batch = [...readQueue(), payload].slice(-QUEUE_LIMIT);
   if (beacon(batch)) {
     writeQueue([]);
@@ -533,7 +567,9 @@ function startSections(): void {
         }
       }
     },
-    { threshold: 0.4 },
+    // -15%/-25% margins plus a small threshold: on mobile a 1900-2200px section
+    // can never cover 40% of the viewport, so a tall section never fired.
+    { rootMargin: "-15% 0px -25% 0px", threshold: 0.05 },
   );
   document.querySelectorAll("[data-section]").forEach((el) => io.observe(el));
 }
@@ -600,14 +636,22 @@ export function initAnalytics(): void {
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-      sendExit();
+      // Alt+Tab / another tab: reported as hidden, pagehide still owes a final beacon.
+      sendExit("hidden");
       return;
     }
-    // Back from the background: a fresh visible period, a fresh exit event.
-    exitSent = false;
+    // Back from the background: a fresh visible period, a fresh hidden exit.
+    hiddenExitSent = false;
     noteActivity();
   });
-  window.addEventListener("pagehide", sendExit);
+  window.addEventListener("pagehide", () => sendExit("pagehide"));
+  // bfcache restore is a new visible period on the same page: both flags reset.
+  window.addEventListener("pageshow", (event) => {
+    if (!event.persisted) return;
+    hiddenExitSent = false;
+    pagehideSent = false;
+    noteActivity();
+  });
 
   // Events queued on a previous page (cold start, aborted fetch) are retried now.
   if (readQueue().length) scheduleFlush();

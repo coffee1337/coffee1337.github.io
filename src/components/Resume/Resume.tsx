@@ -71,7 +71,14 @@ export function Resume() {
             <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {dict.projects.items.map((p, i) => (
                 <li key={p.id}>
-                  <a href={p.github} target="_blank" rel="noopener noreferrer" className="group block">
+                  <a
+                    href={p.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackEvent("project_action", { project: p.id, action: "github", section: "resume" })}
+                    data-track="resume_project_github"
+                    className="group block"
+                  >
                     <span className="mono text-[10px] text-[var(--ink-faint)]">{String(i + 1).padStart(2, "0")}</span>
                     <span className="mt-1 block text-sm group-hover:text-[var(--accent)]">{p.name}</span>
                   </a>
