@@ -183,7 +183,7 @@ export function Projects() {
                   </div>
                   {active.status && (
                     <span className="border border-[var(--accent)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--accent)]">
-                      {dict.sections.projectsUi.active}
+                      {active.status}
                     </span>
                   )}
                 </div>

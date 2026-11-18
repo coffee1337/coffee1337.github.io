@@ -4,7 +4,8 @@
 // section (scroll-through), scroll (depth 25/50/75/100), ping (30s heartbeat),
 // exit (active_sec + max_scroll + reason: hidden|pagehide) plus semantic events
 // emitted by components (loader, entry_cta, stack_key, project_*, resume,
-// contact_*, social_click, assistant, cmdk, theme_switch, lang_switch).
+// contact_*, social_click, assistant, cmdk, theme_switch, lang_switch) and one
+// vitals event per page load (TTFB, FCP, LCP, CLS, INP, low_power).
 // Each payload carries a 30-minute sliding session id, an anonymous 16-char
 // visitor id, device metadata and the "me" flag (opt-in via ?me=1) so the owner
 // can be told apart in the dashboard. `lang` is the browser language, while
@@ -399,6 +400,145 @@ export function trackEvent(name: string, props?: EventProps): void {
   void sendPayload(buildPayload(name, props));
 }
 
+/* ------------------------------------------------------------ vitals --- */
+
+interface VitalsState {
+  ttfb: number;
+  fcp: number;
+  lcp: number;
+  cls: number;
+  inp: number;
+  clsSupported: boolean;
+}
+
+const vitals: VitalsState = { ttfb: 0, fcp: 0, lcp: 0, cls: 0, inp: 0, clsSupported: false };
+let vitalsStarted = false;
+let vitalsSent = false;
+
+/** At least one load timing arrived: enough to report something honest. */
+function vitalsReady(): boolean {
+  return vitals.lcp > 0 || vitals.fcp > 0 || vitals.ttfb > 0;
+}
+
+function supportsEntry(type: string): boolean {
+  const supported = (PerformanceObserver as unknown as { supportedEntryTypes?: string[] }).supportedEntryTypes;
+  return !supported || supported.includes(type);
+}
+
+/** Same weak-device signals the scene degrades on. */
+function lowPowerDevice(): boolean {
+  if (!hasWindow) return false;
+  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  if (nav.connection?.saveData) return true;
+  if (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) return true;
+  if (typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency <= 4) return true;
+  try {
+    return window.matchMedia("(max-width: 760px)").matches;
+  } catch {
+    return false;
+  }
+}
+
+function vitalsProps(): EventProps {
+  const props: EventProps = { low_power: lowPowerDevice() };
+  if (vitals.ttfb > 0) props.ttfb = vitals.ttfb;
+  if (vitals.fcp > 0) props.fcp = vitals.fcp;
+  if (vitals.lcp > 0) props.lcp = vitals.lcp;
+  if (vitals.inp > 0) props.inp = vitals.inp;
+  // an honest CLS of 0 still counts, so it ships whenever the observer exists
+  if (vitals.clsSupported) props.cls = vitals.cls;
+  return props;
+}
+
+/** Standard PerformanceObserver only: no web-vitals package, no new weight. */
+function observeVitals(): void {
+  if (vitalsStarted || !hasWindow || typeof PerformanceObserver === "undefined") return;
+  vitalsStarted = true;
+
+  try {
+    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (nav && Number.isFinite(nav.responseStart)) {
+      const ttfb = Math.round(nav.responseStart - Math.max(0, nav.requestStart));
+      if (ttfb > 0) vitals.ttfb = ttfb;
+    }
+  } catch {
+    /* navigation timing unavailable */
+  }
+
+  try {
+    if (supportsEntry("paint")) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.name === "first-contentful-paint") vitals.fcp = Math.round(entry.startTime);
+        }
+      });
+      observer.observe({ type: "paint", buffered: true });
+    }
+  } catch {
+    /* paint unsupported */
+  }
+
+  try {
+    if (supportsEntry("largest-contentful-paint")) {
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const entry = entries[entries.length - 1];
+        if (entry) vitals.lcp = Math.round(entry.startTime);
+      });
+      observer.observe({ type: "largest-contentful-paint", buffered: true });
+    }
+  } catch {
+    /* LCP unsupported */
+  }
+
+  try {
+    if (supportsEntry("layout-shift")) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const shift = entry as PerformanceEntry & { value?: number; hadRecentInput?: boolean };
+          if (typeof shift.value === "number" && !shift.hadRecentInput) {
+            vitals.cls = Math.round((vitals.cls + shift.value) * 1000) / 1000;
+          }
+        }
+      });
+      observer.observe({ type: "layout-shift", buffered: true });
+      vitals.clsSupported = true;
+    }
+  } catch {
+    /* CLS unsupported (Safari) */
+  }
+
+  try {
+    if (supportsEntry("event")) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const timing = entry as PerformanceEntry & { duration?: number; interactionId?: number };
+          if ((timing.interactionId ?? 0) > 0) {
+            vitals.inp = Math.max(vitals.inp, Math.round(timing.duration ?? 0));
+          }
+        }
+      });
+      // durationThreshold is part of the spec but missing from the TS lib type
+      observer.observe({ type: "event", buffered: true, durationThreshold: 40 } as PerformanceObserverInit);
+    }
+  } catch {
+    /* event timing unsupported */
+  }
+
+  try {
+    if (supportsEntry("first-input")) {
+      const observer = new PerformanceObserver((list) => {
+        if (vitals.inp > 0) return;
+        const entry = list.getEntries()[0] as PerformanceEntry & { duration?: number };
+        if (entry) vitals.inp = Math.round(entry.duration ?? 0);
+      });
+      observer.observe({ type: "first-input", buffered: true });
+    }
+  } catch {
+    /* first-input unsupported */
+  }
+}
+
 /* -------------------------------------------------------- exit beacon --- */
 
 /** Set while the tab is in the background: reset when the page is visible again. */
@@ -422,8 +562,14 @@ function sendExit(reason: "hidden" | "pagehide"): void {
   else pagehideSent = true;
   tickActive();
   maxScroll = Math.max(maxScroll, readScrollDepth());
+  const pending: Payload[] = [...readQueue()];
+  if (!vitalsSent && vitalsReady()) {
+    // a visit shorter than 10s still reports its timings, in the same beacon
+    vitalsSent = true;
+    pending.push(buildPayload("vitals", vitalsProps()));
+  }
   const payload = buildPayload("exit", { active_sec: getActiveSec(), max_scroll: maxScroll, reason });
-  const batch = [...readQueue(), payload].slice(-QUEUE_LIMIT);
+  const batch = [...pending, payload].slice(-QUEUE_LIMIT);
   if (beacon(batch)) {
     writeQueue([]);
     return;
@@ -590,6 +736,7 @@ export function initAnalytics(): void {
 
   noteActivity();
   trackEvent("pageview");
+  observeVitals();
 
   document.addEventListener("click", onGlobalClick, true);
 
@@ -633,6 +780,13 @@ export function initAnalytics(): void {
   window.setInterval(() => {
     if (document.visibilityState === "visible") trackEvent("ping");
   }, 30_000);
+
+  // One vitals event per page load, and only for a page the visitor actually saw.
+  window.setTimeout(() => {
+    if (vitalsSent || document.visibilityState !== "visible" || !vitalsReady()) return;
+    vitalsSent = true;
+    trackEvent("vitals", vitalsProps());
+  }, 10_000);
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {

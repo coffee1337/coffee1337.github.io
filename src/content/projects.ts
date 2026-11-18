@@ -46,8 +46,8 @@ export const projectMeta = [
     visual: "analytics" as const,
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/portfolio-analytics",
-    stack: ["Python", "FastAPI", "SQLAlchemy", "SQLite", "JavaScript"],
-    status: false,
+    stack: ["Python", "FastAPI", "PostgreSQL", "SQLAlchemy", "SQLite", "React", "TypeScript", "Tailwind CSS", "Docker"],
+    status: true,
   },
 ];
 
