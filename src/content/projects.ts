@@ -2,17 +2,12 @@ import type { ProjectContent } from "./types";
 
 /**
  * Локальные PDF Роспатента. Кнопки скачивания рендерятся только для реально
- * существующих файлов: `check-links.mjs` валидирует каждый локальный href,
- * поэтому путь публикуется лишь после того, как файл положен в `public/certificates/`.
- *
- * Чтобы включить кнопки:
- *   1. public/certificates/ru2026624059-certificate.pdf  ← свидетельство № 2026624059
- *   2. public/certificates/ru2026624059-abstract.pdf     ← официальный бюллетень / реферат
- *   3. раскомментировать пути ниже.
+ * существующих файлов: `check-links.mjs` валидирует каждый локальный href.
+ * Файлы лежат в `public/certificates/`; если какой-то убрать — обнулить его путь здесь.
  */
 export const CERTIFICATE_FILES: { certificate?: string; abstract?: string } = {
-  certificate: undefined,
-  abstract: undefined,
+  certificate: "/certificates/ru2026624059-certificate.pdf",
+  abstract: "/certificates/ru2026624059-abstract.pdf",
 };
 
 export const projectMeta = [
