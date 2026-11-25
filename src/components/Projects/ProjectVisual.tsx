@@ -8,6 +8,7 @@ import {
   MentorVisual,
   MonitorVisual,
   NgieuVisual,
+  RadarVisual,
 } from "./visuals";
 
 const MAP = {
@@ -17,6 +18,7 @@ const MAP = {
   search: AstarVisual,
   neighbors: KnnVisual,
   analytics: AnalyticsVisual,
+  radar: RadarVisual,
 } as const;
 
 /**

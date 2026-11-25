@@ -16,6 +16,7 @@ const SECTION_HREFS = {
   about: "/#about",
   stack: "/#stack",
   projects: "/#projects",
+  certificates: "/#certificates",
   education: "/#education",
   contacts: "/#contact",
   contact: "/#contact",
@@ -143,6 +144,7 @@ export async function contentDocs() {
     const section = (id) => `${base}/#${id}`;
     const textSource = `content-${lang}`;
     const projectsSource = `content-projects-${lang}`;
+    const certificatesSource = `content-certificates-${lang}`;
     const sectionsSource = `content-sections-${lang}`;
 
     const hero = dict.hero;
@@ -241,7 +243,7 @@ export async function contentDocs() {
           project.decisions?.length ? `${dict.projectPage.decisions}: ${project.decisions.join(" ")}` : "",
           `${dict.projects.technology}: ${project.stack.join(", ")}.`,
           project.status ? `${dict.projects.active}: ${project.status}.` : "",
-          `${dict.projects.github}: ${project.github}`,
+          project.github ? `${dict.projects.github}: ${project.github}` : project.patent ? `Rospatent: ${project.patent.number}` : "",
           `${lang === "ru" ? "Кейс на сайте" : "Case study"}: ${links.site}${base}/projects/${project.id}/`,
         ]
           .filter(Boolean)
@@ -249,6 +251,24 @@ export async function contentDocs() {
         `${base}/projects/${project.id}/`,
       );
     }
+
+    const certificates = dict.sections.certificates;
+    push(
+      certificatesSource,
+      lang === "ru" ? "Сертификаты и регистрация ИС" : "Certifications & Registered IP",
+      [
+        certificates.lead,
+        ...certificates.items.map((item) =>
+          [
+            `${item.title} — ${item.issuer}, ${item.date}. ${item.tags.join(", ")}.`,
+            ...(item.meta ?? []).map((row) => `${row.label}: ${row.value}.`),
+          ]
+            .filter(Boolean)
+            .join(" "),
+        ),
+      ].join("\n\n"),
+      section("certificates"),
+    );
 
     push(
       sectionsSource,

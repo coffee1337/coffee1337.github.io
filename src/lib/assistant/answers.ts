@@ -76,10 +76,15 @@ export function answerLocal(question: string, options: LocalAnswerOptions = {}):
     }
 
     case "projects": {
-      const items = dict.projects.items.map(
-        (item) => `- **${item.name}** — ${item.statement} (${mdLink(labels.caseStudy, projectPage(item.id))}, ${mdLink(labels.github, item.github)})`,
-      );
-      return done("projects", [copy.projectsIntro, "", ...items].join("\n"), [dict.nav.projects], dict.projects.items.map((item) => projectPage(item.id)));
+      const items = dict.projects.items.map((item) => {
+        const refs = [mdLink(labels.caseStudy, projectPage(item.id))];
+        if (item.github) refs.push(mdLink(labels.github, item.github));
+        if (item.patent) refs.push(mdLink(item.patent.number, item.patent.registryUrl));
+        return `- **${item.name}** — ${item.statement} (${refs.join(", ")})`;
+      });
+      const hrefs = dict.projects.items.map((item) => projectPage(item.id));
+      for (const item of dict.projects.items) if (item.patent) hrefs.push(item.patent.registryUrl);
+      return done("projects", [copy.projectsIntro, "", ...items].join("\n"), [dict.nav.projects], hrefs);
     }
 
     case "project": {
@@ -95,8 +100,44 @@ export function answerLocal(question: string, options: LocalAnswerOptions = {}):
         `- **${labels.stack}:** ${project.stack.join(", ")}`,
       ];
       if (project.status) lines.push(`- **${labels.status}:** ${project.status}`);
-      lines.push("", `${mdLink(labels.caseStudy, projectPage(project.id))} · ${mdLink(labels.github, project.github)}`);
-      return done("project", lines.join("\n"), [project.name], [projectPage(project.id), project.github]);
+      const refs = [mdLink(labels.caseStudy, projectPage(project.id))];
+      if (project.github) refs.push(mdLink(labels.github, project.github));
+      if (project.patent) refs.push(mdLink(project.patent.number, project.patent.registryUrl));
+      lines.push("", refs.join(" · "));
+      const hrefs = [projectPage(project.id)];
+      if (project.github) hrefs.push(project.github);
+      if (project.patent) hrefs.push(project.patent.registryUrl);
+      return done("project", lines.join("\n"), [project.name], hrefs);
+    }
+
+    case "certificates": {
+      const certificates = dict.sections.certificates;
+      const items = certificates.items.map((item) => {
+        const refs: string[] = [];
+        const target = item.links.find((link) => link.kind === "registry" || link.kind === "verify");
+        if (target) refs.push(mdLink(target.label, target.href));
+        const caseStudy = item.links.find((link) => link.kind === "case");
+        if (caseStudy) refs.push(mdLink(caseStudy.label, `${base}${caseStudy.href}`));
+        const suffix = refs.length ? ` (${refs.join(", ")})` : "";
+        return `- **${item.title}** — ${item.issuer}, ${item.date}${suffix}`;
+      });
+      const lines = [
+        `**${certificates.title}**`,
+        "",
+        copy.certificatesIntro,
+        "",
+        ...items,
+        "",
+        mdLink(dict.nav.certificates, section("certificates")),
+      ];
+      const hrefs = [section("certificates")];
+      for (const item of certificates.items) {
+        for (const link of item.links) {
+          if (link.kind === "case") hrefs.push(`${base}${link.href}`);
+          else if (link.kind !== "pdf") hrefs.push(link.href);
+        }
+      }
+      return done("certificates", lines.join("\n"), [dict.nav.certificates], hrefs);
     }
 
     case "tech": {

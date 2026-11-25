@@ -45,6 +45,12 @@
   transform-origin: left center;
 }
 
+/* Развёртка ИКО вращается вокруг центра экрана в координатах viewBox. */
+.sv-sweep {
+  transform-box: view-box;
+  transform-origin: 120px 148px;
+}
+
 /* ── текст ──────────────────────────────────────────────────────────────── */
 
 .sv-node-title {
@@ -238,6 +244,35 @@
   }
 }
 
+/* ── radar: развёртка ИКО и подсветка обнаруженных целей ────────────────── */
+
+[data-flow="true"] .sv-sweep {
+  animation: sv-sweep 5s linear infinite;
+}
+
+[data-flow="true"] .sv-blip {
+  animation: sv-blip 2.4s ease-in-out infinite;
+}
+
+@keyframes sv-blip {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sv-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ── monitor: алерт выше порога ─────────────────────────────────────────── */
 
 [data-flow="true"] .sv-alert {
@@ -268,7 +303,9 @@
   [data-flow] .sv-bar,
   [data-flow] .sv-row,
   [data-flow] .sv-needle,
-  [data-flow] .sv-packet {
+  [data-flow] .sv-packet,
+  [data-flow] .sv-sweep,
+  [data-flow] .sv-blip {
     animation: none !important;
   }
 

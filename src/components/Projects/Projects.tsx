@@ -12,7 +12,21 @@ import { trackEvent } from "../../analytics";
 
 const FILTERS = ["All", "Python", "AI/ML", "FastAPI", "Flutter", "C#", "C++"] as const;
 
-const AI_ML = ["pytorch", "rag", "llm", "numpy", "a*", "k-nn", "knn", "машинное обучение", "machine learning"];
+const AI_ML = [
+  "pytorch",
+  "rag",
+  "llm",
+  "numpy",
+  "a*",
+  "k-nn",
+  "knn",
+  "yolo11s",
+  "yolo",
+  "opencv",
+  "bytetrack",
+  "машинное обучение",
+  "machine learning",
+];
 
 /** Фильтр принимает любую технологию: из стека клавиатуры приходит произвольная строка. */
 const matches = (stack: string[], filter: string | null): boolean => {
@@ -92,7 +106,7 @@ export function Projects() {
     void navigator.clipboard.writeText(value).then(() => toast(`✓ ${dict.contact.copied}: ${value}`));
   };
 
-  const cloneCommand = `git clone ${active.github}.git`;
+  const cloneCommand = active.github ? `git clone ${active.github}.git` : null;
 
   return (
     <section id="projects" data-section="projects" ref={ref} className="section-anchor relative z-[2] py-20 md:py-28">
@@ -210,24 +224,66 @@ export function Projects() {
                 })()}
 
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <a
-                    href={active.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent("project_action", { project: active.id, action: "github" })}
-                    data-track="project_github"
-                    className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
-                  >
-                    {dict.sections.projectsUi.repo} ↗
-                  </a>
+                  {active.github && (
+                    <a
+                      href={active.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("project_action", { project: active.id, action: "github" })}
+                      data-track="project_github"
+                      className="rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
+                    >
+                      {dict.sections.projectsUi.repo} ↗
+                    </a>
+                  )}
                   <a
                     href={`${pathBase}/projects/${active.id}/`}
                     onClick={() => trackEvent("project_action", { project: active.id, action: "case_study" })}
                     data-track="project_case"
-                    className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                    className={
+                      active.github
+                        ? "rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                        : "rounded-full bg-[var(--accent)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--bg)]"
+                    }
                   >
                     {dict.sections.projectsUi.caseStudy} →
                   </a>
+                  {active.patent?.certificatePdfUrl && (
+                    <a
+                      href={active.patent.certificatePdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("project_action", { project: active.id, action: "patent_certificate" })}
+                      data-track="project_patent_certificate"
+                      className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                    >
+                      {dict.projectPage.patentCertificate} ↗
+                    </a>
+                  )}
+                  {active.patent?.abstractPdfUrl && (
+                    <a
+                      href={active.patent.abstractPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("project_action", { project: active.id, action: "patent_abstract" })}
+                      data-track="project_patent_abstract"
+                      className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                    >
+                      {dict.projectPage.patentAbstract} ↗
+                    </a>
+                  )}
+                  {active.patent && (
+                    <a
+                      href={active.patent.registryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("project_action", { project: active.id, action: "patent" })}
+                      data-track="project_patent"
+                      className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                    >
+                      {dict.projectPage.patentRegistry} ↗
+                    </a>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -244,22 +300,24 @@ export function Projects() {
                   </button>
                 </div>
 
-                <div className="mt-4 flex items-center gap-2 border border-[var(--line)] bg-[var(--bg-2)] px-3 py-2 font-mono text-[11px]">
-                  <span className="text-[var(--accent)]">$</span>
-                  <code className="truncate text-[var(--ink-dim)]">{cloneCommand}</code>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      copy(cloneCommand);
-                      trackEvent("project_action", { project: active.id, action: "clone_copy" });
-                    }}
-                    data-track="project_clone"
-                    className="ml-auto shrink-0 text-[var(--ink-faint)] hover:text-[var(--ink)]"
-                    aria-label={dict.sections.projectsUi.copy}
-                  >
-                    ⧉
-                  </button>
-                </div>
+                {cloneCommand && (
+                  <div className="mt-4 flex items-center gap-2 border border-[var(--line)] bg-[var(--bg-2)] px-3 py-2 font-mono text-[11px]">
+                    <span className="text-[var(--accent)]">$</span>
+                    <code className="truncate text-[var(--ink-dim)]">{cloneCommand}</code>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        copy(cloneCommand);
+                        trackEvent("project_action", { project: active.id, action: "clone_copy" });
+                      }}
+                      data-track="project_clone"
+                      className="ml-auto shrink-0 text-[var(--ink-faint)] hover:text-[var(--ink)]"
+                      aria-label={dict.sections.projectsUi.copy}
+                    >
+                      ⧉
+                    </button>
+                  </div>
+                )}
 
                 <AnimatePresence initial={false}>
                   {detailsOpen && (

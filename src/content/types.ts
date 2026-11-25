@@ -2,6 +2,30 @@ export type Lang = "en" | "ru";
 
 export type FullDictionary = Dictionary & { sections: Sections };
 
+/**
+ * Охранный документ Роспатента: реквизиты государственной регистрации базы данных.
+ * Живёт в локализованной копии проекта — правообладатель и авторы пишутся на языке страницы.
+ */
+export interface ProjectPatent {
+  /** Полный номер свидетельства: RU2026624059. */
+  number: string;
+  /** Номер свидетельства без префикса: 2026624059. */
+  certificateNo: string;
+  applicationNo: string;
+  applicationDate: string;
+  registeredAt: string;
+  bulletin: string;
+  owner: string;
+  authors: string;
+  dbms: string;
+  volume: string;
+  registryUrl: string;
+  /** Локальный PDF свидетельства — только если файл реально лежит в public/certificates/. */
+  certificatePdfUrl?: string;
+  /** Локальный PDF реферата (бюллетень) — только если файл реально лежит в public/certificates/. */
+  abstractPdfUrl?: string;
+}
+
 export interface ProjectContent {
   id: string;
   name: string;
@@ -13,11 +37,57 @@ export interface ProjectContent {
   architecture?: string[];
   decisions?: string[];
   stack: string[];
-  github: string;
+  /** Публичный репозиторий. У закрытых R&D-кейсов отсутствует. */
+  github?: string;
+  patent?: ProjectPatent;
   demoUrl?: string;
   docsUrl?: string;
-  visual: "mentor" | "campus" | "ledger" | "search" | "neighbors" | "analytics";
+  visual: "mentor" | "campus" | "ledger" | "search" | "neighbors" | "analytics" | "radar";
   image?: string;
+}
+
+export type CertificateCategory = "ip" | "ai" | "cloud";
+
+export type CertificateLinkKind = "verify" | "registry" | "case" | "pdf";
+
+export interface CertificateLink {
+  label: string;
+  href: string;
+  kind: CertificateLinkKind;
+}
+
+export interface CertificateMeta {
+  label: string;
+  value: string;
+}
+
+export interface CertificateItem {
+  id: string;
+  category: CertificateCategory;
+  /** Главный артефакт секции — государственная регистрация БД. */
+  featured?: boolean;
+  /** Ключевая позиция для компактного блока в резюме. */
+  highlight?: boolean;
+  badge: string;
+  title: string;
+  subtitle?: string;
+  issuer: string;
+  date: string;
+  tags: string[];
+  meta?: CertificateMeta[];
+  links: CertificateLink[];
+}
+
+export interface CertificatesSection {
+  index: string;
+  label: string;
+  title: string;
+  lead: string;
+  countLabel: string;
+  filterLabel: string;
+  filters: { all: string; ip: string; ai: string; cloud: string };
+  labels: { issued: string; awarded: string; empty: string };
+  items: CertificateItem[];
 }
 
 export interface Sections {
@@ -45,6 +115,7 @@ export interface Sections {
     note: string;
   };
   reviews: { index: string; label: string; title: string; prev: string; next: string; empty: string };
+  certificates: CertificatesSection;
   contactForm: {
     title: string;
     name: string;
@@ -167,6 +238,19 @@ export interface Visuals {
     store: string;
     footnote: string;
   };
+  radar: {
+    label: string;
+    eyebrow: string;
+    generator: string;
+    generatorSub: string;
+    detector: string;
+    detectorSub: string;
+    metric: string;
+    metricSub: string;
+    targetA: string;
+    targetB: string;
+    footnote: string;
+  };
 }
 
 export interface Dictionary {
@@ -190,6 +274,7 @@ export interface Dictionary {
     about: string;
     capabilities: string;
     projects: string;
+    certificates: string;
     experience: string;
     stack: string;
     resume: string;
@@ -264,6 +349,18 @@ export interface Dictionary {
     release: string;
     screenshot: string;
     diagram: string;
+    patentTitle: string;
+    patentNumber: string;
+    patentApplication: string;
+    patentRegistered: string;
+    patentBulletin: string;
+    patentOwner: string;
+    patentDbms: string;
+    patentVolume: string;
+    patentAuthors: string;
+    patentRegistry: string;
+    patentCertificate: string;
+    patentAbstract: string;
   };
   catalog: {
     index: string;
@@ -306,6 +403,8 @@ export interface Dictionary {
     skillsTitle: string;
     skills: string[];
     workTitle: string;
+    certTitle: string;
+    certMore: string;
     download: string;
     view: string;
   };

@@ -1,4 +1,5 @@
 import type { Lang, Sections } from "./types";
+import { CERTIFICATE_FILES } from "./projects";
 
 export type { Sections };
 
@@ -25,7 +26,7 @@ const en: Sections = {
       {
         id: "code",
         title: "Read the code",
-        body: "Six repositories: architecture notes, case studies, and the source behind every claim.",
+        body: "Seven case studies: six open repositories, a Rospatent-registered dataset, and the architecture behind every claim.",
         action: "Projects + GitHub",
       },
     ],
@@ -60,12 +61,163 @@ const en: Sections = {
     note: "Education as the base under the ML/AI specialisation, not as the headline.",
   },
   reviews: {
-    index: "05",
+    index: "06",
     label: "Reviews",
     title: "What people say.",
     prev: "Previous review",
     next: "Next review",
     empty: "Reviews are being collected.",
+  },
+  certificates: {
+    index: "05",
+    label: "Credentials",
+    title: "Credentials and registered IP.",
+    lead:
+      "Vendor certifications, LinkedIn Learning credentials and a state-registered database: the engineering work is documented, and every entry links to the issuer's verification page or the open Rospatent registry.",
+    countLabel: "documents",
+    filterLabel: "Filter credentials",
+    filters: { all: "All", ip: "Registered IP", ai: "AI & Data", cloud: "Cloud & DevOps" },
+    labels: {
+      issued: "Issuer",
+      awarded: "Issued",
+      empty: "Nothing in this category yet.",
+    },
+    items: [
+      {
+        id: "rospatent-radar-ppi-mtd",
+        category: "ip",
+        featured: true,
+        badge: "RU2026624059 · IP",
+        title: "State Registration Certificate of Database No. 2026624059",
+        subtitle:
+          "Synthetic Radar PPI Moving-Target Detection Dataset (RadarPPI-MTD) · Application No. 2026623714 · Bulletin No. 9 · 11.8 GB",
+        issuer: "Rospatent (FIPS)",
+        date: "Aug 2026",
+        tags: ["Python", "YOLO11s", "Synthetic Data", "Computer Vision"],
+        meta: [
+          { label: "Certificate", value: "No. 2026624059 (RU2026624059)" },
+          { label: "Application", value: "No. 2026623714 · 04.08.2026" },
+          { label: "Registered", value: "25.08.2026 · Bulletin No. 9" },
+          { label: "Rights holder", value: "NGIEU" },
+          { label: "DBMS / generator", value: "Radar PPI Generator v1.0.0" },
+          { label: "Database size", value: "11.8 GB" },
+        ],
+      links: [
+        {
+          label: "Rospatent Registry",
+          href: "https://new.fips.ru/registers-doc-view/fips_servlet?DB=DB&DocNumber=2026624059&TypeFile=html",
+          kind: "registry",
+        },
+        { label: "Case study", href: "/projects/radar-ppi-mtd/", kind: "case" },
+        ...(CERTIFICATE_FILES.certificate
+          ? [{ label: "Certificate PDF", href: CERTIFICATE_FILES.certificate, kind: "pdf" as const }]
+          : []),
+        ...(CERTIFICATE_FILES.abstract
+          ? [{ label: "Abstract PDF", href: CERTIFICATE_FILES.abstract, kind: "pdf" as const }]
+          : []),
+      ],
+      },
+      {
+        id: "snowflake-genai-pro",
+        category: "ai",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Generative AI Professional Certificate by Snowflake",
+        issuer: "Snowflake",
+        date: "Nov 2026",
+        tags: ["Generative AI", "Snowflake", "Data AI"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/7dbcfe3d6e75e230a455c69fc572a2bf422822b777cc40686c8ec1b220177967/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "docker-foundations-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Docker Foundations Professional Certificate",
+        issuer: "Docker, Inc.",
+        date: "Oct 2026",
+        tags: ["Docker", "Containerization"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/3da5e65791016cdc89e7f42a986a37c699f119cf7b6f90ac683362857740c3f7/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "azure-essentials-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Microsoft Azure Essentials Professional Certificate",
+        issuer: "Microsoft",
+        date: "Oct 2026",
+        tags: ["Microsoft Azure", "Cloud Computing"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/1e5b63d85c89c9efa42594708e819226f4036646c14fd345356a085d3f5b58e6/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "github-essentials-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Career Essentials in GitHub Professional Certificate",
+        issuer: "GitHub",
+        date: "Oct 2026",
+        tags: ["GitHub", "GitHub Actions", "CI/CD"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/5ee9bbacfc5a96408649fbb18ec701032c546fcc574f4395c077ae8cef0aed48/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "snowflake-ai-agents",
+        category: "ai",
+        badge: "COURSE",
+        title: "Building AI Agents with Snowflake",
+        issuer: "LinkedIn Learning · Snowflake",
+        date: "Nov 2026",
+        tags: ["AI Agents", "Snowflake"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/7432d7674af7d7e569f163ae9668c3a290d63075ec99cac1e8f563783c4bb768/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "aws-ai-practitioner-prep",
+        category: "ai",
+        badge: "CERT PREP",
+        title: "AWS Certified AI Practitioner (AIF-C01) Cert Prep",
+        issuer: "LinkedIn Learning",
+        date: "Oct 2026",
+        tags: ["AWS", "Generative AI"],
+        links: [
+          {
+            label: "Show credential",
+            href: "https://www.linkedin.com/learning/certificates/4ca1b7777b424c3d759513f754b34f1897de6d5f41921b8e65b70983d4adc663/",
+            kind: "verify",
+          },
+        ],
+      },
+    ],
   },
   contactForm: {
     title: "Write directly",
@@ -146,7 +298,7 @@ const ru: Sections = {
       {
         id: "code",
         title: "Посмотреть код",
-        body: "Шесть репозиториев: архитектура, кейсы и исходники за каждым утверждением.",
+        body: "Семь инженерных кейсов: шесть открытых репозиториев, зарегистрированная в Роспатенте БД и архитектура за каждым решением.",
         action: "Проекты и GitHub",
       },
     ],
@@ -181,12 +333,163 @@ const ru: Sections = {
     note: "Образование — база под ML/AI-специализацию, а не главный акцент.",
   },
   reviews: {
-    index: "05",
+    index: "06",
     label: "Отзывы",
     title: "Что говорят.",
     prev: "Предыдущий отзыв",
     next: "Следующий отзыв",
     empty: "Отзывы собираются.",
+  },
+  certificates: {
+    index: "05",
+    label: "Сертификаты",
+    title: "Сертификаты и зарегистрированная ИС.",
+    lead:
+      "Вендорские сертификаты, программы LinkedIn Learning и база данных с государственной регистрацией: инженерная работа документирована, и каждая позиция ведёт на страницу верификации или в открытый реестр Роспатента.",
+    countLabel: "документов",
+    filterLabel: "Фильтр по категории",
+    filters: { all: "Все", ip: "Роспатент / IP", ai: "AI и данные", cloud: "Cloud и DevOps" },
+    labels: {
+      issued: "Выдал",
+      awarded: "Выдан",
+      empty: "В этой категории пока пусто.",
+    },
+    items: [
+      {
+        id: "rospatent-radar-ppi-mtd",
+        category: "ip",
+        featured: true,
+        badge: "RU2026624059 · IP",
+        title: "Свидетельство о государственной регистрации базы данных № 2026624059",
+        subtitle:
+          "Синтетический датасет изображений индикатора кругового обзора РЛС с разметкой движущихся целей (RadarPPI-MTD) · Заявка № 2026623714 · Бюл. № 9 · 11,8 ГБ",
+        issuer: "Роспатент (ФИПС)",
+        date: "авг. 2026",
+        tags: ["Python", "YOLO11s", "Синтетические данные", "Компьютерное зрение"],
+        meta: [
+          { label: "Свидетельство", value: "№ 2026624059 (RU2026624059)" },
+          { label: "Заявка", value: "№ 2026623714 · 04.08.2026" },
+          { label: "Регистрация", value: "25.08.2026 · Бюл. № 9" },
+          { label: "Правообладатель", value: "НГИЭУ" },
+          { label: "СУБД / генератор", value: "Radar PPI Generator v1.0.0" },
+          { label: "Объём БД", value: "11,8 ГБ" },
+        ],
+      links: [
+        {
+          label: "Реестр Роспатента",
+          href: "https://new.fips.ru/registers-doc-view/fips_servlet?DB=DB&DocNumber=2026624059&TypeFile=html",
+          kind: "registry",
+        },
+        { label: "Кейс на сайте", href: "/projects/radar-ppi-mtd/", kind: "case" },
+        ...(CERTIFICATE_FILES.certificate
+          ? [{ label: "PDF свидетельства", href: CERTIFICATE_FILES.certificate, kind: "pdf" as const }]
+          : []),
+        ...(CERTIFICATE_FILES.abstract
+          ? [{ label: "PDF реферата", href: CERTIFICATE_FILES.abstract, kind: "pdf" as const }]
+          : []),
+      ],
+      },
+      {
+        id: "snowflake-genai-pro",
+        category: "ai",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Generative AI Professional Certificate by Snowflake",
+        issuer: "Snowflake",
+        date: "нояб. 2026",
+        tags: ["Генеративный AI", "Snowflake", "Данные и AI"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/7dbcfe3d6e75e230a455c69fc572a2bf422822b777cc40686c8ec1b220177967/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "docker-foundations-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Docker Foundations Professional Certificate",
+        issuer: "Docker, Inc.",
+        date: "окт. 2026",
+        tags: ["Docker", "Контейнеризация"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/3da5e65791016cdc89e7f42a986a37c699f119cf7b6f90ac683362857740c3f7/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "azure-essentials-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Microsoft Azure Essentials Professional Certificate",
+        issuer: "Microsoft",
+        date: "окт. 2026",
+        tags: ["Microsoft Azure", "Облачные вычисления"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/1e5b63d85c89c9efa42594708e819226f4036646c14fd345356a085d3f5b58e6/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "github-essentials-pro",
+        category: "cloud",
+        highlight: true,
+        badge: "PRO CERT",
+        title: "Career Essentials in GitHub Professional Certificate",
+        issuer: "GitHub",
+        date: "окт. 2026",
+        tags: ["GitHub", "GitHub Actions", "CI/CD"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/5ee9bbacfc5a96408649fbb18ec701032c546fcc574f4395c077ae8cef0aed48/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "snowflake-ai-agents",
+        category: "ai",
+        badge: "COURSE",
+        title: "Building AI Agents with Snowflake",
+        issuer: "LinkedIn Learning · Snowflake",
+        date: "нояб. 2026",
+        tags: ["AI-агенты", "Snowflake"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/7432d7674af7d7e569f163ae9668c3a290d63075ec99cac1e8f563783c4bb768/",
+            kind: "verify",
+          },
+        ],
+      },
+      {
+        id: "aws-ai-practitioner-prep",
+        category: "ai",
+        badge: "CERT PREP",
+        title: "AWS Certified AI Practitioner (AIF-C01) Cert Prep",
+        issuer: "LinkedIn Learning",
+        date: "окт. 2026",
+        tags: ["AWS", "Генеративный AI"],
+        links: [
+          {
+            label: "Показать аккредитацию",
+            href: "https://www.linkedin.com/learning/certificates/4ca1b7777b424c3d759513f754b34f1897de6d5f41921b8e65b70983d4adc663/",
+            kind: "verify",
+          },
+        ],
+      },
+    ],
   },
   contactForm: {
     title: "Написать напрямую",

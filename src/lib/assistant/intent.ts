@@ -64,6 +64,20 @@ const EDUCATION = [
 
 const PROJECTS_LIST = ["проект*", "project*", "портфоли*", "portfolio", "кейс*", "case"];
 
+const CERTIFICATES = [
+  "сертификат*",
+  "аккредитац*",
+  "роспатент*",
+  "патент*",
+  "свидетельств*",
+  "certificat*",
+  "credential*",
+  "accreditation*",
+  "rospatent",
+  "patent*",
+  "snowflake",
+];
+
 const STACK = [
   "стек*",
   "stack",
@@ -163,6 +177,18 @@ export const PROJECT_ALIASES: Record<string, string[]> = {
     "питон ментор",
     "ментор по python",
   ],
+  "radar-ppi-mtd": [
+    "radar-ppi-mtd",
+    "radarppi-mtd",
+    "radarppi",
+    "radar ppi",
+    "рлс",
+    "ико рлс",
+    "генератор рлс",
+    "детектор целей",
+    "yolo11s",
+    "yolo11",
+  ],
   ngie: ["ngieuapp", "ngie", "ngieu", "нгиэуapp", "приложение нгиэу", "университетское приложение", "uni app"],
   "transaction-monitor": [
     "transactionmonitor",
@@ -221,6 +247,8 @@ export const TECHS: ReadonlyArray<{ id: string; label: string; aliases: string[]
   { id: "llm", label: "LLM", aliases: ["llm", "llm api", "языковая модель", "языковые модели"] },
   { id: "rag", label: "RAG", aliases: ["rag", "rag pipeline", "retrieval"] },
   { id: "pytorch", label: "PyTorch", aliases: ["pytorch", "пайторч", "torch"] },
+  { id: "yolo11s", label: "YOLO11s", aliases: ["yolo11s", "yolo11", "yolo"] },
+  { id: "opencv", label: "OpenCV", aliases: ["opencv", "cv2"] },
   { id: "numpy", label: "NumPy", aliases: ["numpy", "намп", "нумпай"] },
   { id: "pandas", label: "Pandas", aliases: ["pandas", "пандас"] },
   { id: "flutter", label: "Flutter", aliases: ["flutter", "флаттер"] },
@@ -319,6 +347,8 @@ export function detectIntent(question: string): DetectedIntent {
 
   const projectId = longestProjectAlias(body);
   if (projectId) return { intent: "project", projectId, polite };
+
+  if (matches(body, CERTIFICATES)) return { intent: "certificates", polite };
 
   const tech = findTech(body);
   if (tech) return { intent: "tech", tech: tech.id, polite };

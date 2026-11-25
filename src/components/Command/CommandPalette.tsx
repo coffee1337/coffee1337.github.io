@@ -14,7 +14,12 @@ type Props = {
   onClose: () => void;
 };
 
-const SECTION_IDS = ["about", "stack", "projects", "resume", "contact"] as const;
+const SECTION_IDS = ["about", "stack", "projects", "certificates", "resume", "contact"] as const;
+
+/** Поисковые синонимы пунктов навигации: палитра ищет по названию и по смыслу. */
+const SECTION_ALIASES: Partial<Record<(typeof SECTION_IDS)[number], string>> = {
+  certificates: "certificates credentials certs rospatent patent сертификаты свидетельство патент",
+};
 
 export function CommandPalette({ open, onClose }: Props) {
   const { dict, lang, switchLang, toggleTheme, setSection, pathBase, route } = useSite();
@@ -92,7 +97,7 @@ export function CommandPalette({ open, onClose }: Props) {
 
               <Group heading={p.nav}>
                 {SECTION_IDS.map((id) => (
-                  <Item key={id} id={`nav-${id}`} group="nav" value={`${id} ${dict.nav[id]} nav`} onSelect={() => jump(id)}>
+                  <Item key={id} id={`nav-${id}`} group="nav" value={`${id} ${dict.nav[id]} nav ${SECTION_ALIASES[id] ?? ""}`} onSelect={() => jump(id)}>
                     {dict.nav[id]}
                   </Item>
                 ))}

@@ -8,6 +8,7 @@ import { Entry } from "./components/Entry/Entry";
 import { About } from "./components/About/About";
 import { Stack } from "./components/Stack/Stack";
 import { Projects } from "./components/Projects/Projects";
+import { Certificates } from "./components/Certificates/Certificates";
 import { Reviews } from "./components/Reviews/Reviews";
 import { Contact } from "./components/Contact/Contact";
 import { Resume } from "./components/Resume/Resume";
@@ -56,6 +57,7 @@ function Shell() {
         <About />
         <Stack />
         <Projects />
+        <Certificates />
         <Reviews />
         <Resume />
         <Contact />

@@ -9,6 +9,7 @@ const SITE = "https://coffee1337.github.io";
 
 const fallbackProjects = [
   { id: "ai-python-mentor", name: "ai-python-mentor", github: "https://github.com/coffee1337/ai-python-mentor" },
+  { id: "radar-ppi-mtd", name: "RadarPPI-MTD", patent: "RU2026624059" },
   { id: "ngie", name: "ngieuapp", github: "https://github.com/coffee1337/ngieuapp" },
   { id: "transaction-monitor", name: "TransactionMonitor", github: "https://github.com/coffee1337/TransactionMonitor" },
   { id: "neural-astar", name: "neural-astar-heuristic", github: "https://github.com/coffee1337/neural-astar-heuristic" },
@@ -21,17 +22,33 @@ const items = dictionaries?.en?.projects?.items?.length
   ? dictionaries.en.projects.items
   : fallbackProjects;
 
-const broken = items.filter((project) => !project?.id || !project?.name || !project?.github);
+// `github` не обязателен: у закрытых R&D-кейсов есть охранный документ вместо репозитория.
+const broken = items.filter((project) => !project?.id || !project?.name);
 if (broken.length) {
   throw new Error(`llms: у проектов нет id/name/github — ${JSON.stringify(broken.map((p) => p?.id ?? p))}`);
 }
 
 const caseLines = items
-  .map(
-    (project) =>
-      `- [${project.name} — case study](${SITE}/projects/${project.id}/) · [RU](${SITE}/ru/projects/${project.id}/) · [GitHub](${project.github})`,
-  )
+  .map((project) => {
+    const patentNo =
+      project.patent && typeof project.patent === "object" ? project.patent.certificateNo : "2026624059";
+    const source = project.github
+      ? `[GitHub](${project.github})`
+      : `Rospatent DB #${patentNo} (closed R&D source)`;
+    return `- [${project.name} — case study](${SITE}/projects/${project.id}/) · [RU](${SITE}/ru/projects/${project.id}/) · ${source}`;
+  })
   .join("\n");
+
+const certificateItems = dictionaries?.en?.sections?.certificates?.items ?? [];
+const certificateLines = certificateItems.length
+  ? certificateItems
+      .map((item) => {
+        const primary = (item.links ?? []).find((link) => link.kind === "registry" || link.kind === "verify");
+        const suffix = primary ? ` — ${primary.label}: ${primary.href}` : "";
+        return `- ${item.title} — ${item.issuer}, ${item.date}${suffix}`;
+      })
+      .join("\n")
+  : "- Rospatent database registration RU2026624059 (RadarPPI-MTD)";
 
 const head = `# Egor Trefilov (coffee1337)
 
@@ -45,11 +62,15 @@ All facts below come from the site content and the listed public repositories. N
 - [Technology stack](${SITE}/#stack)
 - [Projects](${SITE}/#projects)
 - [Projects catalog](${SITE}/projects/) · [Каталог](${SITE}/ru/projects/)
+- [Certifications](${SITE}/#certificates)
 - [Contact](${SITE}/#contact)
 - [Resume PDF](${SITE}/resume/Egor_Trefilov_Resume.pdf)
 
 ## Projects (case pages)
 ${caseLines}
+
+## Certifications & Intellectual Property
+${certificateLines}
 
 ## FAQ for AI agents
 - Who is Egor Trefilov? Python backend developer and AI automation engineer, known online as coffee1337; third-year AI Systems student at NGIEU.

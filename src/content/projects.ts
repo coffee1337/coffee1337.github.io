@@ -1,5 +1,20 @@
 import type { ProjectContent } from "./types";
 
+/**
+ * Локальные PDF Роспатента. Кнопки скачивания рендерятся только для реально
+ * существующих файлов: `check-links.mjs` валидирует каждый локальный href,
+ * поэтому путь публикуется лишь после того, как файл положен в `public/certificates/`.
+ *
+ * Чтобы включить кнопки:
+ *   1. public/certificates/ru2026624059-certificate.pdf  ← свидетельство № 2026624059
+ *   2. public/certificates/ru2026624059-abstract.pdf     ← официальный бюллетень / реферат
+ *   3. раскомментировать пути ниже.
+ */
+export const CERTIFICATE_FILES: { certificate?: string; abstract?: string } = {
+  certificate: undefined,
+  abstract: undefined,
+};
+
 export const projectMeta = [
   {
     id: "ai-python-mentor",
@@ -7,6 +22,14 @@ export const projectMeta = [
     image: undefined as string | undefined,
     github: "https://github.com/coffee1337/ai-python-mentor",
     stack: ["Python", "FastAPI", "PostgreSQL", "SQLAlchemy", "Alembic", "Next.js", "Docker", "RAG", "LLM"],
+    status: true,
+  },
+  {
+    id: "radar-ppi-mtd",
+    visual: "radar" as const,
+    image: undefined as string | undefined,
+    github: undefined as string | undefined,
+    stack: ["Python", "PyTorch", "YOLO11s", "NumPy", "Pillow", "OpenCV", "Pandas", "Matplotlib", "ByteTrack"],
     status: true,
   },
   {
@@ -53,7 +76,17 @@ export const projectMeta = [
 
 export type ProjectCopy = Pick<
   ProjectContent,
-  "name" | "statement" | "purpose" | "built" | "highlights" | "status" | "architecture" | "decisions" | "demoUrl" | "docsUrl"
+  | "name"
+  | "statement"
+  | "purpose"
+  | "built"
+  | "highlights"
+  | "status"
+  | "architecture"
+  | "decisions"
+  | "patent"
+  | "demoUrl"
+  | "docsUrl"
 >;
 
 export function mergeProjects(copy: ProjectCopy[]): ProjectContent[] {

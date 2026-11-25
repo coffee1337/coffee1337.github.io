@@ -136,16 +136,29 @@ export function ProjectsCatalog() {
                         >
                           {t.open} →
                         </a>
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
-                          data-track="catalog_github"
-                          className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
-                        >
-                          {t.github} ↗
-                        </a>
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
+                            data-track="catalog_github"
+                            className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                          >
+                            {t.github} ↗
+                          </a>
+                        ) : project.patent ? (
+                          <a
+                            href={project.patent.certificatePdfUrl ?? project.patent.registryUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => trackEvent("project_action", { project: project.id, action: "patent" })}
+                            data-track="catalog_patent"
+                            className="rounded-full border border-[var(--line)] px-4 py-2 font-mono text-[11px] uppercase text-[var(--ink)] hover:border-[var(--accent)]"
+                          >
+                            {project.patent.number} ↗
+                          </a>
+                        ) : null}
                       </div>
                     </li>
                   );

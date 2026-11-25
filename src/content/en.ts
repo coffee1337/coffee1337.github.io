@@ -1,5 +1,5 @@
 import type { Dictionary } from "./types";
-import { mergeProjects } from "./projects";
+import { CERTIFICATE_FILES, mergeProjects } from "./projects";
 
 const en: Dictionary = {
   meta: {
@@ -26,6 +26,7 @@ const en: Dictionary = {
     about: "About",
     capabilities: "Capabilities",
     projects: "Projects",
+    certificates: "Certs",
     experience: "Experience",
     stack: "Stack",
     resume: "Resume",
@@ -161,6 +162,51 @@ const en: Dictionary = {
           "Retrieval through pgvector instead of stuffing the prompt: the tutor pulls only the chunks relevant to the current lesson.",
           "User Python runs in a separate, isolated execution path; the API process never executes submitted code.",
         ],
+      },
+      {
+        name: "RadarPPI-MTD",
+        status: "Rospatent #2026624059",
+        statement:
+          "Physics-based synthetic radar PPI generator with automatic labeling and a YOLO11s moving-target detector.",
+        purpose:
+          "Automate moving-target detection on radar Plan Position Indicator (PPI) scopes amid noise and clutter, solving the shortage of labeled real radar recordings inside a fully offline R&D environment.",
+        built:
+          "Built during an R&D internship at a radio-engineering research institute: the modular Python package 'Radar PPI Generator' v1.0.0 produced a balanced 10,000-scene dataset (619,153 frames at 1120×855 px, ~10.99M boxes, 11.8 GB — registered with Rospatent #2026624059 at NGIEU). Trained a YOLO11s detector on Tesla T4, implemented custom radar Pd/FPPI metrics, and evaluated sim-to-real transfer on live radar frames with ByteTrack.",
+        highlights: [
+          "Rospatent database registration #2026624059 (10,000 scenes, 619,153 frames, 11.8 GB)",
+          "Physical PPI radar model: 5–15 km range gate, 250 m quantum, 1,272 azimuth ticks, Poisson clutter",
+          "Zero-error Ultralytics YOLO auto-labeling (12×12 px boxes) with pixel visibility verification",
+          "Balanced scene complexity across SNR & clutter density: 3,333 easy / 3,333 medium / 3,334 hard",
+          "YOLO11s (1024×1024, Tesla T4): mAP@0.5 = 0.924, Precision = 0.988, Recall = 0.908",
+          "Custom radar metrics (2,000 scenes, conf=0.25): Pd = 0.916, F1 = 0.955, FPPI = 0.05, 0.56 px error (≈27 m)",
+          "Sim-to-real validation on 43 live radar frames + ByteTrack trajectory association",
+        ],
+        architecture: [
+          "A modular Python pipeline (NumPy, Pillow) synthesizes every frame from physical units: config validation → polar-to-pixel geometry → target kinematics (linear, maneuvering, quantum walk) → Poisson clutter and missed-scan simulation (p_d = 0.9) → layered rendering of grid, clutter and targets.",
+          "A post-render visibility check compares target pixel luminance against the local background so invisible marks never leak into YOLO ground-truth labels.",
+          "Training and evaluation (PyTorch, Ultralytics YOLO11s, OpenCV, Pandas, Matplotlib) run completely offline inside an air-gapped R&D environment.",
+        ],
+        decisions: [
+          "Center-distance matching (≤ 12 px) and Pd–FPPI operating curves alongside IoU: for small radar blips, ground localization accuracy (≈27 m) and false alarms per scan matter more than box overlap.",
+          "Two-tier dataset design: a compact 5,997-frame split (4,670 train / 1,327 val) for 2.5-hour iterations on a single Tesla T4, and the balanced 10,000-scene corpus (~10.99M boxes) registered for downstream domain-adaptation research.",
+          "Explicit sim-to-real gap analysis on 43 live radar frames (43/43 true target hits alongside ~31 clutter false positives per scan) paired with multi-frame ByteTrack association to isolate persistent target tracks.",
+        ],
+        patent: {
+          number: "RU2026624059",
+          certificateNo: "2026624059",
+          applicationNo: "2026623714",
+          applicationDate: "04.08.2026",
+          registeredAt: "25.08.2026",
+          bulletin: "9",
+          owner: "NGIEU — Nizhny Novgorod State Engineering and Economic University",
+          authors: "Egor Trefilov, Artiom Cheryomukhin",
+          dbms: "Radar PPI Generator v1.0.0 (Windows, Linux, macOS)",
+          volume: "11.8 GB",
+          registryUrl:
+            "https://new.fips.ru/registers-doc-view/fips_servlet?DB=DB&DocNumber=2026624059&TypeFile=html",
+          certificatePdfUrl: CERTIFICATE_FILES.certificate,
+          abstractPdfUrl: CERTIFICATE_FILES.abstract,
+        },
       },
       {
         name: "NGIE University App",
@@ -307,12 +353,24 @@ const en: Dictionary = {
     release: "Latest release",
     screenshot: "Screenshot",
     diagram: "Diagram",
+    patentTitle: "State registration",
+    patentNumber: "Certificate",
+    patentApplication: "Application",
+    patentRegistered: "Registered",
+    patentBulletin: "Bulletin",
+    patentOwner: "Rights holder",
+    patentDbms: "DBMS / generator",
+    patentVolume: "Database size",
+    patentAuthors: "Database authors",
+    patentRegistry: "Rospatent Registry",
+    patentCertificate: "Certificate PDF",
+    patentAbstract: "Abstract PDF",
   },
   catalog: {
     index: "Projects",
     label: "Catalog",
     title: "All projects.",
-    lead: "Six public repositories with case studies: what the system does, how it is built and where the source lives.",
+    lead: "Seven engineering case studies: six open repositories plus an R&D system with a Rospatent-registered database — what each system does, how it is built and where the source lives.",
     back: "Back to home",
     all: "All",
     open: "Open case study",
@@ -354,7 +412,7 @@ const en: Dictionary = {
     ],
   },
   resume: {
-    index: "05",
+    index: "06",
     label: "Resume",
     title: "On paper, briefly.",
     name: "Egor Trefilov",
@@ -366,18 +424,20 @@ const en: Dictionary = {
     skillsTitle: "Core skills",
     skills: ["Python", "Backend Development", "FastAPI", "PostgreSQL", "Docker", "REST APIs", "SQLAlchemy", "AI / LLM", "RAG"],
     workTitle: "Selected work",
+    certTitle: "Certifications & Registered IP",
+    certMore: "All certifications",
     download: "Download Resume PDF",
     view: "View GitHub Resume",
   },
   education: {
-    index: "07",
+    index: "08",
     label: "Education",
     school: "NGIEU",
     program: "Systems of Artificial Intelligence",
     period: "2024 — Present",
   },
   contact: {
-    index: "06",
+    index: "07",
     label: "Contact",
     title: "Let's build something useful.",
     status: "Available for work / freelance / collaboration",
@@ -483,6 +543,19 @@ const en: Dictionary = {
       events: "events",
       store: "PostgreSQL",
       footnote: "no cookies · no raw IP",
+    },
+    radar: {
+      label: "RadarPPI-MTD: radar PPI scope with a sweep, detected targets, and the PPI generator → YOLO11s → Pd/FPPI pipeline",
+      eyebrow: "ppi synth → yolo11s → pd/fppi",
+      generator: "PPI Gen",
+      generatorSub: "619k frames",
+      detector: "YOLO11s",
+      detectorSub: "1024px · T4",
+      metric: "Pd 0.916",
+      metricSub: "FPPI 0.05",
+      targetA: "0.94",
+      targetB: "0.92",
+      footnote: "RU2026624059 · 10,000 scenes · 11.8 GB",
     },
   },
 };

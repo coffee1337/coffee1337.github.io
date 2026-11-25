@@ -3,7 +3,7 @@ import type { ProjectContent } from "../../content";
 import { useSite } from "../../context/site";
 
 export const GROUPS: { dir: string; ids: string[] }[] = [
-  { dir: "ai", ids: ["ai-python-mentor", "neural-astar"] },
+  { dir: "ai", ids: ["ai-python-mentor", "radar-ppi-mtd", "neural-astar"] },
   { dir: "mobile", ids: ["ngie"] },
   { dir: "desktop", ids: ["transaction-monitor"] },
   { dir: "ml-from-scratch", ids: ["knn"] },
@@ -12,6 +12,7 @@ export const GROUPS: { dir: string; ids: string[] }[] = [
 
 const GLYPH: Record<string, string> = {
   "ai-python-mentor": "py",
+  "radar-ppi-mtd": "py",
   "neural-astar": "py",
   ngie: "dart",
   "transaction-monitor": "cs",

@@ -131,7 +131,7 @@ async function main() {
     kicker: `${SITE} / CATALOG`,
     title: "All projects",
     statement: dictionaries.en.catalog.lead,
-    stack: `${items.length} PUBLIC REPOSITORIES · CASES · SOURCE`,
+    stack: `${items.length} CASE STUDIES · OPEN SOURCE & R&D`,
     index: "PROJECTS",
   });
   writeFileSync(

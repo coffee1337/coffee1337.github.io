@@ -5,11 +5,13 @@ import { useReveal } from "../../hooks/useMotion";
 import { trackEvent } from "../../analytics";
 
 export function Resume() {
-  const { dict } = useSite();
+  const { dict, pathBase } = useSite();
   const ref = useReveal<HTMLElement>();
   const r = dict.resume;
   const exp = dict.experience;
   const edu = dict.education;
+  const certificates = dict.sections.certificates;
+  const keyCertificates = certificates.items.filter((item) => item.featured || item.highlight);
   const year = new Date().getFullYear();
 
   return (
@@ -69,22 +71,72 @@ export function Resume() {
           <div className="border-t border-[var(--line)] px-5 py-6 md:px-8">
             <h3 className="kicker">{r.workTitle}</h3>
             <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {dict.projects.items.map((p, i) => (
-                <li key={p.id}>
-                  <a
-                    href={p.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent("project_action", { project: p.id, action: "github", section: "resume" })}
-                    data-track="resume_project_github"
-                    className="group block"
-                  >
-                    <span className="mono text-[10px] text-[var(--ink-faint)]">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="mt-1 block text-sm group-hover:text-[var(--accent)]">{p.name}</span>
-                  </a>
-                </li>
-              ))}
+              {dict.projects.items.map((p, i) => {
+                const href = p.github ?? `${pathBase}/projects/${p.id}/`;
+                const external = Boolean(p.github);
+                return (
+                  <li key={p.id}>
+                    <a
+                      href={href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noopener noreferrer" : undefined}
+                      onClick={() =>
+                        trackEvent("project_action", {
+                          project: p.id,
+                          action: external ? "github" : "case_study",
+                          section: "resume",
+                        })
+                      }
+                      data-track={external ? "resume_project_github" : "resume_project_case"}
+                      className="group block"
+                    >
+                      <span className="mono text-[10px] text-[var(--ink-faint)]">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="mt-1 block text-sm group-hover:text-[var(--accent)]">{p.name}</span>
+                    </a>
+                  </li>
+                );
+              })}
             </ol>
+          </div>
+
+          <div className="border-t border-[var(--line)] px-5 py-6 md:px-8">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h3 className="kicker">{r.certTitle}</h3>
+              <a
+                href={`${pathBase}/#certificates`}
+                onClick={() => trackEvent("certificate_click", { id: "all", issuer: "section", section: "resume" })}
+                data-track="resume_certificates_all"
+                className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--ink-dim)] hover:text-[var(--accent)]"
+              >
+                {r.certMore} →
+              </a>
+            </div>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              {keyCertificates.map((item) => {
+                const target = item.links.find((link) => link.kind === "registry" || link.kind === "verify");
+                const href = target
+                  ? target.kind === "case"
+                    ? `${pathBase}${target.href}`
+                    : target.href
+                  : `${pathBase}/#certificates`;
+                const external = href.startsWith("http");
+                return (
+                  <li key={item.id}>
+                    <a
+                      href={href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noopener noreferrer" : undefined}
+                      onClick={() => trackEvent("certificate_click", { id: item.id, issuer: item.issuer, section: "resume" })}
+                      data-track="resume_certificate"
+                      className="group flex items-baseline justify-between gap-3 border-t border-[var(--line)] pt-2"
+                    >
+                      <span className="text-sm leading-snug group-hover:text-[var(--accent)]">{item.title}</span>
+                      <span className="mono shrink-0 text-[10px] text-[var(--ink-faint)]">{item.date}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       </div>

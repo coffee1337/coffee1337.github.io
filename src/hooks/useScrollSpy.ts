@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSite } from "../context/site";
 
-const IDS = ["top", "about", "education", "stack", "capabilities", "projects", "resume", "experience", "contact"];
+const IDS = ["top", "about", "education", "stack", "capabilities", "projects", "certificates", "resume", "experience", "contact"];
 
 /** Общая блокировка для Header и CommandPalette: якорь из меню не должен сразу перебиваться скроллспаем. */
 let sharedLockUntil = 0;

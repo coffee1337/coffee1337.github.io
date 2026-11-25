@@ -11,7 +11,7 @@ const hasWindow = typeof window !== "undefined";
  * Видимые секции главной в порядке DOM. Вложенные блоки (#education, #capabilities,
  * #experience) не считаются отдельными шагами — они части обёрток.
  */
-export const SECTION_ORDER = ["top", "about", "stack", "projects", "resume", "contact"];
+export const SECTION_ORDER = ["top", "about", "stack", "projects", "certificates", "resume", "contact"];
 
 const SECTION_PARENT: Record<string, string> = {
   education: "about",

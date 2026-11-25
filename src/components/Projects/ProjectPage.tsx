@@ -87,6 +87,38 @@ export function ProjectPage({ id }: { id?: string }) {
               </p>
             )}
 
+            {project.patent && (
+              <div className="mt-8 border border-[var(--line)] border-l-2 border-l-[var(--accent)] bg-[var(--bg-2)]">
+                <div className="flex flex-wrap items-center gap-3 border-b border-[var(--line)] px-5 py-3">
+                  <span className="font-pixel text-[10px] uppercase tracking-[0.08em] text-[var(--accent)]">
+                    {project.patent.number}
+                  </span>
+                  <span className="kicker text-[var(--ink)]">{t.patentTitle}</span>
+                </div>
+                <dl className="grid gap-x-8 gap-y-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    { label: t.patentNumber, value: `№ ${project.patent.certificateNo}` },
+                    { label: t.patentApplication, value: `№ ${project.patent.applicationNo} · ${project.patent.applicationDate}` },
+                    {
+                      label: t.patentRegistered,
+                      value: `${project.patent.registeredAt} · ${t.patentBulletin} ${project.patent.bulletin}`,
+                    },
+                    { label: t.patentOwner, value: project.patent.owner },
+                    { label: t.patentDbms, value: project.patent.dbms },
+                    { label: t.patentVolume, value: project.patent.volume },
+                    { label: t.patentAuthors, value: project.patent.authors },
+                  ].map((row) => (
+                    <div key={row.label}>
+                      <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--ink-faint)]">
+                        {row.label}
+                      </dt>
+                      <dd className="mt-1 text-sm text-[var(--ink)]">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
             <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
                 <div className="space-y-5 text-[var(--ink-dim)]">
@@ -147,16 +179,54 @@ export function ProjectPage({ id }: { id?: string }) {
             )}
 
             <div className="mt-16 flex flex-wrap gap-3">
-              <a
-                className="btn btn-primary"
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
-                data-track="project_github"
-              >
-                {copy.github}
-              </a>
+              {project.github && (
+                <a
+                  className="btn btn-primary"
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "github" })}
+                  data-track="project_github"
+                >
+                  {copy.github}
+                </a>
+              )}
+              {project.patent && (
+                <a
+                  className={project.github ? "btn btn-ghost" : "btn btn-primary"}
+                  href={project.patent.registryUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "patent" })}
+                  data-track="project_patent"
+                >
+                  {t.patentRegistry} ↗
+                </a>
+              )}
+              {project.patent?.certificatePdfUrl && (
+                <a
+                  className="btn btn-ghost"
+                  href={project.patent.certificatePdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "patent_certificate" })}
+                  data-track="project_patent_certificate"
+                >
+                  {t.patentCertificate} ↗
+                </a>
+              )}
+              {project.patent?.abstractPdfUrl && (
+                <a
+                  className="btn btn-ghost"
+                  href={project.patent.abstractPdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("project_action", { project: project.id, action: "patent_abstract" })}
+                  data-track="project_patent_abstract"
+                >
+                  {t.patentAbstract} ↗
+                </a>
+              )}
               {project.demoUrl && (
                 <a
                   className="btn btn-ghost"

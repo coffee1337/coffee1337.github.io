@@ -7,6 +7,7 @@ export type AnswerIntent =
   | "stack"
   | "projects"
   | "project"
+  | "certificates"
   | "tech"
   | "education"
   | "hiring"
@@ -41,6 +42,7 @@ export interface AssistantAnswers {
   thanks: string[];
   stackIntro: string;
   projectsIntro: string;
+  certificatesIntro: string;
   techIntro: string;
   noTechProjects: string;
   projectMissing: string;
@@ -114,13 +116,14 @@ const en: AssistantUi = {
   assistant: "assistant",
   answers: {
     greeting:
-      "**Hey — I'm Egor's assistant.** I know his stack, the six projects, education, hiring terms and contacts. Everything I say comes from this site and his public repositories.",
+      "**Hey — I'm Egor's assistant.** I know his stack, the seven projects, certifications, the Rospatent-registered database, education, hiring terms and contacts. Everything I say comes from this site, its knowledge base and his public repositories.",
     thanks: [
       "Anytime. Ask if you want the details on a project or the stack.",
       "You're welcome — happy to help.",
     ],
     stackIntro: "Four layers Egor actually ships with:",
-    projectsIntro: "Six public projects, each with source on GitHub:",
+    projectsIntro: "Seven projects — six open repositories plus a Rospatent-registered R&D system — each with a case study:",
+    certificatesIntro: "Certifications and registered intellectual property:",
     techIntro: "Projects with **{tech}**:",
     noTechProjects: "No public project on the site uses **{tech}** yet. Ask about the stack to see what he does use.",
     projectMissing: "There is no project with that name on the site.",
@@ -156,6 +159,7 @@ const en: AssistantUi = {
       stack: ["Which projects use FastAPI?", "Tell me about AI Python Mentor", "What is your education?"],
       projects: ["Tell me about AI Python Mentor", "Which projects use Python?", "How do I contact you?"],
       project: ["What is your stack?", "Show me the other projects", "Can I hire you?"],
+      certificates: ["Show me your certifications", "What is the Rospatent database?", "Tell me about RadarPPI-MTD"],
       tech: ["Show me all projects", "Tell me about AI Python Mentor", "What is your stack?"],
       education: ["Can I hire you?", "What is your stack?", "Show me the projects"],
       hiring: ["How do I contact you?", "What is your stack?", "Do you freelance?"],
@@ -202,13 +206,14 @@ const ru: AssistantUi = {
   assistant: "ассистент",
   answers: {
     greeting:
-      "**Привет — я ассистент Егора.** Знаю его стек, шесть проектов, образование, условия найма и контакты. Всё, что я говорю, взято с этого сайта и из его публичных репозиториев.",
+      "**Привет — я ассистент Егора.** Знаю его стек, семь проектов, сертификаты, регистрацию базы данных в Роспатенте, образование, условия найма и контакты. Всё, что я говорю, взято с этого сайта, его базы знаний и публичных репозиториев.",
     thanks: [
       "Пожалуйста. Спросите, если нужно глубже по проекту или стеку.",
       "Не за что — обращайтесь.",
     ],
     stackIntro: "Четыре слоя, с которыми Егор реально работает:",
-    projectsIntro: "Шесть публичных проектов, у каждого открыт исходный код:",
+    projectsIntro: "Семь проектов: шесть открытых репозиториев и R&D-система с государственной регистрацией базы данных в Роспатенте — у каждого есть кейс:",
+    certificatesIntro: "Сертификаты и зарегистрированная интеллектуальная собственность:",
     techIntro: "Проекты с **{tech}**:",
     noTechProjects: "Публичных проектов с **{tech}** на сайте пока нет. Спросите про стек — расскажу, что он использует.",
     projectMissing: "Проекта с таким названием на сайте нет.",
@@ -244,6 +249,7 @@ const ru: AssistantUi = {
       stack: ["Какие проекты на FastAPI?", "Расскажи про AI Python Mentor", "Где учишься?"],
       projects: ["Расскажи про AI Python Mentor", "Какие проекты на Python?", "Как с тобой связаться?"],
       project: ["Какой у тебя стек?", "Покажи остальные проекты", "Можно тебя нанять?"],
+      certificates: ["Покажи сертификаты", "Что за база данных в Роспатенте?", "Расскажи про RadarPPI-MTD"],
       tech: ["Покажи все проекты", "Расскажи про AI Python Mentor", "Какой у тебя стек?"],
       education: ["Можно тебя нанять?", "Какой у тебя стек?", "Покажи проекты"],
       hiring: ["Как с тобой связаться?", "Какой у тебя стек?", "Ты фрилансишь?"],

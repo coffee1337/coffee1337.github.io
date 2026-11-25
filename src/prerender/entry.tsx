@@ -30,8 +30,9 @@ export function buildRoutes(): PrerenderRoute[] {
   ];
   routes.push({ path: "/404.html", lang: "en", kind: "notfound" });
   for (const meta of projectMeta) {
-    const repo = String(meta.github).split("/").pop();
-    const sources = [`src/content/knowledge/generated/${repo}.md`, ...contentSources];
+    // У закрытых кейсов нет README в generated/: только контент словарей.
+    const repo = meta.github ? meta.github.split("/").pop() : undefined;
+    const sources = repo ? [`src/content/knowledge/generated/${repo}.md`, ...contentSources] : contentSources;
     routes.push({ path: `/projects/${meta.id}/`, lang: "en", kind: "project", projectId: meta.id, sources });
     routes.push({ path: `/ru/projects/${meta.id}/`, lang: "ru", kind: "project", projectId: meta.id, sources });
   }
@@ -98,7 +99,7 @@ export function routeJsonLd(route: PrerenderRoute): string {
           name: project.name,
           description: project.statement,
           ...(langs.length ? { programmingLanguage: langs } : {}),
-          codeRepository: project.github,
+          ...(project.github ? { codeRepository: project.github } : {}),
           url,
           inLanguage: isRu ? "ru" : "en",
           author: {
@@ -172,7 +173,7 @@ export function routeJsonLd(route: PrerenderRoute): string {
       "@type": "SoftwareSourceCode",
       name: project.name,
       description: project.statement,
-      codeRepository: project.github,
+      ...(project.github ? { codeRepository: project.github } : {}),
       url: `${SITE}${isRu ? "/ru" : ""}/projects/${project.id}/`,
       author: { "@id": `${home}#person` },
     },

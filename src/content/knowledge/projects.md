@@ -2,6 +2,7 @@
 
 ## RU
 ai-python-mentor — full-stack платформа для обучения Python и бэкенду: Next.js, FastAPI, AI Gateway, LLM, RAG на pgvector, PostgreSQL, Redis, Telegram-бот.
+RadarPPI-MTD — R&D-практика в научно-исследовательском институте радиотехники: модульный Python-генератор «Radar PPI Generator» v1.0.0 синтезирует снимки ИКО РЛС из физических величин (строб 5–15 км, квант 250 м, 1272 такта азимута, помехи Пуассона) с авторазметкой YOLO 12×12 пкс. База данных: 10 000 сцен, 619 153 кадра 1120×855, ~10,99 млн боксов, 11,8 ГБ; государственная регистрация в Роспатенте № 2026624059 при НГИЭУ (заявка 2026623714, 25.08.2026, Бюл. № 9). Детектор YOLO11s (1024×1024, Tesla T4): mAP@0.5 = 0.924, Precision = 0.988, Recall = 0.908; радиолокационные метрики на 2000 сценах (conf=0.25): Pd = 0.916, F1 = 0.955, FPPI = 0.05, ошибка 0,56 пкс (≈27 м); проверка на 43 реальных кадрах РЛС с трекингом ByteTrack. Стек: Python, PyTorch, YOLO11s, NumPy, Pillow, OpenCV, Pandas, Matplotlib, ByteTrack. Исходный код закрыт, охранный документ — свидетельство Роспатента.
 ngieuapp — кроссплатформенное приложение университета: расписание, офлайн-кэш на SQLite, уведомления и виджеты. Flutter, Dart, Riverpod, Drift.
 TransactionMonitor — десктопное приложение для мониторинга транзакций и оценки риска. C#, .NET 8, WinUI 3, SQL Server.
 neural-astar-heuristic — нейросетевая эвристика для A*: сначала решённые состояния, затем обучение функции ценности, затем поиск. Python, PyTorch, NumPy.
@@ -10,6 +11,7 @@ portfolio-analytics — собственная аналитика сайта: к
 
 ## EN
 ai-python-mentor — a full-stack platform for learning Python and backend development: Next.js, FastAPI, AI Gateway, LLM, RAG on pgvector, PostgreSQL, Redis, Telegram bot.
+RadarPPI-MTD — R&D internship at a radio-engineering research institute: the modular Python package 'Radar PPI Generator' v1.0.0 synthesizes radar PPI frames from physical units (5–15 km range gate, 250 m quantum, 1,272 azimuth ticks, Poisson clutter) with zero-error YOLO auto-labeling (12×12 px boxes). Database: 10,000 scenes, 619,153 frames at 1120×855 px, ~10.99M boxes, 11.8 GB; registered with Rospatent #2026624059 at NGIEU (application 2026623714, 25.08.2026, Bulletin No. 9). YOLO11s detector (1024×1024, Tesla T4): mAP@0.5 = 0.924, Precision = 0.988, Recall = 0.908; custom radar metrics on 2,000 scenes (conf=0.25): Pd = 0.916, F1 = 0.955, FPPI = 0.05, 0.56 px error (≈27 m); validated on 43 live radar frames with ByteTrack tracking. Stack: Python, PyTorch, YOLO11s, NumPy, Pillow, OpenCV, Pandas, Matplotlib, ByteTrack. Source is closed; the protective document is the Rospatent certificate.
 ngieuapp — a cross-platform university app: schedule, offline SQLite cache, notifications and widgets. Flutter, Dart, Riverpod, Drift.
 TransactionMonitor — a desktop app for transaction monitoring and risk analysis. C#, .NET 8, WinUI 3, SQL Server.
 neural-astar-heuristic — a neural heuristic for A*: solve states first, learn a value function, then search. Python, PyTorch, NumPy.

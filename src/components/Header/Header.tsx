@@ -7,8 +7,8 @@ import { KbdShortcut } from "../Kbd/KbdShortcut";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useScrollLock } from "../../hooks/useScrollLock";
 
-const NAV_IDS = ["about", "stack", "projects", "resume", "contact"] as const;
-const MOBILE_IDS = ["about", "stack", "capabilities", "projects", "resume", "experience", "contact"] as const;
+const NAV_IDS = ["about", "stack", "projects", "certificates", "resume", "contact"] as const;
+const MOBILE_IDS = ["about", "stack", "capabilities", "projects", "certificates", "resume", "experience", "contact"] as const;
 
 type NavKey = keyof ReturnType<typeof useSite>["dict"]["nav"];
 
@@ -103,7 +103,7 @@ export function Header() {
               key={id}
               href={href(id)}
               onClick={(event) => go(event, id)}
-              className="relative rounded-full px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-dim)] hover:text-[var(--ink)]"
+              className="relative whitespace-nowrap rounded-full px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-dim)] hover:text-[var(--ink)]"
             >
               {current === id && (
                 <motion.span
