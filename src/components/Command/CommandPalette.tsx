@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
-import { links } from "../../content";
+import { links, resumePdfFor } from "../../content";
 import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
@@ -138,7 +138,7 @@ export function CommandPalette({ open, onClose }: Props) {
                   value="resume cv резюме скачать"
                   onSelect={() => {
                     trackEvent("resume", { action: "download_pdf", section: "cmdk" });
-                    external(links.resumePdf);
+                    external(resumePdfFor(lang));
                   }}
                 >
                   {p.downloadResume}

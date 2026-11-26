@@ -249,6 +249,8 @@ export const TECHS: ReadonlyArray<{ id: string; label: string; aliases: string[]
   { id: "pytorch", label: "PyTorch", aliases: ["pytorch", "пайторч", "torch"] },
   { id: "yolo11s", label: "YOLO11s", aliases: ["yolo11s", "yolo11", "yolo"] },
   { id: "opencv", label: "OpenCV", aliases: ["opencv", "cv2"] },
+  { id: "snowflake", label: "Snowflake", aliases: ["snowflake", "сноуфлейк", "snowpark"] },
+  { id: "azure", label: "Azure", aliases: ["azure", "microsoft azure", "ажур"] },
   { id: "numpy", label: "NumPy", aliases: ["numpy", "намп", "нумпай"] },
   { id: "pandas", label: "Pandas", aliases: ["pandas", "пандас"] },
   { id: "flutter", label: "Flutter", aliases: ["flutter", "флаттер"] },

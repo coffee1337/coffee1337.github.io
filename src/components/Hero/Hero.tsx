@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { links } from "../../content";
+import { links, resumePdfFor } from "../../content";
 import { useSite } from "../../context/site";
 import { useMagnetic } from "../../hooks/useMotion";
 import { trackEvent } from "../../analytics";
@@ -54,7 +54,7 @@ function CountUp({ value }: { value: number }) {
 }
 
 export function Hero() {
-  const { dict, loaderDone } = useSite();
+  const { dict, loaderDone, lang } = useSite();
   const exploreRef = useMagnetic<HTMLAnchorElement>();
   const root = useRef<HTMLElement>(null);
   const [clock, setClock] = useState("--:--:--");
@@ -66,7 +66,7 @@ export function Hero() {
   }, []);
 
   const metrics = [
-    { value: github.commitsLastYear, label: dict.hero.metricCommits, href: links.github },
+    { value: github.commitsLastYear, label: dict.hero.metricCommits, href: links.github, suffix: "+" },
     { value: github.publicRepos, label: dict.hero.metricRepos, href: links.github },
     { value: dict.hero.metricYearValue, label: dict.hero.metricYear, href: "#about" },
     { value: dict.hero.metricLangsValue, label: dict.hero.metricLangs, href: "#projects" },
@@ -144,7 +144,7 @@ export function Hero() {
             </a>
             <span aria-hidden>·</span>
             <a
-              href={links.resumePdf}
+              href={resumePdfFor(lang)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackEvent("resume", { action: "download_pdf", section: "hero" })}
@@ -171,6 +171,7 @@ export function Hero() {
                 >
                   <p className="display text-[clamp(1.8rem,4vw,2.6rem)] leading-none">
                     <CountUp value={metric.value} />
+                    {"suffix" in metric ? <span aria-hidden>{metric.suffix}</span> : null}
                   </p>
                   <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-faint)]">
                     {metric.label}

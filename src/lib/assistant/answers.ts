@@ -1,4 +1,4 @@
-import { dictionaries, links } from "../../content/index";
+import { dictionaries, links, resumePdfFor } from "../../content/index";
 import { assistantUi, type AnswerIntent } from "../../content/assistant-ui";
 import type { Lang } from "../../content/types";
 import { detectIntent, TECHS } from "./intent";
@@ -6,6 +6,9 @@ import { detectLang } from "./lang";
 import type { Answer, LocalAnswerOptions, SearchHit } from "./types";
 
 const mdLink = (label: string, href: string): string => `[${label}](${href})`;
+
+/** Résumé link in the language of the conversation. */
+const resumeHref = (lang: Lang): string => resumePdfFor(lang);
 
 function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
@@ -183,11 +186,11 @@ export function answerLocal(question: string, options: LocalAnswerOptions = {}):
         "",
         card.body,
         "",
-        `- ${mdLink(labels.resumePdf, links.resumePdf)} · ${mdLink(labels.resumeRepo, links.resumeRepo)}`,
+        `- ${mdLink(labels.resumePdf, resumeHref(lang))} · ${mdLink(labels.resumeRepo, links.resumeRepo)}`,
         `- ${mdLink(labels.email, links.mailto)} · ${mdLink(labels.telegram, links.telegram)}`,
         `- ${dict.footer.location}`,
       ];
-      return done("hiring", lines.join("\n"), [dict.sections.entry.cards[0].title], [links.resumePdf, links.resumeRepo, links.telegram]);
+      return done("hiring", lines.join("\n"), [dict.sections.entry.cards[0].title], [resumeHref(lang), links.resumeRepo, links.telegram]);
     }
 
     case "freelance": {
@@ -208,9 +211,9 @@ export function answerLocal(question: string, options: LocalAnswerOptions = {}):
         `- **${labels.email}:** ${mdLink(links.email, links.mailto)} — ${labels.reliable}.`,
         `- **${labels.telegram}:** ${mdLink(links.telegramHandle, links.telegram)}`,
         `- **${labels.github}:** ${mdLink("github.com/coffee1337", links.github)} · **${labels.linkedin}:** ${mdLink("linkedin.com/in/coffee1337", links.linkedin)}`,
-        `- ${mdLink(labels.resumePdf, links.resumePdf)}`,
+        `- ${mdLink(labels.resumePdf, resumeHref(lang))}`,
       ];
-      return done("contacts", lines.join("\n"), [dict.nav.contact], [links.telegram, links.github, links.linkedin, links.resumePdf]);
+      return done("contacts", lines.join("\n"), [dict.nav.contact], [links.telegram, links.github, links.linkedin, resumeHref(lang)]);
     }
 
     case "location": {
@@ -224,10 +227,10 @@ export function answerLocal(question: string, options: LocalAnswerOptions = {}):
         `${copy.resumeIntro} ${resume.role}. ${resume.profile}`,
         "",
         `- **${resume.skillsTitle}:** ${resume.skills.join(", ")}`,
-        `- ${mdLink(labels.resumePdf, links.resumePdf)}`,
+        `- ${mdLink(labels.resumePdf, resumeHref(lang))}`,
         `- ${mdLink(labels.resumeRepo, links.resumeRepo)}`,
       ];
-      return done("resume", lines.join("\n"), [resume.title], [links.resumePdf, links.resumeRepo]);
+      return done("resume", lines.join("\n"), [resume.title], [resumeHref(lang), links.resumeRepo]);
     }
 
     case "search": {

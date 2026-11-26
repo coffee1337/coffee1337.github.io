@@ -6,7 +6,7 @@ const ALIAS_GROUPS: string[][] = [
   ["c++", "c++17", "cpp"],
   ["rest api", "rest apis"],
   ["ci", "github actions"],
-  ["postgres", "postgresql"],
+  ["postgres", "postgresql", "neon"],
   ["c#", "csharp", "winui", "winui 3"],
   ["sql server", "mssql"],
   ["a*", "astar", "a-star"],
@@ -15,6 +15,10 @@ const ALIAS_GROUPS: string[][] = [
   ["async", "asyncio"],
   ["js", "javascript"],
   ["ts", "typescript"],
+  ["yolo11s", "yolo", "yolo11", "ultralytics"],
+  ["opencv", "cv2"],
+  ["snowflake", "snowflake ai", "snowpark"],
+  ["azure", "microsoft azure", "azure essentials"],
 ];
 
 const lookup = new Map<string, string>();
@@ -51,6 +55,10 @@ const RELATED: Record<string, string[]> = {
   "next.js": ["typescript"],
   sqlalchemy: ["postgresql", "sqlite"],
   postgresql: ["sqlalchemy"],
+  yolo11s: ["pytorch", "opencv"],
+  opencv: ["pytorch", "yolo11s"],
+  snowflake: ["rag", "llm"],
+  azure: ["docker"],
 };
 
 /** Технологии, которые есть в любом публичном проекте (все они — git-репозитории). */

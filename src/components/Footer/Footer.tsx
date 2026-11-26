@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { links } from "../../content";
+import { links, resumePdfFor } from "../../content";
 import { useSite } from "../../context/site";
 import { useToast } from "../Toast/ToastProvider";
 import { KbdShortcut } from "../Kbd/KbdShortcut";
@@ -11,7 +11,7 @@ import "./footer.css";
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export function Footer() {
-  const { dict } = useSite();
+  const { dict, lang } = useSite();
   const { toast } = useToast();
   const [time, setTime] = useState("--:--:--");
   const markRef = useRef<HTMLDivElement>(null);
@@ -91,7 +91,7 @@ export function Footer() {
               <a className="footer-link" href={links.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "linkedin", section: "footer" })} data-track="social_linkedin"><LinkedIn className="footer-link__icon" /><span>{dict.contact.linkedin}</span><ArrowUpRight className="footer-link__arrow" /></a>
               <a className="footer-link" href={links.telegram} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("social_click", { network: "telegram", section: "footer" })} data-track="social_telegram"><Telegram className="footer-link__icon" /><span>{dict.contact.telegram}</span><ArrowUpRight className="footer-link__arrow" /></a>
               <button type="button" className="footer-link" onClick={() => void copyEmail()} data-track="contact_copy_email"><Mail className="footer-link__icon" /><span>{dict.contact.email}</span><Copy className="footer-link__arrow" /></button>
-              <a className="footer-link" href={links.resumePdf} onClick={() => trackEvent("resume", { action: "download_pdf", section: "footer" })} data-track="resume_pdf_footer"><Resume className="footer-link__icon" /><span>{dict.footer.resume}</span><ArrowUpRight className="footer-link__arrow" /></a>
+              <a className="footer-link" href={resumePdfFor(lang)} onClick={() => trackEvent("resume", { action: "download_pdf", section: "footer" })} data-track="resume_pdf_footer"><Resume className="footer-link__icon" /><span>{dict.footer.resume}</span><ArrowUpRight className="footer-link__arrow" /></a>
               <a className="footer-link" href="/llms.txt"><Llms className="footer-link__icon" /><span>llms.txt</span><ArrowUpRight className="footer-link__arrow" /></a>
             </nav>
             <div className="flex flex-col items-start gap-4 text-sm"><p className="text-[var(--ink-dim)]">{dict.footer.location}</p><time className="font-mono tabular-nums text-2xl" dateTime={new Date().toISOString()} suppressHydrationWarning>{time}</time><a href={links.mailto} className="rounded-full bg-[var(--accent)] px-5 py-2 font-mono text-xs text-[var(--bg)]" onClick={() => trackEvent("social_click", { network: "mailto", section: "footer" })} data-track="social_mailto">{dict.footer.sayHello} ↗</a></div>

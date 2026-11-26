@@ -1,17 +1,18 @@
 import type { ReactNode } from "react";
-import { links } from "../../content";
+import { links, resumePdfFor } from "../../content";
 import { useSite } from "../../context/site";
 import { useReveal } from "../../hooks/useMotion";
 import { trackEvent } from "../../analytics";
 
 export function Resume() {
-  const { dict, pathBase } = useSite();
+  const { dict, pathBase, lang } = useSite();
   const ref = useReveal<HTMLElement>();
   const r = dict.resume;
   const exp = dict.experience;
   const edu = dict.education;
   const certificates = dict.sections.certificates;
-  const keyCertificates = certificates.items.filter((item) => item.featured || item.highlight);
+  /** All credentials in #resume: the registered IP plus every certificate (7 entries). */
+  const allCertificates = certificates.items;
   const year = new Date().getFullYear();
 
   return (
@@ -29,7 +30,7 @@ export function Resume() {
           <div className="flex flex-wrap gap-3">
             <a
               className="btn btn-primary"
-              href={links.resumePdf}
+              href={resumePdfFor(lang)}
               download
               onClick={() => trackEvent("resume", { action: "download_pdf", section: "resume" })}
               data-track="resume_pdf"
@@ -53,9 +54,16 @@ export function Resume() {
           <div className="grid md:grid-cols-2">
             <Cell title={r.profileTitle}><p>{r.profile}</p></Cell>
             <Cell id="experience" title={r.experienceTitle}>
-              <p className="text-[var(--ink)]">{exp.role}</p>
-              <p className="mt-1">{exp.employment}</p>
-              <p className="mono mt-3 text-[11px] text-[var(--accent)]">{exp.period}</p>
+              <ul className="grid gap-4">
+                {(exp.roles ?? [{ title: exp.role, org: exp.employment, period: exp.period }]).map((role) => (
+                  <li key={`${role.title}-${role.period}`}>
+                    <p className="text-[var(--ink)]">{role.title}</p>
+                    <p className="mt-0.5 text-[var(--ink-dim)]">{role.org}</p>
+                    <p className="mono mt-1 text-[11px] text-[var(--accent)]">{role.period}</p>
+                    {role.note && <p className="mt-1 text-[var(--ink-dim)]">{role.note}</p>}
+                  </li>
+                ))}
+              </ul>
             </Cell>
             <Cell title={r.educationTitle}>
               <p className="text-[var(--ink)]">{edu.school}</p>
@@ -112,7 +120,7 @@ export function Resume() {
               </a>
             </div>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {keyCertificates.map((item) => {
+              {allCertificates.map((item) => {
                 const target = item.links.find((link) => link.kind === "registry" || link.kind === "verify");
                 const href = target
                   ? target.kind === "case"

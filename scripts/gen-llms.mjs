@@ -64,7 +64,7 @@ All facts below come from the site content and the listed public repositories. N
 - [Projects catalog](${SITE}/projects/) · [Каталог](${SITE}/ru/projects/)
 - [Certifications](${SITE}/#certificates)
 - [Contact](${SITE}/#contact)
-- [Resume PDF](${SITE}/resume/Egor_Trefilov_Resume.pdf)
+- [Resume PDF (EN)](${SITE}/resume/Egor_Trefilov_Resume_EN.pdf) · [Резюме PDF (RU)](${SITE}/resume/Egor_Trefilov_Resume.pdf)
 
 ## Projects (case pages)
 ${caseLines}

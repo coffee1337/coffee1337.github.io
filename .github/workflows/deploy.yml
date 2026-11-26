@@ -35,7 +35,7 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
+          GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN || github.token }}
           VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
           VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
           VITE_CONTACT_ENDPOINT: ${{ vars.VITE_CONTACT_ENDPOINT }}

@@ -191,7 +191,9 @@ export async function contentDocs() {
         `Email: ${links.email}.`,
         `Telegram: ${links.telegramHandle} (${links.telegram}).`,
         `GitHub: ${links.github}. LinkedIn: ${links.linkedin}.`,
-        `${lang === "ru" ? "Резюме" : "Resume"}: ${links.site}${links.resumePdf} · ${links.resumeRepo}.`,
+        `${lang === "ru" ? "Резюме" : "Resume"}: ${links.site}${lang === "en" ? links.resumePdfEn : links.resumePdfRu}` +
+          ` · ${lang === "ru" ? "English edition" : "Русская версия"}: ${links.site}${lang === "en" ? links.resumePdfRu : links.resumePdfEn}` +
+          ` · ${links.resumeRepo}.`,
       ].join("\n\n"),
       section("contact"),
     );
@@ -224,7 +226,8 @@ export async function contentDocs() {
     push(
       textSource,
       lang === "ru" ? "Резюме" : "Resume",
-      [`${resume.name} — ${resume.role}.`, resume.profile, `${resume.skillsTitle}: ${resume.skills.join(", ")}.`, `${links.site}${links.resumePdf}`].join("\n\n"),
+      [`${resume.name} — ${resume.role}.`, resume.profile, `${resume.skillsTitle}: ${resume.skills.join(", ")}.`, `${lang === "ru" ? "Резюме PDF" : "Resume PDF"}: ${links.site}${lang === "en" ? links.resumePdfEn : links.resumePdfRu}`,
+        `${lang === "ru" ? "English PDF" : "Русская версия"}: ${links.site}${lang === "en" ? links.resumePdfRu : links.resumePdfEn}`].join("\n\n"),
       section("resume"),
     );
 

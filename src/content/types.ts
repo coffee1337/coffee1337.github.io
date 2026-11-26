@@ -318,6 +318,8 @@ export interface Dictionary {
     role: string;
     employment: string;
     period: string;
+    /** Both tracks, newest first: freelance work and the R&D internship. */
+    roles?: { title: string; org: string; period: string; note?: string }[];
     tracks: { period: string; title: string; body: string }[];
   };
   capabilities: {

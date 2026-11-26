@@ -115,6 +115,20 @@ const en: Dictionary = {
     role: "Python Backend & AI Automation Developer",
     employment: "Independent / Freelance",
     period: "August 2025 — Present",
+    roles: [
+      {
+        title: "Python Backend & AI Automation Developer",
+        org: "Independent / Freelance",
+        period: "Aug 2025 — Present",
+        note: "FastAPI and PostgreSQL backends, LLM/RAG pipelines, Telegram bots, parsers and Docker delivery.",
+      },
+      {
+        title: "ML / Computer Vision R&D Intern",
+        org: "Radio-Engineering Research Institute",
+        period: "2026",
+        note: "RadarPPI-MTD dataset registered with Rospatent #2026624059 at NGIEU; YOLO11s training and Pd/FPPI evaluation.",
+      },
+    ],
     tracks: [
       { period: "2025 — now", title: "Backend services", body: "REST APIs, PostgreSQL, SQLAlchemy, Alembic, authentication and background jobs." },
       { period: "2025 — now", title: "AI integrations", body: "LLM APIs, RAG pipelines and usage-aware AI features inside real products." },
@@ -399,11 +413,11 @@ const en: Dictionary = {
       },
       {
         name: "AI / Data",
-        items: ["LLM APIs", "RAG", "PyTorch", "Pandas", "Data Processing", "Automation"],
+        items: ["LLM APIs", "RAG", "PyTorch", "YOLO11s", "OpenCV", "Pandas", "Snowflake", "Data Processing", "Automation"],
       },
       {
         name: "Infrastructure",
-        items: ["Docker", "Git", "GitHub Actions", "Linux", "CI"],
+        items: ["Docker", "Git", "GitHub Actions", "Azure", "Linux", "CI"],
       },
       {
         name: "Additional",

@@ -7,6 +7,8 @@ Source: https://github.com/coffee1337/k-nearest-neighbors
 
 ### C++17 implementation of the k-NN classification algorithm with a WinAPI desktop interface
 
+> **Interactive case study →**
+
 📖 About
 
 Desktop application implementing the **k-Nearest Neighbors (k-NN)** classification algorithm from scratch in C++.

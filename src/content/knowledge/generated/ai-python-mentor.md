@@ -1,7 +1,9 @@
-<!-- lang: ru -->
+<!-- lang: en -->
 # AI Python Mentor — README
 
 Source: https://github.com/coffee1337/ai-python-mentor
+
+**English** · Русский · Case Study
 
 🧠 AI Python Mentor
 
@@ -11,86 +13,85 @@ Source: https://github.com/coffee1337/ai-python-mentor
 
 📸 Screenshots
 
-Реальные снимки из браузерного прогона (`npx playwright test`, Chromium 153, 1440×900),
-не макеты.
+Real captures from a browser run (`npx playwright test`, Chromium 153, 1440×900) — not mockups.
 
 ✨ Overview
 
-AI Python Mentor — full-stack приложение для изучения Python с нуля до backend-разработки.
+AI Python Mentor is a full-stack application for learning Python from scratch up to backend development.
 
-Платформа объединяет:
+The platform combines:
 
-- структурированную программу обучения;
-- практические Python-задания;
-- AI-наставника;
-- персональный roadmap;
-- систему прогресса и повторений;
-- анализ вакансий и skill gaps;
-- проектную практику;
-- уведомления в email и Telegram (адаптеры и очередь готовы; включаются провайдером,
-  см. `docs/decisions.md`).
+- a structured curriculum;
+- hands-on Python exercises;
+- an AI mentor;
+- a personalised roadmap;
+- a progress and spaced-repetition system;
+- job-posting analysis and skill gaps;
+- project practice;
+- email and Telegram notifications (adapters and queue are ready; enabled by a provider,
+  see `docs/decisions.md`).
 
-Проект построен как production-oriented система с отдельными backend/frontend слоями, PostgreSQL, миграциями, фоновой обработкой задач, CI и изолированной архитектурой исполнения пользовательского Python-кода.
+The project is built as a production-oriented system with separate backend and frontend layers, PostgreSQL, migrations, background processing, CI and an isolated execution architecture for user Python code.
 
 🚧 Project Status
 
-**Работающий продукт, идёт подготовка релиза v1.0.0.**
+**A working product; release v1.0.0 is in preparation.**
 
-Что проверено командами, а не заявлено:
+What has been verified by commands rather than claimed:
 
-Ограничения, которые нельзя обойти на сборочной машине: здесь нет Docker и root, поэтому
-`compose.prod.yml` проверен структурно, а контейнерный бэкенд runner (runsc + cgroups v2) —
-только unit-тестами. Живой прогон — на целевом хосте по `docs/RUNBOOK.md`.
-Матрица трассировки спеки: `docs/SPEC-MATRIX.md`, аудит дефектов: `docs/AUDIT.md`,
-статус: `docs/STATUS.md`, безопасность: `docs/SECURITY-ASVS.md`.
+Limitations that cannot be avoided on the build machine: there is no Docker and no root here, so
+`compose.prod.yml` is verified structurally, and the containerised runner backend (runsc + cgroups v2)
+is covered by unit tests only. The live run happens on the target host per `docs/RUNBOOK.md`.
+Spec traceability matrix: `docs/SPEC-MATRIX.md`, defect audit: `docs/AUDIT.md`,
+status: `docs/STATUS.md`, security: `docs/SECURITY-ASVS.md`.
 
 🚀 Key Features
 
 ### 🎓 Learning Platform
 
-- 90 учебных навыков и уроков;
-- обучение от Python basics до backend;
-- knowledge checks и quiz;
-- практические задания;
-- система подсказок;
+- 90 learning skills and lessons;
+- a path from Python basics to backend;
+- knowledge checks and quizzes;
+- hands-on assignments;
+- a hint system;
 - spaced repetition;
-- персонализированный learning roadmap;
-- отслеживание прогресса и mastery.
+- a personalised learning roadmap;
+- progress and mastery tracking.
 
 ### 🤖 AI Tutor
 
-- AI-чат с учебным контекстом;
-- локальный RAG по актуальной версии урока;
-- разбор ошибок и пользовательского кода;
-- AI-feedback для письменных заданий;
-- ограничение AI usage;
-- учёт использования и стоимости AI-вызовов.
+- an AI chat with learning context;
+- local RAG over the current version of a lesson;
+- error and user-code analysis;
+- AI feedback for written assignments;
+- AI usage limits;
+- tracking of AI call usage and cost.
 
 ### 💻 Python Practice
 
-Каждое практическое задание использует контракт:
+Every exercise follows the contract:
 
-Система поддерживает:
+The system supports:
 
-- публичные примеры;
-- скрытые тесты;
-- сохранение решений;
-- историю попыток;
-- асинхронную постановку выполнения в очередь.
+- public examples;
+- hidden tests;
+- solution persistence;
+- attempt history;
+- asynchronous enqueueing of executions.
 
-Исполнение пользовательского кода вынесено за пределы основного API и проектируется как отдельный защищённый Runner.
+Execution of user code is moved outside the main API and is designed as a separate hardened Runner.
 
 🏗 Architecture
 
-Основное приложение организовано как модульный монолит.
+The main application is organised as a modular monolith.
 
-Отдельными процессами могут работать:
+These can run as separate processes:
 
 - notification dispatcher;
 - execution dispatcher;
 - Python Runner;
-- обработчики email / Telegram / billing (провайдер подключается переменными окружения;
-  без провайдера письма не уходят, кнопка оплаты скрыта, Telegram не привязан).
+- email / Telegram / billing handlers (a provider is wired through environment variables;
+  without a provider no email is sent, the payment button stays hidden, and Telegram is not linked).
 
 🛠 Tech Stack
 
@@ -136,7 +137,7 @@ AI Python Mentor — full-stack приложение для изучения Pyt
 
 🔐 Authentication & Security
 
-В приложении реализованы:
+The application implements:
 
 - cookie-based sessions;
 - Argon2 password hashing;
@@ -146,62 +147,62 @@ AI Python Mentor — full-stack приложение для изучения Pyt
 - session revocation;
 - account export;
 - account deletion;
-- audit logging для административных операций.
+- audit logging for administrative operations.
 
-Production-конфигурация требует HTTPS и secure cookies.
+The production configuration requires HTTPS and secure cookies.
 
-Секреты не должны храниться в Git-репозитории.
+Secrets must never be stored in the Git repository.
 
 🧠 RAG
 
-AI-наставник использует Retrieval-Augmented Generation для получения контекста из учебных материалов.
+The AI tutor uses Retrieval-Augmented Generation to pull context from the learning materials.
 
-Knowledge base строится на основе immutable snapshots опубликованных уроков.
+The knowledge base is built from immutable snapshots of published lessons.
 
-Это позволяет AI работать с конкретной версией учебного материала, которую изучает пользователь.
+This lets the AI work against the exact version of the material the user is studying.
 
 📊 Learning Model
 
-Платформа разделяет несколько показателей прогресса:
+The platform separates several progress signals:
 
-Результат обучения не определяется только количеством правильных ответов.
+Learning outcomes are not defined by the number of correct answers alone.
 
-Система учитывает:
+The system accounts for:
 
-- знания;
-- практическое применение;
-- самостоятельность;
-- сохранение знаний со временем.
+- knowledge;
+- practical application;
+- independence;
+- retention over time.
 
 💼 Career Features
 
-Платформа может анализировать текст вакансии и выделять:
+The platform can analyse a job posting and extract:
 
-- требования;
-- необходимые технологии;
-- подтверждающие фрагменты вакансии;
-- skill gaps пользователя.
+- requirements;
+- required technologies;
+- supporting excerpts from the posting;
+- the user's skill gaps.
 
-На основе выбранной вакансии learning roadmap может перестраиваться под конкретную карьерную цель.
+Based on the selected posting, the learning roadmap can be rebuilt around a specific career goal.
 
 📦 Project Practice
 
-В платформу входят шаблоны проектов для портфолио.
+The platform includes portfolio project templates.
 
-Для каждого проекта поддерживаются:
+Each project supports:
 
 - milestones;
-- история артефактов;
-- проверка комплектности;
-- публикация проекта в портфолио.
+- artifact history;
+- completeness checks;
+- publishing the project to the portfolio.
 
 ⚡ Quick Start
 
 ### Requirements
 
-Для локальной разработки:
+For local development:
 
-PostgreSQL рекомендуется, но для локального запуска можно использовать SQLite.
+PostgreSQL is recommended, but SQLite can be used for a local run.
 
 🪟 Windows
 
@@ -215,9 +216,9 @@ Health check:
 
 ### Frontend
 
-В новом терминале:
+In a new terminal:
 
-Откройте:
+Open:
 
 🐧 Linux / macOS
 
@@ -225,30 +226,30 @@ Health check:
 
 ### Frontend
 
-🐳 Docker (разработка)
+🐳 Docker (development)
 
-Runner и фоновые обработчики включаются профилями: `--profile execution` (исполнение кода)
-и `--profile notifications` (письма и Telegram).
+The Runner and background handlers are enabled by profiles: `--profile execution` (code execution)
+and `--profile notifications` (email and Telegram).
 
-🚢 Production: одна команда
+🚢 Production: one command
 
-Что произойдёт: `db` → `migrate` (alembic upgrade head) → `seed-check` (90 навыков и 90 заданий,
-иначе деплой падает) → `api` → `execution-worker`, `notification-worker`, `runner`,
-`runner-reaper`, `web`, `caddy` с автоматическим TLS. Наружу открыты только 80/443;
-`/metrics` и `/internal/*` снаружи отдают 404.
+What happens: `db` → `migrate` (alembic upgrade head) → `seed-check` (90 skills and 90 exercises,
+otherwise the deploy fails) → `api` → `execution-worker`, `notification-worker`, `runner`,
+`runner-reaper`, `web`, `caddy` with automatic TLS. Only ports 80/443 are exposed;
+`/metrics` and `/internal/*` return 404 from the outside.
 
-Проверка и дальнейшие шаги: `curl -fsS https://$DOMAIN/ready`, полный runbook —
-`docs/RUNBOOK.md` (деплой, обновление, откат, бэкап, restore drill, реакция на алерты).
+Verification and next steps: `curl -fsS https://$DOMAIN/ready`; the full runbook is
+`docs/RUNBOOK.md` (deploy, upgrade, rollback, backup, restore drill, alert response).
 
 ⚙️ Configuration
 
-Пример конфигурации находится в:
+An example configuration lives in:
 
-Основные группы настроек:
+Main groups of settings:
 
-Пример AI-конфигурации:
+Example AI configuration:
 
-При отсутствии AI Gateway основная учебная система продолжает работать, а AI-функции становятся недоступными.
+Without an AI Gateway the core learning system keeps working, and AI features become unavailable.
 
 🧪 Testing
 
@@ -256,6 +257,6 @@ Backend:
 
 PostgreSQL-specific tests:
 
-Проверка миграций:
+Migration check:
 
 Frontend:

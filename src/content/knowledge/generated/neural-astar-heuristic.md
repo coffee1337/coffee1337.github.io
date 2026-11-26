@@ -3,6 +3,8 @@
 
 Source: https://github.com/coffee1337/neural-astar-heuristic
 
+> **Interactive case study →**
+
 Neural A* Heuristic
 
 Learned neural heuristic for A* search across multiple puzzle environments.

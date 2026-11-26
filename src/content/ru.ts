@@ -113,8 +113,22 @@ const ru: Dictionary = {
   },
   experience: {
     role: "Python Backend & AI Automation Developer",
-    employment: "Independent / Freelance",
+    employment: "Проектная разработка / Фриланс",
     period: "Август 2025 — настоящее время",
+    roles: [
+      {
+        title: "Python Backend & AI Automation Developer",
+        org: "Проектная разработка / Фриланс",
+        period: "Август 2025 — настоящее время",
+        note: "Backend-сервисы на FastAPI и PostgreSQL, LLM/RAG-пайплайны, Telegram-боты, парсеры и деплой в Docker.",
+      },
+      {
+        title: "R&D-практика (ML / Computer Vision)",
+        org: "НИИ радиотехники",
+        period: "2026",
+        note: "База данных RadarPPI-MTD зарегистрирована в Роспатенте № 2026624059 при НГИЭУ; обучение YOLO11s и оценка Pd/FPPI.",
+      },
+    ],
     tracks: [
       { period: "2025 — сейчас", title: "Backend-сервисы", body: "REST API, PostgreSQL, SQLAlchemy, Alembic, аутентификация и фоновые задачи." },
       { period: "2025 — сейчас", title: "AI-интеграции", body: "LLM API, RAG-пайплайны и учёт использования AI внутри рабочих продуктов." },
@@ -399,11 +413,11 @@ const ru: Dictionary = {
       },
       {
         name: "AI / Data",
-        items: ["LLM API", "RAG", "PyTorch", "Pandas", "Обработка данных", "Автоматизация"],
+        items: ["LLM API", "RAG", "PyTorch", "YOLO11s", "OpenCV", "Pandas", "Snowflake", "Обработка данных", "Автоматизация"],
       },
       {
         name: "Инфраструктура",
-        items: ["Docker", "Git", "GitHub Actions", "Linux", "CI"],
+        items: ["Docker", "Git", "GitHub Actions", "Azure", "Linux", "CI"],
       },
       {
         name: "Дополнительно",
@@ -432,7 +446,7 @@ const ru: Dictionary = {
   education: {
     index: "08",
     label: "Образование",
-    school: "NGIEU",
+    school: "НГИЭУ",
     program: "Системы искусственного интеллекта",
     period: "2024 — настоящее время",
   },

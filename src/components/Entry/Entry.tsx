@@ -1,17 +1,21 @@
-import { links } from "../../content";
+import { resumePdfFor } from "../../content";
 import { useSite } from "../../context/site";
 import { useReveal } from "../../hooks/useMotion";
 import { ScrambleHeading } from "../Scramble/ScrambleHeading";
 import { trackEvent } from "../../analytics";
 
 const TARGETS: Record<string, string> = {
-  hire: links.resumePdf,
   freelance: "#contact",
   code: "#projects",
 };
 
+/** «Hire» always downloads the résumé in the language the visitor is reading. */
+function targetFor(id: string, lang: "en" | "ru"): string {
+  return id === "hire" ? resumePdfFor(lang) : TARGETS[id];
+}
+
 export function Entry() {
-  const { dict } = useSite();
+  const { dict, lang } = useSite();
   const ref = useReveal<HTMLElement>({ stagger: 0.06 });
   const entry = dict.sections.entry;
 
@@ -41,7 +45,7 @@ export function Entry() {
           {entry.cards.map((card) => (
             <a
               key={card.id}
-              href={TARGETS[card.id]}
+              href={targetFor(card.id, lang)}
               target={card.id === "hire" ? "_blank" : undefined}
               rel={card.id === "hire" ? "noopener noreferrer" : undefined}
               onClick={() => onCard(card.id)}

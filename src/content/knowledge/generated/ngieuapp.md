@@ -11,6 +11,8 @@ Source: https://github.com/coffee1337/ngieuapp
 
 University application with schedules, notifications, campus information and native Android/iOS widgets.
 
+> **Interactive case study →**
+
 📖 About
 
 NGIE University App is a cross-platform application designed to provide students with quick access to university information and daily academic tools.
