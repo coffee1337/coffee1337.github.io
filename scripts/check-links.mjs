@@ -97,9 +97,16 @@ for (const file of files) {
   if (!/<link rel="canonical" href="https?:\/\/[^"]+"/.test(head)) seo.push(`${name}: нет canonical`);
   if (!/hreflang="en"/.test(head) || !/hreflang="ru"/.test(head)) seo.push(`${name}: нет hreflang en/ru`);
 
+  /* og:image теперь указывает на контент-адресный двойник: /og/<id>.<sha8>.png */
+  const ogSrc = head.match(/property="og:image" content="https?:\/\/[^"]+"/)?.[0]?.match(/content="([^"]+)"/)?.[1];
+  if (ogSrc && /^https?:\/\/coffee1337\.github\.io\//.test(ogSrc)) {
+    const local = ogSrc.replace(/^https?:\/\/coffee1337\.github\.io\//, "");
+    if (!existsSync(join(DIST, local))) seo.push(`${name}: og:image ${local} отсутствует в dist`);
+  }
+
   const caseId = file.match(/\/projects\/([^/]+)\/index\.html$/)?.[1];
   if (caseId && caseId !== "projects") {
-    const og = head.match(/property="og:image" content="[^"]*\/og\/([^"]+)\.png"/)?.[1];
+    const og = head.match(/property="og:image" content="[^"]*\/og\/([^".]+)(?:\.[a-f0-9]{8})?\.png"/)?.[1];
     if (og !== caseId) seo.push(`${name}: og:image должен быть /og/${caseId}.png, сейчас ${og ?? "общий"}`);
   }
 }

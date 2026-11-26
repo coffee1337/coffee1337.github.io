@@ -39,12 +39,20 @@ export function ProjectPage({ id }: { id?: string }) {
       ['meta[property="og:description"]', "content", description],
       ['meta[name="twitter:title"]', "content", title],
       ['meta[name="twitter:description"]', "content", description],
-      ['meta[property="og:image"]', "content", `${window.location.origin}/og/${project.id}.png`],
-      ['meta[name="twitter:image"]', "content", `${window.location.origin}/og/${project.id}.png`],
     ];
     for (const [selector, attr, value] of patches) {
       const el = document.querySelector(selector);
       if (el) el.setAttribute(attr, value);
+    }
+    // og:image проставлен пререндером на контент-адресный /og/<id>.<hash>.png.
+    // Затирать его нельзя: иначе превью снова начнёт ссылаться на вечно закэшированный путь.
+    const ogCasePath = `${window.location.origin}/og/${project.id}.`;
+    for (const selector of ['meta[property="og:image"]', 'meta[name="twitter:image"]']) {
+      const el = document.querySelector(selector);
+      if (!el) continue;
+      if (!(el.getAttribute("content") ?? "").includes(ogCasePath)) {
+        el.setAttribute("content", `${ogCasePath}png`);
+      }
     }
     window.scrollTo(0, 0);
   }, [project, dict, pathBase, lang]);

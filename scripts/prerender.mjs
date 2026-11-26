@@ -1,6 +1,7 @@
 // Prerenders the built SPA into static HTML files for every route, then emits
 // sitemap.xml and 404.html. Runs after `vite build` and `vite build --ssr`.
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +17,52 @@ const raw = await readFile(join(distDir, "index.html"), "utf8");
 const template = raw.includes('<div id="root"></div>')
   ? raw
   : raw.replace(/<div id="root">[\s\S]*?(?=<script type="module")/, '<div id="root"></div>\n  ');
+
+/**
+ * Telegram, Slack and the rest of the preview crawlers cache by URL and ignore
+ * `Cache-Control` refreshes, so a redesigned card can stay invisible for weeks.
+ * Every build therefore publishes a content-addressed twin next to each card —
+ * `/og.png` → `/og.<hash>.png`, `/og/<id>.png` → `/og/<id>.<hash>.png` — and the
+ * pages point at the hashed path. The plain files stay in place for links that
+ * are already shared in the wild.
+ */
+const OG_HASH_LEN = 8;
+const isHashedOg = (name) => new RegExp(`\\.([a-f0-9]{${OG_HASH_LEN}})\\.png$`).test(name);
+
+async function hashOgImages() {
+  const jobs = [];
+  const rootCard = join(distDir, "og.png");
+  if (existsSync(rootCard)) jobs.push({ file: rootCard, url: "/og.png" });
+
+  const ogDir = join(distDir, "og");
+  if (existsSync(ogDir)) {
+    for (const name of (await readdir(ogDir)).sort()) {
+      if (!name.endsWith(".png") || isHashedOg(name)) continue; // never hash a hash
+      jobs.push({ file: join(ogDir, name), url: `/og/${name}` });
+    }
+  }
+
+  const map = new Map(); // "/og/x.png" -> "/og/x.<hash>.png"
+  for (const { file, url } of jobs) {
+    const bytes = await readFile(file);
+    const hash = createHash("sha256").update(bytes).digest("hex").slice(0, OG_HASH_LEN);
+    const hashedUrl = url.replace(/\.png$/, `.${hash}.png`);
+    await copyFile(file, join(distDir, hashedUrl));
+    map.set(url, hashedUrl);
+  }
+  console.log(`prerender: og-хэши ${map.size} (${[...map.values()].slice(0, 3).join(", ")}${map.size > 3 ? ", …" : ""})`);
+  return map;
+}
+
+/** Rewrites every plain OG path inside a string (HTML/JSON-LD) to its hashed twin. */
+function hashifyOgPaths(text, ogMap) {
+  let out = text;
+  // longest first so "/og/projects.png" is never clipped by a shorter key
+  for (const [plain, hashed] of [...ogMap.entries()].sort((a, b) => b[0].length - a[0].length)) {
+    out = out.split(plain).join(hashed);
+  }
+  return out;
+}
 
 const esc = (value) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -45,7 +92,7 @@ function mirror(path, toLang) {
   return base;
 }
 
-function renderPage(route) {
+function renderPage(route, ogMap) {
   const { title, description } = routeMeta(route);
   const url = SITE + route.path;
   const locale = route.lang === "ru" ? "ru_RU" : "en_US";
@@ -55,7 +102,8 @@ function renderPage(route) {
       : route.kind === "catalog" && existsSync(join(distDir, "og", "projects.png"))
         ? "/og/projects.png"
         : "/og.png";
-  const ogImage = `${SITE}${ogFile}`;
+  const ogHashed = ogMap.get(ogFile) ?? ogFile; // falls back to the plain card if a hash is missing
+  const ogImage = `${SITE}${ogHashed}`;
   const ogAlt = routeOgAlt(route);
   const enPath = mirror(route.path, "en");
   const ruPath = mirror(route.path, "ru");
@@ -101,7 +149,7 @@ function renderPage(route) {
   }
 
   // Структурированные данные страницы (WebSite/ProfilePage/Person или SoftwareSourceCode+BreadcrumbList).
-  const jsonLd = routeJsonLd(route);
+  const jsonLd = hashifyOgPaths(routeJsonLd(route), ogMap);
   html = html.replace(
     /<!-- jsonld:start -->[\s\S]*?<!-- jsonld:end -->/,
     jsonLd
@@ -116,9 +164,10 @@ function renderPage(route) {
 }
 
 const routes = buildRoutes();
+const ogHashes = await hashOgImages();
 for (const route of routes) {
   if (route.kind === "notfound") continue;
-  const html = renderPage(route);
+  const html = renderPage(route, ogHashes);
   const file = route.path === "/" ? join(distDir, "index.html") : join(distDir, route.path, "index.html");
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, html);
@@ -129,7 +178,7 @@ for (const route of routes) {
 // so crawlers see a real 404 document instead of a duplicate homepage.
 const notFoundRoute = routes.find((route) => route.kind === "notfound");
 if (notFoundRoute) {
-  const html = renderPage({ ...notFoundRoute, path: "/404/" }).replace(
+  const html = renderPage({ ...notFoundRoute, path: "/404/" }, ogHashes).replace(
     "</head>",
     '<meta name="robots" content="noindex" />\n  </head>',
   );
