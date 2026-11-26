@@ -41,7 +41,7 @@ export function Certificates() {
       className="section-anchor relative z-[2] py-20 md:py-28"
     >
       <div className="site-wrap">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-6" data-reveal>
           <div>
             <p className="kicker">§{t.index} / {t.label}</p>
             <ScrambleHeading text={t.title} className="display mt-3 text-[clamp(2.2rem,5vw,4.4rem)]" />
@@ -55,7 +55,7 @@ export function Certificates() {
           </p>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label={t.filterLabel}>
+        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label={t.filterLabel} data-reveal>
           {FILTERS.map((id) => {
             const pressed = filter === id;
             return (
@@ -182,7 +182,7 @@ function CertificateCard({
 }) {
   const verify = item.links[0];
   return (
-    <li data-reveal className="flex flex-col bg-[var(--bg)] p-6">
+    <li className="flex flex-col bg-[var(--bg)] p-6">
       <div className="flex items-start justify-between gap-3">
         <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--ink-faint)]">{item.issuer}</span>
         <span className="font-pixel shrink-0 text-[9px] uppercase tracking-[0.08em] text-[var(--accent)]">

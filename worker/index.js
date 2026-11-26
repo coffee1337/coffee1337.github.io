@@ -77,7 +77,7 @@ export default {
       model: env.LLM_MODEL,
       stream: true,
       temperature: 0.3,
-      max_tokens: Number(env.LLM_MAX_TOKENS || 400),
+      max_tokens: Number(env.LLM_MAX_TOKENS || 650),
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         ...history,
